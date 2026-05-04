@@ -141,6 +141,9 @@ table.orders tr:hover td{background:#f7f9ff}
 .filter-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
 .clear-btn{padding:10px 16px;background:var(--navy);color:#fff;border:none;border-radius:9px;font-family:"DM Sans",sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:.2s;white-space:nowrap}
 .clear-btn:hover{background:var(--blue)}
+.remaining-btn{padding:10px 16px;background:linear-gradient(135deg,var(--green),#2e9c6e);color:#fff;border:none;border-radius:9px;font-family:"DM Sans",sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:.2s;white-space:nowrap;box-shadow:0 2px 8px rgba(26,122,74,.25)}
+.remaining-btn:hover{background:linear-gradient(135deg,#156b3e,#27875f);box-shadow:0 4px 12px rgba(26,122,74,.35)}
+.clear-btn:hover{background:var(--blue)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px}
 .card{background:var(--card);border-radius:12px;border:2px solid var(--border);overflow:hidden;transition:.25s;box-shadow:0 2px 6px rgba(0,0,0,.04)}
 .card:hover{box-shadow:0 6px 24px rgba(13,31,60,.1);border-color:#c5cedf;transform:translateY(-1px)}
@@ -306,7 +309,8 @@ table.orders tr:hover td{background:#f7f9ff}
         <thead><tr>
           <th>Product</th><th>Customer</th><th style="text-align:right">Dia</th>
           <th style="text-align:right">Ordered</th><th style="text-align:right">Produced MTD</th>
-          <th style="text-align:right">Remaining</th><th style="text-align:right;min-width:120px">Compliance</th>
+          <th style="text-align:right">Dispatched</th><th style="text-align:right">Remaining</th>
+          <th style="text-align:right;min-width:120px">Compliance</th>
         </tr></thead>
         <tbody id="tube-orders-body"></tbody>
       </table>
@@ -319,7 +323,8 @@ table.orders tr:hover td{background:#f7f9ff}
         <thead><tr>
           <th>Product</th><th>Customer</th><th style="text-align:right">Size</th>
           <th style="text-align:right">Ordered</th><th style="text-align:right">Produced MTD</th>
-          <th style="text-align:right">Remaining</th><th style="text-align:right;min-width:120px">Compliance</th>
+          <th style="text-align:right">Dispatched</th><th style="text-align:right">Remaining</th>
+          <th style="text-align:right;min-width:120px">Compliance</th>
         </tr></thead>
         <tbody id="pet-orders-body"></tbody>
       </table>
@@ -336,22 +341,38 @@ table.orders tr:hover td{background:#f7f9ff}
   <!-- ═══════════════════════════════════════════ -->
   <div class="tab-panel" id="panel-calc">
 
-    <div class="legend">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <strong>⚠ Estimated values</strong> — highlighted in orange. Unconfirmed placeholder rates. Verify with the store team before placing purchase orders.
-    </div>
+
 
     <div class="toolbar">
       <div class="search-wrap">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input class="search-input" type="text" id="searchInput" placeholder="Search product or customer…" oninput="filterProducts()">
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="filter-btn active" onclick="setFilter('all',this)">All (46)</button>
-        <button class="filter-btn" onclick="setFilter('tube',this)">Tubes</button>
-        <button class="filter-btn" onclick="setFilter('pet',this)">PET</button>
-        <button class="filter-btn" onclick="setFilter('active',this)">Has Qty</button>
-        <button class="clear-btn" onclick="clearAll()">Clear All</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);flex-shrink:0">Type:</span>
+        <button class="filter-btn active" id="flt-all"    onclick="setTypeFilter('all',this)">All</button>
+        <button class="filter-btn"        id="flt-tube"   onclick="setTypeFilter('tube',this)">Tubes</button>
+        <button class="filter-btn"        id="flt-pet"    onclick="setTypeFilter('pet',this)">PET</button>
+        <button class="filter-btn"        id="flt-active" onclick="setTypeFilter('active',this)">Has Qty</button>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);flex-shrink:0">Dia:</span>
+        <button class="filter-btn active" id="dia-all"   onclick="setDiaFilter('all',this)">All</button>
+        <button class="filter-btn"        id="dia-12"    onclick="setDiaFilter('12.5',this)">12.5</button>
+        <button class="filter-btn"        id="dia-16"    onclick="setDiaFilter('16',this)">16</button>
+        <button class="filter-btn"        id="dia-19"    onclick="setDiaFilter('19',this)">19</button>
+        <button class="filter-btn"        id="dia-20"    onclick="setDiaFilter('20.5',this)">20.5</button>
+        <button class="filter-btn"        id="dia-25"    onclick="setDiaFilter('25',this)">25</button>
+        <button class="filter-btn"        id="dia-30"    onclick="setDiaFilter('30',this)">30</button>
+        <button class="filter-btn"        id="dia-32"    onclick="setDiaFilter('32',this)">32</button>
+        <button class="filter-btn"        id="dia-35"    onclick="setDiaFilter('35',this)">35</button>
+        <button class="filter-btn"        id="dia-pet"   onclick="setDiaFilter('pet',this)">PET</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="remaining-btn" onclick="loadRemainingOrders()" title="Auto-fill quantities from active order remaining balance">
+          📋 Load Remaining Orders
+        </button>
+        <button class="clear-btn" onclick="clearAll()">✕ Clear All</button>
       </div>
     </div>
 
@@ -375,23 +396,23 @@ table.orders tr:hover td{background:#f7f9ff}
 <script>
 /* ═══════════════════════════════════════════════════════
    LIVE DATA — auto-generated by update_html.py
-   Last generated: 03-May-2026 15:38
+   Last generated: 04-May-2026 14:11
    ════════════════════════════════════════════════════ */
 /*/* DATA_START */
 const DASH_DATA = {
   "month": "May 2026",
-  "lastUpdated": "Updated 03-May-2026 15:38 from AlphaContainers_v10_9.xlsx",
+  "lastUpdated": "Updated 04-May-2026 14:11 from AlphaContainers_v10_14.xlsx",
   "kpi": {
-    "tubeYest": 0,
-    "tubeMTD": 0,
-    "petYest": 0,
+    "tubeYest": 45150,
+    "tubeMTD": 45150,
+    "petYest": 5520,
     "petMTD": 0
   },
   "downtime": [
     {
       "cat": "Mechanical",
       "icon": "\ud83d\udd27",
-      "hrs": 0.0
+      "hrs": 220.0
     },
     {
       "cat": "Electrical",
@@ -411,12 +432,12 @@ const DASH_DATA = {
     {
       "cat": "Operations",
       "icon": "\u2699\ufe0f",
-      "hrs": 0.0
+      "hrs": 600.0
     },
     {
       "cat": "Power Shutdown",
       "icon": "\ud83d\udd0c",
-      "hrs": 0.0
+      "hrs": 210.0
     },
     {
       "cat": "Gas Shutdown",
@@ -440,29 +461,29 @@ const DASH_DATA = {
       "dispatch": 0
     },
     {
-      "pid": 6559,
-      "product": "PHLOGIN GEL 20G",
-      "customer": "Brookes Pharma Private Limited",
-      "dia": "19mm",
-      "ordered": 35000,
-      "produced": 0,
-      "dispatch": 0
-    },
-    {
       "pid": 9003,
       "product": "S-43 DIA 19",
       "customer": "Samsol International Private Limited",
       "dia": "19mm",
-      "ordered": 50000,
+      "ordered": 10888,
       "produced": 0,
       "dispatch": 0
     },
     {
-      "pid": 5699,
-      "product": "S-43 DIA 20.5",
-      "customer": "Samsol International Private Limited",
+      "pid": 6077,
+      "product": "VINCE HIS BEARD & MUSTACHE COLOR",
+      "customer": "Mablay Beauty PVT LTD.",
       "dia": "20.5mm",
-      "ordered": 86000,
+      "ordered": 22000,
+      "produced": 0,
+      "dispatch": 0
+    },
+    {
+      "pid": 6228,
+      "product": "HIS ONLY HAIR COLOR CREAM 40GM",
+      "customer": "Mablay Beauty PVT LTD.",
+      "dia": "25mm",
+      "ordered": 22000,
       "produced": 0,
       "dispatch": 0
     },
@@ -471,81 +492,90 @@ const DASH_DATA = {
       "product": "S 43 25MM",
       "customer": "Samsol International Private Limited",
       "dia": "25mm",
-      "ordered": 166406,
+      "ordered": 41414,
+      "produced": 20160,
+      "dispatch": 0
+    },
+    {
+      "pid": 5814,
+      "product": "VINCE NURTURAL",
+      "customer": "Mablay Beauty PVT LTD.",
+      "dia": "30mm",
+      "ordered": 22000,
       "produced": 0,
       "dispatch": 0
     },
     {
-      "pid": 3726,
-      "product": "TUBES",
-      "customer": "Samsol International Private Limited",
-      "dia": "25mm",
-      "ordered": 96210,
-      "produced": 0,
+      "pid": 6206,
+      "product": "HELLO HAIR COLOR",
+      "customer": "Golden Pearl Cosmetics (PVT) LTD",
+      "dia": "30mm",
+      "ordered": 106060,
+      "produced": 24990,
       "dispatch": 0
     },
     {
-      "pid": 6470,
-      "product": "TUBES COMMON RED",
-      "customer": "Samsol International Private Limited",
-      "dia": "25mm",
-      "ordered": 55000,
-      "produced": 0,
-      "dispatch": 0
-    },
-    {
-      "pid": 6506,
-      "product": "TUBES MEN BLUE",
-      "customer": "Samsol International Private Limited",
-      "dia": "25mm",
-      "ordered": 16000,
+      "pid": 6515,
+      "product": "H.H 100GM",
+      "customer": "Hola Hair",
+      "dia": "32mm",
+      "ordered": 11792,
       "produced": 0,
       "dispatch": 0
     }
   ],
   "petOrders": [
     {
-      "pid": 6595,
-      "product": "DOWFEN GEL 50G",
-      "customer": "Seatle (Private) Limited",
-      "dia": "30ml",
-      "ordered": 25000,
-      "produced": 0,
-      "dispatch": 0
-    },
-    {
-      "pid": 5782,
-      "product": "M.G",
-      "customer": "Mega Grey",
-      "dia": "32ml",
-      "ordered": 72080,
-      "produced": 0,
-      "dispatch": 0
-    },
-    {
-      "pid": 6515,
-      "product": "H.H 100GM",
-      "customer": "Samsol International Private Limited",
-      "dia": "32ml",
-      "ordered": 89400,
-      "produced": 0,
-      "dispatch": 0
-    },
-    {
-      "pid": 6020,
-      "product": "ANVIL 43",
-      "customer": "Adore",
-      "dia": "35ml",
-      "ordered": 20500,
-      "produced": 0,
-      "dispatch": 0
-    },
-    {
       "pid": 8005,
       "product": "PET BOTTLE SMALL (120ML) YELLOW",
       "customer": "Samsol International Private Limited",
       "dia": "120 mlml",
-      "ordered": 100000,
+      "ordered": 58960,
+      "produced": 0,
+      "dispatch": 0
+    },
+    {
+      "pid": 8010,
+      "product": "PET BOTTLE SMALL (130ML) TRANSPARENT",
+      "customer": "Alpha Labs PVT LTD",
+      "dia": "130 mlml",
+      "ordered": 5000,
+      "produced": 0,
+      "dispatch": 0
+    },
+    {
+      "pid": 8001,
+      "product": "TRANSPARENT BOTTLE 150ML",
+      "customer": "Alpha Labs PVT LTD",
+      "dia": "150 mlml",
+      "ordered": 166960,
+      "produced": 0,
+      "dispatch": 0
+    },
+    {
+      "pid": 8007,
+      "product": "PET BOTTLE LARGE 200ML WHITE",
+      "customer": "Samsol International Private Limited",
+      "dia": "200 mlml",
+      "ordered": 10000,
+      "produced": 0,
+      "dispatch": 0
+    },
+    {
+      "pid": 8006,
+      "product": "BT-200 ML YELLOW",
+      "customer": "Samsol International Private Limited",
+      "dia": "200 mlml",
+      "ordered": 42400,
+      "produced": 0,
+      "dispatch": 0
+    },
+    {
+      "pid": 8014,
+      "product": "BT-200ML MUSTARD OIL (TRANSPARENT)",
+      "customer": "Samsol International Private Limited",
+      "dia": "200 mlml",
+      "ordered": 10000,
       "produced": 0,
       "dispatch": 0
     }
@@ -680,71 +710,6 @@ function fmt(n, uom) {
   return n.toFixed(2);
 }
 
-function renderCard(p) {
-  const isPet = p.type === 'pet';
-  const hasBOM = !!BOM[p.pid];
-  const qty = quantities[p.pid] || '';
-  const hasQty = qty > 0;
-
-  let matsHTML = '';
-  if (hasQty && hasBOM) {
-    const results = calc(p.pid, qty);
-    const groups = {};
-    results.forEach(m => {
-      if (!groups[m.cat]) groups[m.cat] = [];
-      groups[m.cat].push(m);
-    });
-    matsHTML = Object.entries(groups).map(([cat, items]) => `
-      <div class="mat-group">
-        <div class="mat-group-label">${cat}</div>
-        ${items.map(m => `
-          <div class="mat-row ${m.est ? 'estimated' : ''}">
-            <div class="mat-icon ${CAT_CLASS[cat]||'ic-misc'}">${CAT_ICON[cat]||'📌'}</div>
-            <div class="mat-name">${m.name}</div>
-            <div class="mat-id">${m.id ? '#'+m.id : '—'}</div>
-            <div class="mat-qty ${m.est ? 'est' : ''}">${fmt(m.total, m.uom)}<span class="uom">${m.uom}</span></div>
-            ${m.est ? '<div class="est-dot" title="Estimated value"></div>' : ''}
-          </div>
-        `).join('')}
-      </div>
-    `).join('');
-  } else if (hasQty && !hasBOM) {
-    matsHTML = '<div style="text-align:center;padding:12px;color:var(--muted);font-size:12px">⚠ No BOM data for this product</div>';
-  }
-
-  return `
-    <div class="card ${hasQty ? 'has-qty' : ''}" data-pid="${p.pid}" data-type="${p.type}" data-name="${p.name.toLowerCase()}" data-customer="${p.customer.toLowerCase()}">
-      <div class="card-header">
-        <div class="dia-badge ${isPet ? 'pet' : ''}">
-          <span class="num">${isPet ? p.dia.replace('ml','') : p.dia}</span>
-          <span class="unit">${isPet ? 'ml' : 'mm'}</span>
-        </div>
-        <div class="card-title">
-          <div class="product-name">${p.name}</div>
-          <div class="customer-name">${p.customer}</div>
-          <span class="pid-tag">PID ${p.pid}</span>
-          ${!hasBOM ? '<span class="est-tag">No BOM</span>' : ''}
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="qty-row">
-          <div class="qty-label">Required</div>
-          <input class="qty-input ${hasQty ? 'active' : ''}" type="number" min="0" step="1" inputmode="numeric" pattern="[0-9]*"
-            placeholder="0"
-            value="${qty || ''}"
-            oninput="updateQty(${p.pid}, this.value, this)"
-            onkeydown="if(event.key==='Enter')this.blur()">
-          <div class="qty-unit">pcs</div>
-        </div>
-        <div class="mat-divider" style="${hasQty ? '' : 'display:none'}"></div>
-        <div class="materials ${hasQty ? 'show' : ''}" id="mats-${p.pid}">
-          ${matsHTML}
-        </div>
-      </div>
-    </div>
-  `;
-}
-
 function updateQty(pid, val, el) {
   const n = parseInt(val) || 0;
   if (n > 0) { quantities[pid] = n; } else { delete quantities[pid]; }
@@ -801,80 +766,8 @@ function updateQty(pid, val, el) {
   updateGrandTotal();
 }
 
-function updateGrandTotal() {
-  const totals = {}; // key: `${itemId}|${name}|${uom}|${cat}` → {name, uom, cat, total, est, id}
-  let totalPieces = 0;
-  let productCount = 0;
 
-  Object.entries(quantities).forEach(([pid, qty]) => {
-    if (qty <= 0) return;
-    totalPieces += qty;
-    productCount++;
-    const results = calc(parseInt(pid), qty);
-    results.forEach(m => {
-      const key = `${m.id}|${m.name}|${m.uom}|${m.cat}`;
-      if (!totals[key]) totals[key] = {id:m.id, name:m.name, uom:m.uom, cat:m.cat, total:0, est:m.est};
-      totals[key].total += m.total;
-      if (m.est) totals[key].est = true;
-    });
-  });
 
-  const sub = document.getElementById('grandSub');
-  const wrap = document.getElementById('grandTableWrap');
-
-  if (productCount === 0) {
-    sub.textContent = 'Enter quantities above to see totals across all products.';
-    wrap.innerHTML = '<div class="grand-total-empty"><div class="big">📋</div>No quantities entered yet.</div>';
-    return;
-  }
-
-  sub.textContent = `${productCount} product${productCount>1?'s':''} · ${totalPieces.toLocaleString()} total pieces`;
-
-  // Group by cat
-  const groups = {};
-  Object.values(totals).forEach(t => {
-    if (!groups[t.cat]) groups[t.cat] = [];
-    groups[t.cat].push(t);
-  });
-
-  const catOrder = ['SLUG','BASE COAT','LACQUER','LATEX','ZINC POWDER','CAP','CARTON','TAPE','THINNER','INK','PET RESIN','MASTER BATCH','MASTERBATCH','POLY BAG','PACKING','VARNISH'];
-  const sortedGroups = Object.entries(groups).sort(([a],[b]) => {
-    const ai = catOrder.indexOf(a); const bi = catOrder.indexOf(b);
-    return (ai===-1?99:ai) - (bi===-1?99:bi);
-  });
-
-  let html = `<div class="grand-total-table-scroll"><table class="grand-total-table">
-    <thead><tr>
-      <th>Material</th>
-      <th>Item ID</th>
-      <th style="text-align:right">Total Required</th>
-    </tr></thead><tbody>`;
-
-  sortedGroups.forEach(([cat, items]) => {
-    html += `<tr><td colspan="3" style="padding:10px 12px 4px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);background:var(--light)">${cat}</td></tr>`;
-    items.forEach(t => {
-      html += `<tr>
-        <td>
-          <div class="cat-cell">
-            <div class="cat-icon ${CAT_CLASS[cat]||'ic-misc'}">${CAT_ICON[cat]||'📌'}</div>
-            ${t.name}${t.est ? ' <span class="est-tag">estimated</span>':''}
-          </div>
-        </td>
-        <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">${t.id ? '#'+t.id : '—'}</td>
-        <td><strong style="font-family:'DM Mono',monospace;${t.est?'color:var(--red)':''}">${fmt(t.total,t.uom)}</strong> <span style="font-size:11px;color:var(--muted)">${t.uom}</span></td>
-      </tr>`;
-    });
-  });
-  html += '</tbody></table></div>';
-  wrap.innerHTML = html;
-}
-
-function setFilter(f, btn) {
-  activeFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  filterProducts();
-}
 
 function filterProducts() {
   const q = document.getElementById('searchInput').value.toLowerCase();
@@ -911,6 +804,84 @@ function renderGrid() {
 
 
 
+function updateGrandTotal() {
+  const totals = {};
+  const productLines = [];
+  let totalPieces = 0, productCount = 0;
+
+  Object.entries(quantities).forEach(([pid, qty]) => {
+    if (qty <= 0) return;
+    totalPieces += qty; productCount++;
+    const p = PRODUCTS.find(x => x.pid === parseInt(pid));
+    if (p) productLines.push({pid:parseInt(pid), name:p.name, customer:p.customer, qty});
+    calc(parseInt(pid), qty).forEach(m => {
+      const key = `${m.id}|${m.name}|${m.uom}|${m.cat}`;
+      if (!totals[key]) totals[key] = {id:m.id, name:m.name, uom:m.uom, cat:m.cat, total:0, est:m.est};
+      totals[key].total += m.total;
+      if (m.est) totals[key].est = true;
+    });
+  });
+
+  const sub  = document.getElementById('grandSub');
+  const wrap = document.getElementById('grandTableWrap');
+  if (productCount === 0) {
+    sub.textContent = 'Enter quantities above to see totals.';
+    wrap.innerHTML = '<div class="grand-total-empty"><div class="big">📋</div>No quantities entered yet.</div>';
+    return;
+  }
+  sub.textContent = `${productCount} product${productCount>1?'s':''} · ${totalPieces.toLocaleString()} total pieces`;
+
+  const catOrder = ['SLUG','BASE COAT','LACQUER','LATEX','ZINC POWDER','CAP','CARTON','TAPE','THINNER','INK','PET RESIN','MASTER BATCH','MASTERBATCH','POLY BAG','PACKING','VARNISH'];
+  const groups = {};
+  Object.values(totals).forEach(t => {
+    if (!groups[t.cat]) groups[t.cat] = [];
+    groups[t.cat].push(t);
+  });
+  const sortedGroups = Object.entries(groups).sort(([a],[b]) => {
+    const ai = catOrder.indexOf(a), bi = catOrder.indexOf(b);
+    return (ai===-1?99:ai)-(bi===-1?99:bi);
+  });
+
+  // Products summary
+  let h = `<div style="margin-bottom:16px;padding:14px;background:var(--light);border-radius:10px;border:1px solid var(--border)">
+    <div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Products in this calculation</div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="text-align:left;font-size:10px;font-weight:600;color:var(--muted);padding:4px 8px;text-transform:uppercase;letter-spacing:.8px">Product</th>
+        <th style="text-align:left;font-size:10px;font-weight:600;color:var(--muted);padding:4px 8px;text-transform:uppercase;letter-spacing:.8px">Customer</th>
+        <th style="text-align:right;font-size:10px;font-weight:600;color:var(--muted);padding:4px 8px;text-transform:uppercase;letter-spacing:.8px">Pieces</th>
+      </tr></thead><tbody>`;
+  productLines.forEach(pl => {
+    h += `<tr>
+      <td style="padding:6px 8px;font-size:12px;font-weight:500;border-bottom:1px solid var(--border)">${pl.name}</td>
+      <td style="padding:6px 8px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border)">${pl.customer}</td>
+      <td style="padding:6px 8px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:var(--navy);text-align:right;border-bottom:1px solid var(--border)">${pl.qty.toLocaleString()}</td>
+    </tr>`;
+  });
+  h += `<tr style="background:rgba(0,0,0,.03)">
+    <td colspan="2" style="padding:7px 8px;font-size:12px;font-weight:700">TOTAL</td>
+    <td style="padding:7px 8px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--navy);text-align:right">${totalPieces.toLocaleString()}</td>
+  </tr></tbody></table></div>`;
+
+  // Materials table
+  h += `<div class="grand-total-table-scroll"><table class="grand-total-table">
+    <thead><tr>
+      <th>Material</th><th>Item ID</th><th style="text-align:right">Total Required</th>
+    </tr></thead><tbody>`;
+  sortedGroups.forEach(([cat, items]) => {
+    h += `<tr><td colspan="3" style="padding:8px 10px 3px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);background:var(--light)">${CAT_ICON[cat]||''} ${cat}</td></tr>`;
+    items.forEach(t => {
+      h += `<tr>
+        <td><div class="cat-cell"><div class="cat-icon ${CAT_CLASS[cat]||'ic-misc'}">${CAT_ICON[cat]||'📌'}</div>${t.name}${t.est?' <span class="est-tag">⚠ est</span>':''}</div></td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">${t.id?'#'+t.id:'—'}</td>
+        <td><strong style="font-family:'DM Mono',monospace;${t.est?'color:var(--red)':''}">${fmt(t.total,t.uom)}</strong> <span style="font-size:11px;color:var(--muted)">${t.uom}</span></td>
+      </tr>`;
+    });
+  });
+  h += '</tbody></table></div>';
+  wrap.innerHTML = h;
+}
+
 // ─── DASHBOARD RENDER ───
 function renderDashboard() {
   const d = DASH_DATA;
@@ -938,11 +909,12 @@ function renderDashboard() {
   function renderOrderRows(orders, bodyId, badgeId) {
     const tbody = document.getElementById(bodyId);
     const badge = document.getElementById(badgeId);
-    let totalOrdered=0, totalProduced=0;
+    let totalOrdered=0, totalProduced=0, totalDispatch=0;
     let html = '';
     orders.forEach(o => {
-      totalOrdered  += o.ordered;
-      totalProduced += o.produced;
+      totalOrdered   += o.ordered;
+      totalProduced  += o.produced;
+      totalDispatch  += (o.dispatch || 0);
       const remaining = Math.max(0, o.ordered - o.produced);
       const pct = o.ordered > 0 ? Math.min(100, o.produced / o.ordered * 100) : 0;
       const barClass = pct >= 90 ? 'green' : pct >= 60 ? 'yellow' : 'red';
@@ -952,6 +924,7 @@ function renderDashboard() {
         <td>${o.dia}</td>
         <td>${o.ordered.toLocaleString()}</td>
         <td style="font-weight:600;color:var(--navy)">${o.produced.toLocaleString()}</td>
+        <td style="color:var(--blue)">${(o.dispatch||0).toLocaleString()}</td>
         <td style="${remaining===0?'color:var(--green);font-weight:600':''}">${remaining.toLocaleString()}</td>
         <td>
           <div class="compliance-bar">
@@ -961,12 +934,12 @@ function renderDashboard() {
         </td>
       </tr>`;
     });
-    // Total row
     const totalPct = totalOrdered > 0 ? Math.min(100, totalProduced/totalOrdered*100) : 0;
     html += `<tr class="total-row">
       <td colspan="3">TOTAL</td>
       <td>${totalOrdered.toLocaleString()}</td>
       <td>${totalProduced.toLocaleString()}</td>
+      <td>${totalDispatch.toLocaleString()}</td>
       <td>${Math.max(0,totalOrdered-totalProduced).toLocaleString()}</td>
       <td><span class="compliance-pct">${totalPct.toFixed(1)}%</span></td>
     </tr>`;
@@ -1008,7 +981,7 @@ function renderCard(p) {
   const qty = quantities[p.pid] || '';
   const hasQty = qty > 0;
   return `
-    <div class="card ${hasQty ? 'has-qty' : ''}" data-pid="${p.pid}" data-type="${p.type}" data-name="${p.name.toLowerCase()}" data-customer="${p.customer.toLowerCase()}">
+    <div class="card ${hasQty ? 'has-qty' : ''}" data-pid="${p.pid}" data-type="${p.type}" data-name="${p.name.toLowerCase()}" data-customer="${p.customer.toLowerCase()}" data-dia="${p.dia}">
       <div class="card-header">
         <div class="dia-badge ${isPet ? 'pet' : ''}">
           <span class="num">${isPet ? p.dia.replace('ml','') : p.dia}</span>
@@ -1036,10 +1009,26 @@ function renderCard(p) {
     </div>`;
 }
 
-function setFilter(f, btn) {
-  activeFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+let activeTypeFilter = 'all';
+let activeDiaFilter  = 'all';
+
+function setTypeFilter(f, btn) {
+  activeTypeFilter = f;
+  document.querySelectorAll('[id^="flt-"]').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  filterProducts();
+}
+
+function setDiaFilter(d, btn) {
+  activeDiaFilter = d;
+  document.querySelectorAll('[id^="dia-"]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  // If PET dia filter selected, also force type to PET
+  if (d === 'pet') {
+    activeTypeFilter = 'pet';
+    document.querySelectorAll('[id^="flt-"]').forEach(b=>b.classList.remove('active'));
+    document.getElementById('flt-pet').classList.add('active');
+  }
   filterProducts();
 }
 
@@ -1047,13 +1036,20 @@ function filterProducts() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   let visible = 0;
   document.querySelectorAll('[data-pid]').forEach(card => {
-    const name = card.dataset.name, cust = card.dataset.customer, type = card.dataset.type;
-    const hasQty = quantities[parseInt(card.dataset.pid)] > 0;
+    const name    = card.dataset.name;
+    const cust    = card.dataset.customer;
+    const type    = card.dataset.type;
+    const dia     = card.dataset.dia;
+    const hasQty  = quantities[parseInt(card.dataset.pid)] > 0;
     let show = true;
     if (q && !name.includes(q) && !cust.includes(q)) show = false;
-    if (activeFilter === 'tube' && type !== 'tube') show = false;
-    if (activeFilter === 'pet'  && type !== 'pet')  show = false;
-    if (activeFilter === 'active' && !hasQty)        show = false;
+    if (activeTypeFilter === 'tube'   && type !== 'tube')  show = false;
+    if (activeTypeFilter === 'pet'    && type !== 'pet')   show = false;
+    if (activeTypeFilter === 'active' && !hasQty)          show = false;
+    if (activeDiaFilter !== 'all' && activeDiaFilter !== 'pet') {
+      if (dia !== activeDiaFilter) show = false;
+    }
+    if (activeDiaFilter === 'pet' && type !== 'pet') show = false;
     card.style.display = show ? '' : 'none';
     if (show) visible++;
   });
@@ -1061,8 +1057,43 @@ function filterProducts() {
   if (nr) nr.style.display = visible ? 'none' : 'block';
 }
 
+function loadRemainingOrders() {
+  const allOrders = [...(DASH_DATA.tubeOrders||[]), ...(DASH_DATA.petOrders||[])];
+  let filled = 0;
+  allOrders.forEach(o => {
+    const remaining = Math.max(0, o.ordered - o.produced);
+    if (remaining > 0) {
+      quantities[o.pid] = remaining;
+      filled++;
+      // Update the input if card is in DOM
+      const inp = document.querySelector(`[data-pid="${o.pid}"] .qty-input`);
+      if (inp) {
+        inp.value = remaining;
+        inp.classList.add('active');
+        const card = document.querySelector(`[data-pid="${o.pid}"]`);
+        if (card) card.classList.add('has-qty');
+        // Trigger materials render
+        updateQty(o.pid, remaining, inp);
+      }
+    }
+  });
+  if (filled === 0) {
+    alert('No remaining orders found. All orders are complete or no production data loaded yet.');
+  } else {
+    updateGrandTotal();
+    // Switch to "Has Qty" filter to show only filled products
+    setTypeFilter('active', document.getElementById('flt-active'));
+  }
+}
+
 function clearAll() {
   Object.keys(quantities).forEach(k => delete quantities[k]);
+  // Reset type filter
+  activeTypeFilter = 'all';
+  activeDiaFilter  = 'all';
+  document.querySelectorAll('[id^="flt-"],[id^="dia-"]').forEach(b=>b.classList.remove('active'));
+  document.getElementById('flt-all').classList.add('active');
+  document.getElementById('dia-all').classList.add('active');
   renderGrid();
   updateGrandTotal();
 }
