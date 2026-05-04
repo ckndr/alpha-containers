@@ -1,0 +1,35 @@
+# ── Excel files — NEVER commit (contain business data) ──
+*.xlsx
+*.xls
+*.xlsm
+
+# ── ERP export files ──
+*.pdf
+Inventory.pdf
+dispatch*.xls
+pending*.xlsx
+Production*.xlsx
+
+# ── Python cache ──
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# ── Windows junk ──
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ── OneDrive sync artifacts ──
+*.tmp
+~$*
+
+# ── Backup copies ──
+*_backup*
+*_old*
+*_copy*
+
+# ── Only the HTML app goes to GitHub ──
+# (update_html.py is also included so the script travels with the repo)
