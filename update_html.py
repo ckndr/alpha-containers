@@ -148,10 +148,12 @@ def read_orders(row_range, is_pet=False):
         dia      = ws_db.cell(row=r, column=5).value
         pid      = ws_db.cell(row=r, column=6).value
         ordered  = ws_db.cell(row=r, column=7).value
+        dispatch = ws_db.cell(row=r, column=11).value  # col K
         if not pid or not product: continue
         pid_int  = int(pid)
         produced = mtd_by_pid.get(pid_int, 0)
-        dia_str  = (str(dia) + ('ml' if is_pet else 'mm')) if dia else '—'
+        _dia_raw = str(dia).replace(' ml','').replace('ml','').replace(' mm','').replace('mm','').strip() if dia else ''
+        dia_str  = (_dia_raw + ('ml' if is_pet else 'mm')) if _dia_raw else '—'
         orders.append({
             'pid':      pid_int,
             'product':  str(product),
@@ -159,7 +161,7 @@ def read_orders(row_range, is_pet=False):
             'dia':      dia_str,
             'ordered':  int(ordered) if ordered else 0,
             'produced': produced,
-            'dispatch': 0,
+            'dispatch': int(dispatch) if dispatch else 0,
         })
     return orders
 
@@ -188,7 +190,7 @@ dash_data = {
         'petMTD':   pet_mtd,
     },
     'downtime': [
-        {'cat': cat, 'icon': DOWNTIME_ICONS.get(cat,'⏱'), 'hrs': round(dt_totals[cat], 2)}
+        {'cat': cat, 'icon': DOWNTIME_ICONS.get(cat,'⏱'), 'hrs': round(dt_totals[cat] / 60, 2)}
         for cat in downtime_cols
     ],
     'tubeOrders': tube_orders,
@@ -224,6 +226,20 @@ html = html[:pos_start] + new_data + html[pos_end + len(marker_end):]
 
 with open(HTML_PATH, 'w', encoding='utf-8') as f:
     f.write(html)
+
+# ── Stamp new cache version into sw.js so browser picks up changes ──
+SW_PATH = os.path.join(DIR, 'sw.js')
+if os.path.exists(SW_PATH):
+    with open(SW_PATH, 'r', encoding='utf-8') as f:
+        sw_content = f.read()
+    import re as _re
+    new_cache = f"alpha-containers-{now.strftime('%Y%m%d%H%M')}"
+    sw_content = _re.sub(r"const CACHE_NAME = '[^']+';",
+                         f"const CACHE_NAME = '{new_cache}';",
+                         sw_content)
+    with open(SW_PATH, 'w', encoding='utf-8') as f:
+        f.write(sw_content)
+    print(f"  SW cache version → {new_cache}")
 
 print(f"\n✓ HTML updated successfully → {os.path.basename(HTML_PATH)}")
 print(f"  Open in Chrome on PC or Android to view dashboard.")

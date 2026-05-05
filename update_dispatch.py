@@ -1,0 +1,352 @@
+"""
+Alpha Containers - Dispatch Updater v7
+----------------------------------------------------------------------
+CHANGE LOG v7:
+  - NAME_FIXES updated after catalog rename (v10.3):
+      REMOVED "BT-200 ML YELLOW" -> old "YELLOW LARGE BOTTLE 200ML"
+              (ERP name now matches catalog exactly -- auto-resolves)
+      REMOVED "PET BOTTLE LARGE 200ML WHITE" -> old "WHITE BOTTLE 200ML"
+              (ERP name now matches catalog exactly -- auto-resolves)
+      ADDED   "BT-120 ML YELLOW" -> "PET BOTTLE SMALL (120ML) YELLOW"
+              (ERP uses BT- prefix; catalog uses descriptive name)
+  - PET_TOTAL_ROW updated: 30 -> 32 (Dashboard restructured in v10.3,
+    PET total row shifted from row 30 to row 32)
+  - Stale K30 formula patch updated to K32.
+
+CHANGE LOG v5:
+  - Replaced manual DISPATCH_ALIASES (required a PID entry for every product)
+    with automatic catalog matching. Script now reads Product_Catalog sheet
+    from the AlphaContainers Excel file at runtime and builds a name->PID
+    map automatically. Any product added to Product_Catalog is automatically
+    supported -- no script changes needed.
+
+  - NAME_FIXES dict retained but now much smaller: only needed for products
+    where the ERP dispatch name differs from the Product_Catalog name.
+    Currently only 3 PET entries. Everything else matches by name directly.
+
+  - PIDs are still used internally to locate the correct Dashboard row
+    (Dashboard col F holds PIDs). The user never needs to know or enter PIDs.
+
+CHANGE LOG v4:
+  - Added "ANVIL 43" -> PID 6020 and "ANVIL 45" -> PID 6021.
+
+CHANGE LOG v3:
+  - BT-200 ML YELLOW confirmed as Samsol International (PID 8006).
+  - Abid Masood Khan documented as PET cash placeholder.
+
+CHANGE LOG v2:
+  - Added "BT-200 ML YELLOW" -> PID 8006 (YELLOW LARGE BOTTLE 200ML)
+  - Script now overwrites the existing AlphaContainers file in place.
+
+PURPOSE:
+  Reads dispatch.xls (TUBEX-ALUM) and dispatch_pet.xls (TUBEX-PET)
+  from the same folder, then writes MTD dispatch quantities into
+  column K of the Tubex_Dashboard sheet in the latest
+  AlphaContainers*.xlsx file.
+
+HOW IT WORKS:
+  - Both dispatch files are ERP "Dispatch Report (Date Wise)" exports.
+  - They are always full MTD. Every run replaces all K values.
+  - ERP product names matched to Dashboard rows via Product_Catalog lookup.
+  - Saves back to the SAME file. No new version is created.
+
+NAME_FIXES:
+  Only add entries here when the ERP dispatch name differs from the
+  Product_Catalog name. Most tube products match automatically.
+  Key   = product name exactly as it appears in dispatch .xls (stripped)
+  Value = product name exactly as it appears in Product_Catalog col D
+"""
+
+import os
+import glob
+
+import warnings
+warnings.filterwarnings("ignore", message=".*Data Validation.*")
+warnings.filterwarnings("ignore", message=".*extension.*")
+import pandas as pd
+from openpyxl import load_workbook
+
+
+# -----------------------------------------------------------------------
+# NAME_FIXES
+# Only needed when ERP dispatch name != Product_Catalog name.
+# If ERP name matches catalog name exactly (case-insensitive), no entry
+# is needed here -- it is matched automatically.
+#
+# TO ADD A NEW ENTRY: paste the ERP name exactly as it appears in the
+# dispatch .xls on the left, and the Product_Catalog col D name on right.
+# -----------------------------------------------------------------------
+NAME_FIXES = {
+    # PET products -- ERP uses a different naming convention than catalog
+    # NOTE: "BT-200 ML YELLOW" and "PET BOTTLE LARGE 200ML WHITE" were
+    # removed from NAME_FIXES because the catalog was renamed to match
+    # the ERP names exactly (v10.3) -- they now auto-resolve.
+    "BT-120 ML YELLOW":                       "PET BOTTLE SMALL (120ML) YELLOW",
+    "PET BOTTLE SMALL (120ML) COMPACT BLACK": "BLACK SMALL BOTTLE 120ML",
+}
+
+
+# -----------------------------------------------------------------------
+# Sheet / column constants
+# -----------------------------------------------------------------------
+DASHBOARD_SHEET     = "Tubex_Dashboard"
+CATALOG_SHEET       = "Product_Catalog"
+
+DASHBOARD_PID_COL   = 6    # col F -- PID in Dashboard
+DASHBOARD_DISP_COL  = 11   # col K -- Dispatch qty in Dashboard
+DASHBOARD_ROW_MIN   = 11
+DASHBOARD_ROW_MAX   = 200
+
+CATALOG_PID_COL     = 1    # col A -- Product ID
+CATALOG_NAME_COL    = 4    # col D -- Product Name
+CATALOG_DATA_START  = 3    # first data row (rows 1-2 are headers)
+
+PET_TOTAL_ROW       = 32
+
+
+# -----------------------------------------------------------------------
+def load_catalog(wb):
+    """
+    Read Product_Catalog sheet from already-open workbook.
+    Returns {product_name_upper: pid} for all rows with a valid PID and name.
+    """
+    ws = wb[CATALOG_SHEET]
+    catalog = {}
+    for row in range(CATALOG_DATA_START, ws.max_row + 1):
+        pid_val  = ws.cell(row, CATALOG_PID_COL).value
+        name_val = ws.cell(row, CATALOG_NAME_COL).value
+        if pid_val is None or name_val is None:
+            continue
+        try:
+            pid = int(float(str(pid_val)))
+        except (ValueError, TypeError):
+            continue
+        name = str(name_val).strip()
+        if name:
+            catalog[name.upper()] = pid
+    return catalog
+
+
+def resolve_pid(erp_name, catalog):
+    """
+    Given an ERP dispatch product name, return (catalog_name, pid) or (erp_name, None).
+    1. Check NAME_FIXES for a known ERP->catalog name translation.
+    2. Use the resulting name for case-insensitive catalog lookup.
+    """
+    catalog_name = NAME_FIXES.get(erp_name, erp_name)
+    pid = catalog.get(catalog_name.upper())
+    return catalog_name, pid
+
+
+def parse_dispatch_file(path):
+    """
+    Parse one ERP dispatch .xls (Date Wise format).
+    Returns {product_name: total_dispatched_qty}.
+    """
+    df = pd.read_excel(path, sheet_name=0, engine='xlrd', header=None)
+
+    SKIP_PREFIXES = ('dispatch report', 'month :', 'no.')
+    SKIP_EXACT    = {'end of file'}
+
+    result = {}
+    current_product = None
+
+    for _, row in df.iterrows():
+        col0 = row[0]
+        col7 = row[7]
+
+        if isinstance(col0, str) and str(col0).strip():
+            c0       = col0.strip()
+            c0_lower = c0.lower()
+            if c0_lower in SKIP_EXACT:
+                continue
+            if any(c0_lower.startswith(p) for p in SKIP_PREFIXES):
+                continue
+            if 'grand total' in c0_lower:
+                continue
+            if pd.isna(row[1]):
+                current_product = c0
+                continue
+
+        try:
+            int(float(col0))
+            if pd.isna(col7):
+                continue
+            disp_qty = float(col7)
+            if current_product is not None:
+                result[current_product] = result.get(current_product, 0) + disp_qty
+        except (ValueError, TypeError):
+            pass
+
+    return result
+
+
+def find_files(folder):
+    ac_files = glob.glob(os.path.join(folder, "AlphaContainers*.xlsx"))
+    if not ac_files:
+        print("  ERROR: No AlphaContainers*.xlsx found in: " + folder)
+        return None, None, None
+    ac = sorted(ac_files)[-1]
+
+    dispatch_tube = os.path.join(folder, "dispatch.xls")
+    dispatch_pet  = os.path.join(folder, "dispatch_pet.xls")
+
+    for p, label in [(dispatch_tube, "dispatch.xls"), (dispatch_pet, "dispatch_pet.xls")]:
+        if not os.path.exists(p):
+            print("  ERROR: " + label + " not found in: " + folder)
+            return None, None, None
+
+    return ac, dispatch_tube, dispatch_pet
+
+
+def build_pid_row_map(ws):
+    """Scan Dashboard col F for PIDs. Returns {pid: row_number}."""
+    pid_map = {}
+    for r in range(DASHBOARD_ROW_MIN, DASHBOARD_ROW_MAX + 1):
+        pid_val = ws.cell(r, DASHBOARD_PID_COL).value
+        if pid_val is not None:
+            try:
+                pid_map[int(pid_val)] = r
+            except (ValueError, TypeError):
+                pass
+    return pid_map
+
+
+def update_dispatch(ac_path, dispatch_by_pid):
+    wb = load_workbook(ac_path)
+    ws = wb[DASHBOARD_SHEET]
+
+    pid_row_map = build_pid_row_map(ws)
+
+    # Wipe all K values in product rows (skip formula strings = TOTAL rows)
+    for r in range(DASHBOARD_ROW_MIN, DASHBOARD_ROW_MAX + 1):
+        cell = ws.cell(r, DASHBOARD_DISP_COL)
+        if cell.value is not None and not isinstance(cell.value, str):
+            cell.value = None
+
+    # Write dispatch totals
+    updated = 0
+    skipped = []
+    for pid, qty in dispatch_by_pid.items():
+        if pid not in pid_row_map:
+            skipped.append((pid, qty))
+            continue
+        ws.cell(pid_row_map[pid], DASHBOARD_DISP_COL).value = int(qty)
+        updated += 1
+
+    # Fix K32 PET TOTAL formula if still on old range
+    k32 = ws.cell(PET_TOTAL_ROW, DASHBOARD_DISP_COL)
+    if isinstance(k32.value, str) and 'SUM' in k32.value and 'K26:K30' not in k32.value:
+        k32.value = '=SUM(K26:K31)'
+        print("  Fixed: K32 PET TOTAL formula corrected -> =SUM(K26:K31)")
+
+    wb.save(ac_path)
+    return updated, skipped
+
+
+def main():
+    SEP = "=" * 60
+
+    print("")
+    print(SEP)
+    print("  Alpha Containers - Dispatch Updater v6")
+    print(SEP)
+    print("")
+
+    folder = os.path.dirname(os.path.abspath(__file__))
+
+    print("[1/4] Finding files...")
+    ac_path, tube_path, pet_path = find_files(folder)
+    if not ac_path:
+        return
+    print("  Alpha File:    " + os.path.basename(ac_path))
+    print("  Dispatch Tube: " + os.path.basename(tube_path))
+    print("  Dispatch PET:  " + os.path.basename(pet_path))
+
+    print("")
+    print("[1b] Loading Product_Catalog from Excel...")
+    wb_temp = load_workbook(ac_path, read_only=True, data_only=True)
+    catalog = load_catalog(wb_temp)
+    wb_temp.close()
+    print("  %d products loaded from catalog." % len(catalog))
+
+    print("")
+    print("[2/4] Parsing dispatch files...")
+    tube_dispatch = parse_dispatch_file(tube_path)
+    pet_dispatch  = parse_dispatch_file(pet_path)
+
+    print("")
+    print("  TUBE dispatches (TUBEX-ALUM):")
+    tube_total = 0
+    for product in sorted(tube_dispatch):
+        qty           = tube_dispatch[product]
+        cat_name, pid = resolve_pid(product, catalog)
+        flag = ("-> matched: %s (PID %s)" % (cat_name, pid)) if pid else "-> !! NOT IN CATALOG"
+        print("    %-45s %9d  %s" % (product, int(qty), flag))
+        tube_total += qty
+    print("    %-45s %9d" % ("GRAND TOTAL", int(tube_total)))
+
+    print("")
+    print("  PET dispatches (TUBEX-PET):")
+    pet_total = 0
+    for product in sorted(pet_dispatch):
+        qty           = pet_dispatch[product]
+        cat_name, pid = resolve_pid(product, catalog)
+        flag = ("-> matched: %s (PID %s)" % (cat_name, pid)) if pid else "-> !! NOT IN CATALOG"
+        print("    %-45s %9d  %s" % (product, int(qty), flag))
+        pet_total += qty
+    print("    %-45s %9d" % ("GRAND TOTAL", int(pet_total)))
+
+    print("")
+    print("[3/4] Resolving PIDs and checking for mismatches...")
+    dispatch_by_pid   = {}
+    unmapped_products = []
+
+    all_dispatches = {}
+    all_dispatches.update(tube_dispatch)
+    all_dispatches.update(pet_dispatch)
+
+    for product, qty in all_dispatches.items():
+        cat_name, pid = resolve_pid(product, catalog)
+        if pid is None:
+            unmapped_products.append((product, cat_name, qty))
+        else:
+            dispatch_by_pid[pid] = dispatch_by_pid.get(pid, 0) + qty
+
+    if unmapped_products:
+        print("")
+        print("  !! PRODUCTS NOT MATCHED (not written to Dashboard):")
+        for product, cat_name, qty in unmapped_products:
+            if product in NAME_FIXES:
+                print("    ERP: '%s' -> NAME_FIXES target '%s' not found in catalog. Check spelling." % (product, cat_name))
+            else:
+                print("    ERP: '%s'  qty=%d" % (product, int(qty)))
+                print("    Fix options:")
+                print("      A) If ERP name matches catalog col D exactly -> will auto-resolve next run.")
+                print("      B) If ERP uses a different name -> add to NAME_FIXES in script.")
+
+    print("")
+    print("[4/4] Updating Dashboard column K...")
+    updated_count, skipped_pids = update_dispatch(ac_path, dispatch_by_pid)
+
+    print("")
+    print("  PIDs written to K:")
+    for pid in sorted(dispatch_by_pid):
+        print("    PID %-8d qty=%9d" % (pid, int(dispatch_by_pid[pid])))
+
+    if skipped_pids:
+        print("")
+        print("  !! PIDs resolved from catalog but NOT found in Dashboard col F:")
+        for pid, qty in skipped_pids:
+            print("    PID %d  qty=%d  (check Dashboard col F has this PID)" % (pid, int(qty)))
+
+    print("")
+    print("  Updated %d product row(s)" % updated_count)
+    print("  Saved:  " + os.path.basename(ac_path))
+    print("")
+    print("  Press Ctrl+Shift+F9 in Excel to recalculate formulas.")
+    print(SEP)
+
+
+if __name__ == "__main__":
+    main()

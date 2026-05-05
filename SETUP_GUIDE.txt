@@ -1,0 +1,177 @@
+╔═══════════════════════════════════════════════════════════════════╗
+║   ALPHA CONTAINERS — GitHub Pages Setup Guide                    ║
+║   Do this ONCE. After that: double-click bat, done.              ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+YOUR ONEDRIVE FOLDER
+────────────────────
+Home PC  (Win 10): C:\Users\Sikander\OneDrive\AlphaContainers
+Office PC (Win 11): C:\Users\HP\OneDrive\AlphaContainers
+
+Both PCs see the exact same files through OneDrive. 
+Python scripts use relative paths so they work on both — no changes needed.
+
+════════════════════════════════════════════════════════════════════
+STEP 1 — Create a GitHub account (skip if you have one)
+════════════════════════════════════════════════════════════════════
+
+1. Go to https://github.com
+2. Click "Sign up"
+3. Use a professional email (e.g. your work email)
+4. Choose a username — e.g. "SikanderAC" or "AlphaContainersPK"
+5. Complete verification and confirm your email
+
+════════════════════════════════════════════════════════════════════
+STEP 2 — Create a new repository
+════════════════════════════════════════════════════════════════════
+
+1. After logging in, click the "+" icon (top right) → "New repository"
+2. Repository name: alpha-containers
+3. Description: Alpha Containers Production Dashboard
+4. Set to PUBLIC (required for free GitHub Pages)
+5. Do NOT tick "Add README" — leave everything unticked
+6. Click "Create repository"
+7. COPY the URL shown — it will look like:
+       https://github.com/YourUsername/alpha-containers.git
+   You'll need this in Step 4.
+
+════════════════════════════════════════════════════════════════════
+STEP 3 — Install Git for Windows (skip if already installed)
+════════════════════════════════════════════════════════════════════
+
+1. Go to https://git-scm.com/download/win
+2. Download and run the installer
+3. Click Next through everything — defaults are all fine
+4. When done, open Command Prompt and type:
+       git --version
+   You should see something like: git version 2.44.0.windows.1
+5. Set your name and email (one time only):
+       git config --global user.name "Sikander"
+       git config --global user.email "your.email@example.com"
+
+════════════════════════════════════════════════════════════════════
+STEP 4 — Connect your OneDrive folder to GitHub (ONE TIME ONLY)
+════════════════════════════════════════════════════════════════════
+
+Open Command Prompt. Copy and paste these commands ONE BY ONE.
+Replace YOUR_GITHUB_URL with the URL you copied in Step 2.
+
+  cd "C:\Users\Sikander\OneDrive\AlphaContainers"
+
+  git init
+
+  git remote add origin YOUR_GITHUB_URL
+
+  copy .gitignore .gitignore
+
+  git add AlphaContainers_App.html update_html.py .gitignore "Run All Updates.bat"
+
+  git commit -m "Initial deploy"
+
+  git branch -M main
+
+  git push -u origin main
+
+If it asks for your GitHub credentials, enter your username and password.
+(If password doesn't work, see STEP 4b below.)
+
+────────────────────────────────────────────────────────────────────
+STEP 4b — GitHub now requires a Personal Access Token (if prompted)
+────────────────────────────────────────────────────────────────────
+Instead of your password, GitHub wants a token:
+1. Go to https://github.com/settings/tokens
+2. Click "Generate new token (classic)"
+3. Note: "Alpha Containers deploy"
+4. Expiration: No expiration (or 1 year)
+5. Tick the box: "repo" (first checkbox)
+6. Scroll down → "Generate token"
+7. COPY the token immediately (you won't see it again)
+8. Use this token as your password when git asks
+
+════════════════════════════════════════════════════════════════════
+STEP 5 — Enable GitHub Pages
+════════════════════════════════════════════════════════════════════
+
+1. Go to your repository on GitHub:
+       https://github.com/YourUsername/alpha-containers
+2. Click "Settings" tab (top of the repo page)
+3. In the left sidebar, click "Pages"
+4. Under "Branch", select: main
+5. Folder: / (root)
+6. Click "Save"
+7. Wait 60 seconds, then your live URL appears:
+       https://YourUsername.github.io/alpha-containers/AlphaContainers_App.html
+
+THAT IS YOUR BOSS'S LINK. Share it once. He bookmarks it forever.
+
+════════════════════════════════════════════════════════════════════
+STEP 6 — Install on boss's Android phone as an app
+════════════════════════════════════════════════════════════════════
+
+Send the boss this link: https://YourUsername.github.io/alpha-containers/AlphaContainers_App.html
+
+On his Android phone:
+1. Open the link in Chrome (not Samsung Browser)
+2. Tap the ⋮ menu (three dots, top right)
+3. Tap "Add to Home Screen"
+4. Tap "Add"
+5. Done — it appears on his home screen like a real app
+
+Every morning after you run "Run All Updates.bat", his app refreshes
+automatically within 60 seconds. He never needs a new link or file.
+
+════════════════════════════════════════════════════════════════════
+STEP 7 — Office PC setup (AFTER Step 4 is done at home)
+════════════════════════════════════════════════════════════════════
+
+OneDrive will have already synced everything to your office PC.
+You just need to tell git about the remote:
+
+  cd "C:\Users\[your office username]\OneDrive\AlphaContainers"
+  git init
+  git remote add origin YOUR_GITHUB_URL
+  git fetch origin
+  git checkout main
+
+After that, "Run All Updates.bat" works identically on the office PC.
+
+════════════════════════════════════════════════════════════════════
+DAILY WORKFLOW (after all setup is done)
+════════════════════════════════════════════════════════════════════
+
+  1. Imran's Production.xlsx is updated (as usual)
+  2. Double-click "Run All Updates.bat"
+  3. Done — boss's dashboard is live within 60 seconds
+
+Nothing else to do. Ever.
+
+════════════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+════════════════════════════════════════════════════════════════════
+
+"git is not recognized"
+→ Git not installed. Redo Step 3.
+
+"fatal: not a git repository"
+→ You skipped Step 4 on this PC. Redo Step 7 (office) or Step 4 (home).
+
+"remote: Repository not found"
+→ Wrong URL. Check Step 2 and redo git remote set-url origin YOUR_URL
+
+"Authentication failed"
+→ Use Personal Access Token not your password. See Step 4b.
+
+"Pages not showing"
+→ Wait 2 minutes after enabling Pages. Hard-refresh the browser (Ctrl+Shift+R).
+
+Boss sees old data
+→ Run "Run All Updates.bat" again. Check internet connection during push.
+→ Boss should hard-refresh: pull down in Chrome to refresh PWA.
+
+════════════════════════════════════════════════════════════════════
+YOUR LIVE DASHBOARD URL (fill in after Step 5):
+════════════════════════════════════════════════════════════════════
+
+https://ckndr.github.io/alpha-containers/AlphaContainers_App.html
+
+(Write it here after you complete setup)
