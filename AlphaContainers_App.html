@@ -8,7 +8,30 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Alpha Containers">
 <title>Alpha Containers</title>
-<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-512.png">
+<script>
+(function(){
+  var iconData = "data:image/png;base64,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";
+  var manifest = {
+    "name": "Alpha Containers",
+    "short_name": "AlphaAC",
+    "description": "Tubex Production System",
+    "start_url": location.href,
+    "display": "standalone",
+    "background_color": "#0d1f3c",
+    "theme_color": "#0d1f3c",
+    "icons": [
+      {"src": iconData, "sizes": "512x512", "type": "image/png", "purpose": "any"},
+      {"src": iconData, "sizes": "192x192", "type": "image/png", "purpose": "any"}
+    ]
+  };
+  var blob = new Blob([JSON.stringify(manifest)], {type:"application/json"});
+  var link = document.createElement("link");
+  link.rel = "manifest";
+  link.href = URL.createObjectURL(blob);
+  document.head.appendChild(link);
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -33,7 +56,7 @@ body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min
 }
 .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .header-left{display:flex;align-items:center;gap:14px}
-.logo-box{width:40px;height:40px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:"DM Mono",monospace;font-weight:500;color:var(--navy);font-size:12px;flex-shrink:0}
+.logo-box{width:40px;height:40px;border-radius:9px;flex-shrink:0;object-fit:contain;display:block}
 .header h1{font-family:"DM Serif Display",serif;color:#fff;font-size:19px;font-weight:400}
 .header h1 span{color:var(--accent2);font-style:italic}
 .header-sub{color:rgba(255,255,255,.5);font-size:11px;margin-top:2px}
@@ -308,7 +331,7 @@ table.orders tr:hover td{background:#f7f9ff}
 <div class="header">
   <div class="header-top">
     <div class="header-left">
-      <div class="logo-box">AC</div>
+      <img class="logo-box" src="data:image/png;base64,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" alt="Alpha Containers">
       <div>
         <h1>Alpha <span>Containers</span></h1>
         <div class="header-sub">Tubex Production System</div>
@@ -475,12 +498,12 @@ table.orders tr:hover td{background:#f7f9ff}
 <script>
 /* ═══════════════════════════════════════════════════════
    LIVE DATA — auto-generated by update_html.py
-   Last generated: 14-May-2026 11:42
+   Last generated: 15-May-2026 00:54
    ════════════════════════════════════════════════════ */
 /*/* DATA_START */
 const DASH_DATA = {
   "month": "May 2026",
-  "lastUpdated": "Updated 14-May-2026 11:42 from AlphaContainers_v10_24.xlsx",
+  "lastUpdated": "Updated 15-May-2026 00:54 from AlphaContainers_v10_24.xlsx",
   "kpi": {
     "tubeYest": 21540,
     "tubeMTD": 231240,
