@@ -1,8 +1,10 @@
 @echo off
-if /i "%~1"=="/auto" set "_AUTO_PUSH=1"
+set "_BATCH_MODE="
+if /i "%~1"=="/auto" set "_BATCH_MODE=1"
+if /i "%~1"=="/run" set "_BATCH_MODE=1"
 :: If not already inside a persistent window, relaunch inside cmd /k so the
 :: window stays open after the script finishes.
-if not defined _KEEP_OPEN if not defined _AUTO_PUSH (
+if not defined _KEEP_OPEN if not defined _BATCH_MODE (
     set _KEEP_OPEN=1
     cmd /k "%~f0"
     exit
@@ -10,13 +12,14 @@ if not defined _KEEP_OPEN if not defined _AUTO_PUSH (
 setlocal enabledelayedexpansion
 cd /d "%~dp0.."
 set "ONEDRIVE_BACKUP=C:\Users\HP\OneDrive\AlphaContainers"
+set "GIT_TERMINAL_PROMPT=0"
+set "GCM_INTERACTIVE=Never"
 
 if /i "%~1"=="/auto" (
     if not exist "Logs" mkdir "Logs"
     >>"Logs\hourly_push.log" echo.
     >>"Logs\hourly_push.log" echo ===========================================================
     >>"Logs\hourly_push.log" echo Hourly push started: %date% %time%
-    set "_AUTO_PUSH="
     call "%~f0" /run >>"Logs\hourly_push.log" 2>&1
     exit /b %errorlevel%
 )
