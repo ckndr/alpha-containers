@@ -9,6 +9,7 @@ if not defined _KEEP_OPEN if not defined _AUTO_PUSH (
 )
 setlocal enabledelayedexpansion
 cd /d "%~dp0.."
+set "ONEDRIVE_BACKUP=C:\Users\HP\OneDrive\AlphaContainers"
 
 if /i "%~1"=="/auto" (
     if not exist "Logs" mkdir "Logs"
@@ -27,6 +28,16 @@ echo.
 echo  ===========================================================
 echo   Alpha Containers -- Push Full Backup to GitHub
 echo  ===========================================================
+echo.
+
+echo [OneDrive] Copying project files to OneDrive backup...
+if not exist "%ONEDRIVE_BACKUP%" mkdir "%ONEDRIVE_BACKUP%"
+robocopy "%CD%" "%ONEDRIVE_BACKUP%" /E /COPY:DAT /DCOPY:DAT /R:2 /W:2 /XD ".git" "Logs" /XF "~$*" >nul
+if errorlevel 8 (
+    echo  WARNING: OneDrive backup copy failed. GitHub push will still continue.
+) else (
+    echo  OneDrive backup updated: %ONEDRIVE_BACKUP%
+)
 echo.
 
 where git >nul 2>&1

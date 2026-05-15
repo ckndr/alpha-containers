@@ -12,6 +12,8 @@ When editing an Excel workbook, do not overwrite the existing file. Save the edi
 
 Use `Scripts\Push.bat` when you want to upload the current project files to GitHub without running the daily update workflow.
 
+`Scripts\Push.bat` also copies the project folder to `C:\Users\HP\OneDrive\AlphaContainers` before pushing to GitHub. It copies new and changed files, but does not delete extra files already in OneDrive. It excludes the `.git` folder, local logs, and temporary Excel lock files.
+
 Use `Scripts\Pull.bat` before starting work on another computer. It downloads the latest `main` branch from GitHub into the local `D:\Alpha` folder. If local uncommitted changes exist, it stops and asks you to push or clean up first.
 
 Important: the main versioned workbook files, such as `AlphaContainers_v10_27.xlsx`, are included in GitHub sync so they can move between work and home. Raw Excel/data exports such as `dispatch.xls`, `inventory.xls`, `Production.xlsx`, and other `.xls`/`.xlsx` files remain ignored unless intentionally allowed.
