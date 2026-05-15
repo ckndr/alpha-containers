@@ -1,16 +1,19 @@
 @echo off
 chcp 65001 > nul
 echo ============================================================
-echo   Alpha Containers - Dispatch Updater
+echo   Alpha Containers - WIP Updater
+echo   (Manual step - paste Aurangzeb's WIP message when prompted)
 echo ============================================================
-echo.
-echo   Installing libraries (first time only)...
-pip install pandas openpyxl xlrd >nul 2>nul
-echo   Ready.
 echo.
 cd /d "%~dp0"
 set PYTHONIOENCODING=utf-8
-python update_dispatch.py
+
+if "%~1"=="" (
+    python update_wip.py
+) else (
+    python update_wip.py %*
+)
+
 echo.
 echo Press any key to close...
 pause >nul

@@ -3,7 +3,7 @@ generate_icons.py
 Alpha Containers — App Icon Generator
 --------------------------------------
 Run this ONCE to create proper PWA icons from your company logo.
-Place this file in your AlphaContainers OneDrive folder and double-click,
+Place this file in your AlphaContainers project folder and double-click,
 or run: python generate_icons.py
 
 Requires: pip install Pillow requests
@@ -11,7 +11,8 @@ Requires: pip install Pillow requests
 
 import os, sys, struct, zlib
 
-DIR = os.path.dirname(os.path.abspath(__file__))
+# Scripts live in AlphaContainers/Scripts/ — icons go to root (where HTML is)
+DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # ── Try to use Pillow for high-quality icons ──────────────────
 def try_pillow():

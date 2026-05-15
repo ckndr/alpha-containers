@@ -2,7 +2,7 @@
 // Network-first: always fetches fresh data when online
 // Falls back to cache only when offline
 
-const CACHE_NAME = 'alpha-containers-202605150952';
+const CACHE_NAME = 'alpha-containers-202605151200';
 const ASSETS = [
   './AlphaContainers_App.html',
   './manifest.json',

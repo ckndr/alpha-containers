@@ -1,6 +1,30 @@
 """
-Alpha Containers - Dispatch Updater v7
+Alpha Containers - Dispatch Updater v10
 ----------------------------------------------------------------------
+CHANGE LOG v10:
+  BUGFIX — 19mm S-43 / S-45 disambiguation:
+    PID 6624 was mislabeled as "S-43 DIA 19" in Product_Catalog; BOM 192 confirms
+    it is "S-45 DIA 19MM". PID 6623 (BOM 193) is the S-43 DIA 19MM product.
+    Both are now in Product_Catalog with correct names, so dispatch auto-resolves
+    by exact name match — no NAME_FIXES entries required.
+    NAME_FIXES entries added as explicit safety anchors regardless:
+      "S-43 DIA 19MM" -> "S-43 DIA 19MM"  (PID 6623 — auto-match safety)
+      "S-45 DIA 19MM" -> "S-45 DIA 19MM"  (PID 6624 — auto-match safety)
+    These are identity mappings; they make the intent explicit and ensure
+    that even if catalog names change slightly the script flags the mismatch.
+
+CHANGE LOG v9:
+  - Added dynamic date filtering: The script now automatically detects and
+    ignores any dispatch records matching the current system date (today's data).
+    If it's May 8th, all May 8th data is excluded.
+
+CHANGE LOG v8:
+  - NAME_FIXES: Added 3 new ERP name mappings confirmed from dispatch
+    mismatch log:
+      "PET BOTTLE (150ML)TRANSPARENT BODY MIST"              -> "TRANSPARENT BOTTLE 150ML"          (PID 8001)
+      "PET BOTTLE SMALL (120 ML) YELLOW"                     -> "PET BOTTLE SMALL (120ML) YELLOW"   (PID 8005)
+      "PET BOTTLE SMALL (130 ML) (TRANSPARENT) (WITHOUT CAP)"-> "PET BOTTLE SMALL (130ML) TRANSPARENT" (PID 8010)
+
 CHANGE LOG v7:
   - NAME_FIXES updated after catalog rename (v10.3):
       REMOVED "BT-200 ML YELLOW" -> old "YELLOW LARGE BOTTLE 200ML"
@@ -27,17 +51,6 @@ CHANGE LOG v5:
   - PIDs are still used internally to locate the correct Dashboard row
     (Dashboard col F holds PIDs). The user never needs to know or enter PIDs.
 
-CHANGE LOG v4:
-  - Added "ANVIL 43" -> PID 6020 and "ANVIL 45" -> PID 6021.
-
-CHANGE LOG v3:
-  - BT-200 ML YELLOW confirmed as Samsol International (PID 8006).
-  - Abid Masood Khan documented as PET cash placeholder.
-
-CHANGE LOG v2:
-  - Added "BT-200 ML YELLOW" -> PID 8006 (YELLOW LARGE BOTTLE 200ML)
-  - Script now overwrites the existing AlphaContainers file in place.
-
 PURPOSE:
   Reads dispatch.xls (TUBEX-ALUM) and dispatch_pet.xls (TUBEX-PET)
   from the same folder, then writes MTD dispatch quantities into
@@ -59,6 +72,7 @@ NAME_FIXES:
 
 import os
 import glob
+from datetime import datetime
 
 import warnings
 warnings.filterwarnings("ignore", message=".*Data Validation.*")
@@ -77,12 +91,24 @@ from openpyxl import load_workbook
 # dispatch .xls on the left, and the Product_Catalog col D name on right.
 # -----------------------------------------------------------------------
 NAME_FIXES = {
+    # 19mm Samsol — two distinct products added v10.22:
+    #   6623 = S-43 DIA 19MM (BOM 193)
+    #   6624 = S-45 DIA 19MM (BOM 192)
+    # Both names now exist in Product_Catalog and auto-resolve.
+    # Entries below are safety anchors to make intent explicit.
+    "S-43 DIA 19MM":  "S-43 DIA 19MM",   # PID 6623 — identity mapping, safety anchor
+    "S-45 DIA 19MM":  "S-45 DIA 19MM",   # PID 6624 — identity mapping, safety anchor
+
     # PET products -- ERP uses a different naming convention than catalog
     # NOTE: "BT-200 ML YELLOW" and "PET BOTTLE LARGE 200ML WHITE" were
     # removed from NAME_FIXES because the catalog was renamed to match
     # the ERP names exactly (v10.3) -- they now auto-resolve.
-    "BT-120 ML YELLOW":                       "PET BOTTLE SMALL (120ML) YELLOW",
-    "PET BOTTLE SMALL (120ML) COMPACT BLACK": "BLACK SMALL BOTTLE 120ML",
+    "BT-120 ML YELLOW":                                       "PET BOTTLE SMALL (120ML) YELLOW",   # old ERP name retained
+    "PET BOTTLE SMALL (120ML) COMPACT BLACK":                 "BLACK SMALL BOTTLE 120ML",
+    # Added v8 — ERP names confirmed from dispatch mismatch log
+    "PET BOTTLE (150ML)TRANSPARENT BODY MIST":                "TRANSPARENT BOTTLE 150ML",          # PID 8001 — ERP appends "Body Mist" suffix
+    "PET BOTTLE SMALL (120 ML) YELLOW":                       "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — ERP has space: "120 ML" vs "120ML"
+    "PET BOTTLE SMALL (130 ML) (TRANSPARENT) (WITHOUT CAP)":  "PET BOTTLE SMALL (130ML) TRANSPARENT",  # PID 8010 — ERP adds "(WITHOUT CAP)"
 }
 
 
@@ -141,6 +167,7 @@ def resolve_pid(erp_name, catalog):
 def parse_dispatch_file(path):
     """
     Parse one ERP dispatch .xls (Date Wise format).
+    Ignores any dispatch rows matching the current day.
     Returns {product_name: total_dispatched_qty}.
     """
     df = pd.read_excel(path, sheet_name=0, engine='xlrd', header=None)
@@ -150,6 +177,21 @@ def parse_dispatch_file(path):
 
     result = {}
     current_product = None
+    ignored_today = 0
+
+    today = datetime.now()
+    today_date = today.date()
+    today_strs = [
+        today.strftime("%d/%m/%Y").lower(),
+        today.strftime("%d-%m-%Y").lower(),
+        today.strftime("%d-%b-%Y").lower(),
+        today.strftime("%Y-%m-%d").lower(),
+        f"{today.day}/{today.month}/{today.year}",
+        f"{today.day}-{today.month}-{today.year}",
+        today.strftime("%d.%m.%Y").lower(),
+        today.strftime("%d-%b-%y").lower(),
+        today.strftime("%d/%m/%y").lower()
+    ]
 
     for _, row in df.iterrows():
         col0 = row[0]
@@ -172,11 +214,37 @@ def parse_dispatch_file(path):
             int(float(col0))
             if pd.isna(col7):
                 continue
+
+            skip_row = False
+            for val in row:
+                if pd.isna(val):
+                    continue
+                if hasattr(val, 'date') and callable(getattr(val, 'date')):
+                    if val.date() == today_date:
+                        skip_row = True
+                        break
+                elif isinstance(val, str):
+                    v_str = val.strip().lower()
+                    if v_str in today_strs:
+                        skip_row = True
+                        break
+                    for ts in today_strs:
+                        if v_str.startswith(ts + ' ') or v_str.startswith(ts + 't'):
+                            skip_row = True
+                            break
+
+            if skip_row:
+                ignored_today += 1
+                continue
+
             disp_qty = float(col7)
             if current_product is not None:
                 result[current_product] = result.get(current_product, 0) + disp_qty
         except (ValueError, TypeError):
             pass
+
+    if ignored_today > 0:
+        print(f"  -> Ignored {ignored_today} dispatch row(s) from today ({today_date}) in {os.path.basename(path)}")
 
     return result
 
@@ -218,13 +286,11 @@ def update_dispatch(ac_path, dispatch_by_pid):
 
     pid_row_map = build_pid_row_map(ws)
 
-    # Wipe all K values in product rows (skip formula strings = TOTAL rows)
     for r in range(DASHBOARD_ROW_MIN, DASHBOARD_ROW_MAX + 1):
         cell = ws.cell(r, DASHBOARD_DISP_COL)
         if cell.value is not None and not isinstance(cell.value, str):
             cell.value = None
 
-    # Write dispatch totals
     updated = 0
     skipped = []
     for pid, qty in dispatch_by_pid.items():
@@ -249,11 +315,11 @@ def main():
 
     print("")
     print(SEP)
-    print("  Alpha Containers - Dispatch Updater v6")
+    print("  Alpha Containers - Dispatch Updater v10")
     print(SEP)
     print("")
 
-    folder = os.path.dirname(os.path.abspath(__file__))
+    folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     print("[1/4] Finding files...")
     ac_path, tube_path, pet_path = find_files(folder)

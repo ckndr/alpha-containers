@@ -9,7 +9,6 @@
 <meta name="apple-mobile-web-app-title" content="Alpha Containers">
 <title>Alpha Containers</title>
 <link rel="manifest" href="./manifest.json">
-<link rel="apple-touch-icon" href="./icon-512.png">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -34,7 +33,7 @@ body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min
 }
 .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .header-left{display:flex;align-items:center;gap:14px}
-.logo-box{width:40px;height:40px;border-radius:9px;flex-shrink:0;object-fit:contain;display:block}
+.logo-box{width:40px;height:40px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:"DM Mono",monospace;font-weight:500;color:var(--navy);font-size:12px;flex-shrink:0}
 .header h1{font-family:"DM Serif Display",serif;color:#fff;font-size:19px;font-weight:400}
 .header h1 span{color:var(--accent2);font-style:italic}
 .header-sub{color:rgba(255,255,255,.5);font-size:11px;margin-top:2px}
@@ -262,31 +261,6 @@ table.orders tr:hover td{background:#f7f9ff}
   #panel-calc .grand-total-wrap{display:block!important}
 }
 
-/* ── STICKY JUMP BUTTON ── */
-.jump-btn-wrap{
-  position:fixed;bottom:22px;right:22px;z-index:999;
-  display:none;
-  animation:jumpIn .25s cubic-bezier(.34,1.56,.64,1);
-}
-@keyframes jumpIn{from{opacity:0;transform:translateY(16px) scale(.9)}to{opacity:1;transform:none}}
-.jump-btn{
-  display:flex;align-items:center;gap:8px;
-  padding:11px 20px;background:var(--navy);color:#fff;
-  border:none;border-radius:50px;
-  font-family:"DM Sans",sans-serif;font-size:13px;font-weight:600;
-  cursor:pointer;box-shadow:0 4px 18px rgba(13,31,60,.35);
-  transition:.2s;white-space:nowrap;
-}
-.jump-btn:hover{background:var(--blue);box-shadow:0 6px 24px rgba(35,85,160,.45);transform:translateY(-1px)}
-.jump-btn .arrow{font-size:16px;line-height:1;transition:.2s}
-.jump-btn:hover .arrow{transform:translateY(2px)}
-/* grand-total needs breathing room so sticky header doesn't cover it on scroll */
-#grandTotal{scroll-margin-top:80px}
-@media(max-width:480px){
-  .jump-btn-wrap{bottom:14px;right:12px}
-  .jump-btn{font-size:12px;padding:10px 16px}
-}
-
 
 
   /* ── FOOTER ── */
@@ -309,7 +283,7 @@ table.orders tr:hover td{background:#f7f9ff}
 <div class="header">
   <div class="header-top">
     <div class="header-left">
-      <img class="logo-box" src="data:image/png;base64,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" alt="Alpha Containers">
+      <div class="logo-box">AC</div>
       <div>
         <h1>Alpha <span>Containers</span></h1>
         <div class="header-sub">Tubex Production System</div>
@@ -476,25 +450,25 @@ table.orders tr:hover td{background:#f7f9ff}
 <script>
 /* ═══════════════════════════════════════════════════════
    LIVE DATA — auto-generated by update_html.py
-   Last generated: 15-May-2026 12:00
+   Last generated: 08-May-2026 16:06
    ════════════════════════════════════════════════════ */
 /*/* DATA_START */
 const DASH_DATA = {
   "month": "May 2026",
-  "lastUpdated": "Updated 15-May-2026 12:00 from AlphaContainers_v10_26.xlsx",
+  "lastUpdated": "Updated 08-May-2026 16:06 from AlphaContainers_v10_16.xlsx",
   "kpi": {
-    "tubeYest": 21540,
-    "tubeMTD": 231240,
-    "petYest": 0,
+    "tubeYest": 26040,
+    "tubeMTD": 135624,
+    "petYest": 10080,
     "petMTD": 44640,
-    "tubeMTDDispatch": 260603,
-    "petMTDDispatch": 107840
+    "tubeMTDDispatch": 35280,
+    "petMTDDispatch": 98120
   },
   "downtime": [
     {
       "cat": "Mechanical",
       "icon": "🔧",
-      "hrs": 27.67
+      "hrs": 15.67
     },
     {
       "cat": "Electrical",
@@ -504,17 +478,17 @@ const DASH_DATA = {
     {
       "cat": "Material Shortage",
       "icon": "📦",
-      "hrs": 49.5
+      "hrs": 28.5
     },
     {
       "cat": "Changeover",
       "icon": "🔄",
-      "hrs": 75.17
+      "hrs": 20.33
     },
     {
       "cat": "Operations",
       "icon": "⚙️",
-      "hrs": 79.33
+      "hrs": 34.33
     },
     {
       "cat": "Power Shutdown",
@@ -543,13 +517,13 @@ const DASH_DATA = {
       "dispatch": 0
     },
     {
-      "pid": 6624,
-      "product": "S-45 DIA 19MM",
+      "pid": 9003,
+      "product": "S-43 DIA 19",
       "customer": "Samsol International Private Limited",
       "dia": "19mm",
       "ordered": 10888,
       "produced": 0,
-      "dispatch": 8232
+      "dispatch": 0
     },
     {
       "pid": 6559,
@@ -565,8 +539,8 @@ const DASH_DATA = {
       "product": "VINCE HIS BEARD & MUSTACHE COLOR",
       "customer": "Mablay Beauty PVT LTD.",
       "dia": "20.5mm",
-      "ordered": 23970,
-      "produced": 23970,
+      "ordered": 22000,
+      "produced": 0,
       "dispatch": 0
     },
     {
@@ -575,7 +549,7 @@ const DASH_DATA = {
       "customer": "Mablay Beauty PVT LTD.",
       "dia": "25mm",
       "ordered": 22000,
-      "produced": 21840,
+      "produced": 0,
       "dispatch": 0
     },
     {
@@ -583,7 +557,7 @@ const DASH_DATA = {
       "product": "S 43 25MM",
       "customer": "Samsol International Private Limited",
       "dia": "25mm",
-      "ordered": 38976,
+      "ordered": 41414,
       "produced": 38976,
       "dispatch": 0
     },
@@ -592,8 +566,8 @@ const DASH_DATA = {
       "product": "VINCE NURTURAL",
       "customer": "Mablay Beauty PVT LTD.",
       "dia": "30mm",
-      "ordered": 23562,
-      "produced": 23562,
+      "ordered": 22000,
+      "produced": 0,
       "dispatch": 0
     },
     {
@@ -601,18 +575,9 @@ const DASH_DATA = {
       "product": "HELLO HAIR COLOR",
       "customer": "Golden Pearl Cosmetics (PVT) LTD",
       "dia": "30mm",
-      "ordered": 87108,
+      "ordered": 106060,
       "produced": 87108,
-      "dispatch": 152320
-    },
-    {
-      "pid": 6595,
-      "product": "DOWFEN GEL 50G",
-      "customer": "Seatle (Private) Limited",
-      "dia": "30mm",
-      "ordered": 0,
-      "produced": 0,
-      "dispatch": 24990
+      "dispatch": 0
     },
     {
       "pid": 6515,
@@ -620,7 +585,7 @@ const DASH_DATA = {
       "customer": "Hola Hair",
       "dia": "32mm",
       "ordered": 11792,
-      "produced": 13104,
+      "produced": 0,
       "dispatch": 0
     },
     {
@@ -628,36 +593,9 @@ const DASH_DATA = {
       "product": "V- HC BROWN",
       "customer": "Adore",
       "dia": "35mm",
-      "ordered": 34000,
-      "produced": 12060,
-      "dispatch": 5040
-    },
-    {
-      "pid": 6531,
-      "product": "V-HC BLACK",
-      "customer": "Adore",
-      "dia": "35mm",
-      "ordered": 10000,
-      "produced": 10620,
+      "ordered": 40000,
+      "produced": 9540,
       "dispatch": 0
-    },
-    {
-      "pid": 6623,
-      "product": "S-43 DIA 19MM",
-      "customer": "Samsol International Private Limited",
-      "dia": "19mm",
-      "ordered": 0,
-      "produced": 0,
-      "dispatch": 24696
-    },
-    {
-      "pid": 6416,
-      "product": "SIGNATURE HAIR COLOR CREAM 60ML",
-      "customer": "Al-Rehman Group",
-      "dia": "30mm",
-      "ordered": 0,
-      "produced": 0,
-      "dispatch": 10045
     }
   ],
   "petOrders": [
@@ -668,7 +606,7 @@ const DASH_DATA = {
       "dia": "120ml",
       "ordered": 58960,
       "produced": 39120,
-      "dispatch": 51720
+      "dispatch": 42000
     },
     {
       "pid": 8010,
@@ -725,8 +663,7 @@ const PRODUCTS = [
   {pid:1085,type:'tube',dia:'19',customer:'Brookes Pharma',name:'PYODINE GEL 20GM'},
   {pid:6559,type:'tube',dia:'19',customer:'Brookes Pharma',name:'PHLOGIN GEL 20G'},
   {pid:6560,type:'tube',dia:'19',customer:'Brookes Pharma',name:'CONTRATUBEX GEL 20G'},
-  {pid:6623,type:'tube',dia:'19',customer:'Samsol International',name:'S-43 DIA 19MM'},
-  {pid:6624,type:'tube',dia:'19',customer:'Samsol International',name:'S-45 DIA 19MM'},
+  {pid:9003,type:'tube',dia:'19',customer:'Samsol International',name:'S-43 DIA 19'},
   {pid:6077,type:'tube',dia:'20.5',customer:'Mablay Beauty',name:'VINCE HIS BEARD & MUSTACHE COLOR'},
   {pid:5698,type:'tube',dia:'20.5',customer:'Samsol International',name:'S-45 DIA 20.5'},
   {pid:5699,type:'tube',dia:'20.5',customer:'Samsol International',name:'S-43 DIA 20.5'},
@@ -766,21 +703,14 @@ const PRODUCTS = [
   {pid:8008,type:'pet',dia:'200ml',customer:'Samsol International',name:'BLACK BOTTLE 200ML'},
   {pid:8009,type:'pet',dia:'300ml',customer:'Mablay Beauty',name:'TRANSPARENT BOTTLE 300ML'},
   {pid:8013,type:'pet',dia:'500ml',customer:'Mablay Beauty',name:'TRANSPARENT JAR 500ML'},
-  {pid:8014,type:'pet',dia:'200ml',customer:'Samsol International',name:'BT-200ML MUSTARD OIL (TRANSPARENT)'},
-  {pid:2909,type:'tube',dia:'30',customer:'Professional Beauty Solution',name:'EAZI COLOR PERMANENT HAIR COLOUR 60ML'},
-  {pid:4227,type:'tube',dia:'25',customer:'Professional Beauty Solution (Pvt) Ltd',name:'BELINI HAIR COLOR 50ML'},
-  {pid:5389,type:'tube',dia:'25',customer:'Habib Hanif Inc',name:'S-45'},
-  {pid:6151,type:'tube',dia:'30',customer:'Mateen Sons',name:'GP DIA 30MM'}
+  {pid:8014,type:'pet',dia:'200ml',customer:'Samsol International',name:'BT-200ML MUSTARD OIL (TRANSPARENT)'}
 ];
 
 const BOM = {
   1085:[{cat:'SLUG',id:22,name:'19X4.2',uom:'kg',r:3.367,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.31,s:0.1,est:false},{cat:'CAP',id:81,name:'M-9 S/M F/P WHITE (S)',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:39,name:'19X200 3Ply',uom:'pcs',r:5,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.0034,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.138,s:0.1,est:false},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'L',r:0.1449,s:0.1,est:false}],
-  2909:[{cat:'SLUG',id:2,name:'30X4.3',uom:'kg',r:8,s:0.1,est:false},{cat:'BASE COAT',id:170,name:'WHITE 5711200001',uom:'kg',r:0.67,s:0.1,est:false},{cat:'CARTON',id:45,name:'30X150 3Ply L18.75" W12.5" H6.5"',uom:'pcs',r:6.6666,s:0.1,est:false},{cat:'ZINC POWDER',id:4165,name:'Zinc Archinate',uom:'kg',r:0.00832,s:0.1,est:false},{cat:'LACQUER',id:1065,name:'PIGMENTED LACQUAR 57300',uom:'kg',r:0.28,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.156,s:0.1,est:false}],
   3447:[{cat:'SLUG',id:6,name:'25X4.5 S/M',uom:'kg',r:5.917,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.61,s:0.1,est:false},{cat:'CAP',id:68,name:'M-11 S/M SPR WHITE DIA 25MM',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3598,name:'25x336 5Ply',uom:'pcs',r:2.976,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.00615,s:0.1,est:false},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'L',r:0.3737,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:4.712,s:0.1,est:false}],
   3726:[{cat:'SLUG',id:6,name:'25X4.5 S/M',uom:'kg',r:5.917,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.612,s:0.1,est:false},{cat:'CAP',id:68,name:'M-11 S/M SPR WHITE DIA 25MM',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3598,name:'25x336 5Ply',uom:'pcs',r:2.976,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.00615,s:0.1,est:false},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'L',r:0.292,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.079,s:0.1,est:false}],
   4050:[{cat:'SLUG',id:406,name:'30X4.5 S/M',uom:'kg',r:8,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.6684,s:0.1,est:false},{cat:'LATEX',id:186,name:'LATEX IMP 574010002',uom:'kg',r:0.12,s:0.1,est:false},{cat:'CAP',id:578,name:'M-12 S/M SPR WHITE DIA 30',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:45,name:'30X150 3Ply',uom:'pcs',r:6.666,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.00832,s:0.1,est:false},{cat:'LACQUER',id:4155,name:'E/P LACQUER 4000 A/R',uom:'kg',r:0.2959,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.156,s:0.1,est:false}],
-  4227:[{cat:'SLUG',id:6,name:'25X4.5 S/M',uom:'kg',r:5.9171,s:0.1,est:false},{cat:'LATEX',id:186,name:'LATEX IMP 574010002',uom:'kg',r:0.09,s:0.1,est:false},{cat:'CAP',id:3522,name:'M-11 S/M SPR DARK BLUE DIA 25MM',uom:'pcs',r:1000,s:0.1,est:false},{cat:'CARTON',id:3598,name:'25x336 5Ply L21.5" W14.5" H7 "',uom:'pcs',r:2.9761,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.00832,s:0.1,est:false},{cat:'LACQUER',id:1065,name:'PIGMENTED LACQUAR 57300',uom:'kg',r:0.4202,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.079,s:0.1,est:false}],
-  5389:[{cat:'SLUG',id:6,name:'25X4.5 S/M',uom:'kg',r:5.917,s:0.1,est:false},{cat:'BASE COAT',id:4156,name:'BEIGE 5711200007',uom:'kg',r:0.61,s:0.1,est:false},{cat:'CAP',id:3866,name:'M-11 S/M SPR BEIGE DIA 25',uom:'pcs',r:1000,s:0.1,est:false},{cat:'CARTON',id:3598,name:'25x336 5Ply L21.5" W14.5" H7 "',uom:'pcs',r:2.976,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.0061538,s:0.1,est:false},{cat:'LACQUER',id:184,name:'LACQUAR IMP 49989',uom:'kg',r:0.3737,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:4.712,s:0.1,est:false}],
   5698:[{cat:'SLUG',id:4179,name:'20.5x4.5',uom:'kg',r:3.937,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.385,s:0.1,est:false},{cat:'CAP',id:6971,name:'M-9 S/M SPR WHITE DIA 20.5MM',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3619,name:'20.5x510 5ply',uom:'pcs',r:2.976,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.00409,s:0.1,est:false},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'L',r:0.24,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.059,s:0.1,est:false}],
   5699:[{cat:'SLUG',id:4179,name:'20.5x4.5',uom:'kg',r:3.937,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.385,s:0.1,est:false},{cat:'CAP',id:6971,name:'M-9 S/M SPR WHITE DIA 20.5MM',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3619,name:'20.5x510 5ply',uom:'pcs',r:1.9607,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.00409,s:0.1,est:false},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'L',r:0.24,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.059,s:0.1,est:false}],
   5731:[{cat:'SLUG',id:4179,name:'20.5x4.5',uom:'kg',r:3.937,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.385,s:0.1,est:false},{cat:'CAP',id:6971,name:'M-9 S/M SPR WHITE DIA 20.5MM',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3619,name:'20.5x510 5ply',uom:'pcs',r:1.96,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.004094,s:0.1,est:false},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'L',r:0.24,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:2.996,s:0.1,est:false}],
@@ -790,7 +720,6 @@ const BOM = {
   6020:[{cat:'SLUG',id:3503,name:'35X5.0',uom:'kg',r:12.82,s:0.1,est:false},{cat:'BASE COAT',id:4156,name:'BEIGE 5711200007',uom:'kg',r:0.78,s:0.1,est:false},{cat:'CAP',id:1073,name:'M-11 S/M F/P BLACK',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3988,name:'35x180 5ply',uom:'pcs',r:6.06,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.01333,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.168,s:0.1,est:false},{cat:'LACQUER',id:4155,name:'E/P LACQUER 4000 A/R',uom:'kg',r:0.5,s:0.1,est:false},{cat:'LATEX',id:186,name:'LATEX IMP 574010002',uom:'kg',r:0.7,s:0.1,est:false}],
   6021:[{cat:'SLUG',id:3503,name:'35X5.0',uom:'kg',r:12.82,s:0.1,est:false},{cat:'BASE COAT',id:4156,name:'BEIGE 5711200007',uom:'kg',r:0.78,s:0.1,est:false},{cat:'CAP',id:1073,name:'M-11 S/M F/P BLACK',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3988,name:'35x180 5ply',uom:'pcs',r:6.06,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.01333,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.168,s:0.1,est:false},{cat:'LACQUER',id:4155,name:'E/P LACQUER 4000 A/R',uom:'kg',r:0.5,s:0.1,est:false},{cat:'LATEX',id:186,name:'LATEX IMP 574010002',uom:'kg',r:0.7,s:0.1,est:false}],
   6077:[{cat:'SLUG',id:4179,name:'20.5x4.5',uom:'kg',r:3.937,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.31,s:0.1,est:false},{cat:'CAP',id:7370,name:'M-9 S/M SPR BLACK DIA 20.5MM',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3619,name:'20.5x510 5ply',uom:'pcs',r:1.7,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.0034,s:0.1,est:false},{cat:'LACQUER',id:4155,name:'E/P LACQUER 4000 A/R',uom:'kg',r:0.1449,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.059,s:0.1,est:false}],
-  6151:[{cat:'SLUG',id:2,name:'30X4.3',uom:'kg',r:8,s:0.1,est:false},{cat:'BASE COAT',id:170,name:'WHITE 5711200001',uom:'kg',r:0.67,s:0.1,est:false},{cat:'LATEX',id:186,name:'LATEX IMP 574010002',uom:'kg',r:0.28,s:0.1,est:false},{cat:'CAP',id:578,name:'M-12 S/M SPR WHITE DIA 30 SCABIN',uom:'pcs',r:1000,s:0.1,est:false},{cat:'CARTON',id:3988,name:'35x180 5ply L21.5" W14.5" H8.5"',uom:'pcs',r:4.2016,s:0.1,est:false},{cat:'ZINC POWDER',id:4165,name:'Zinc Archinate',uom:'kg',r:0.00832,s:0.1,est:false},{cat:'LACQUER',id:1065,name:'PIGMENTED LACQUAR 57300',uom:'kg',r:0.28,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.156,s:0.1,est:false},{cat:'INK',id:6935,name:'GOLD V0221267-RF-401363',uom:'kg',r:0.033,s:0.1,est:false}],
   6206:[{cat:'SLUG',id:406,name:'30X4.5 S/M',uom:'kg',r:8,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.67,s:0.1,est:false},{cat:'LATEX',id:186,name:'LATEX IMP 574010002',uom:'kg',r:0.28,s:0.1,est:false},{cat:'CAP',id:68,name:'M-11 S/M SPR WHITE DIA 25MM',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3598,name:'25x336 5Ply',uom:'pcs',r:4.2016,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.00832,s:0.1,est:false},{cat:'LACQUER',id:4155,name:'E/P LACQUER 4000 A/R',uom:'kg',r:0.28,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.156,s:0.1,est:false},{cat:'INK',id:6935,name:'GOLD V0221267-RF-401363',uom:'kg',r:0.033,s:0.1,est:false}],
   6228:[{cat:'SLUG',id:6,name:'25X4.5 S/M',uom:'kg',r:5.97,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.612,s:0.1,est:false},{cat:'LATEX',id:186,name:'LATEX IMP 574010002',uom:'kg',r:0.25,s:0.1,est:false},{cat:'CAP',id:68,name:'M-11 S/M SPR WHITE DIA 25MM',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3598,name:'25x336 5Ply',uom:'pcs',r:2.976,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.0061538,s:0.1,est:false},{cat:'LACQUER',id:4155,name:'E/P LACQUER 4000 A/R',uom:'kg',r:0.292,s:0.1,est:false},{cat:'STATIONARY',id:495,name:'CARTON LABEL',uom:'pcs',r:2.976,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.079,s:0.1,est:false}],
   6312:[{cat:'SLUG',id:406,name:'30X4.5 S/M',uom:'kg',r:8,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.67,s:0.1,est:false},{cat:'CARTON',id:45,name:'30X150 3Ply',uom:'pcs',r:6.6666,s:0.1,est:false},{cat:'LACQUER',id:4155,name:'E/P LACQUER 4000 A/R',uom:'kg',r:0.28,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.156,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.00832,s:0.1,est:false}],
@@ -809,8 +738,6 @@ const BOM = {
   6560:[{cat:'SLUG',id:22,name:'19X4.2',uom:'kg',r:3.367,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.31,s:0.1,est:false},{cat:'CAP',id:81,name:'M-9 S/M F/P WHITE (S)',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:39,name:'19X200 3Ply',uom:'pcs',r:5,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.0034,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.138,s:0.1,est:false},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'L',r:0.1449,s:0.1,est:false}],
   6561:[{cat:'SLUG',id:2799,name:'16x4.5',uom:'kg',r:2.51889,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.29,s:0.1,est:false},{cat:'CAP',id:69,name:'M-7 S/M F/P (S) WHITE',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:36,name:'16X200 3Ply',uom:'pcs',r:5,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.0026196,s:0.1,est:false},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'L',r:0.17,s:0.1,est:false},{cat:'THINNER',id:190,name:'THINNER FOR LACQUER SOL R/C',uom:'L',r:0.06,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.119,s:0.1,est:false},{cat:'CARTON',id:200,name:'DIA 16 5Ply',uom:'pcs',r:0.55,s:0.1,est:false}],
   6595:[{cat:'SLUG',id:406,name:'30X4.5 S/M',uom:'kg',r:8,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.67,s:0.1,est:false},{cat:'LATEX',id:186,name:'LATEX IMP 574010002',uom:'kg',r:0.28,s:0.1,est:false},{cat:'CAP',id:3211,name:'M-9 S/M SPR WHITE DIA 22 AUTO',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3598,name:'25x336 5Ply',uom:'pcs',r:4.2016,s:0.1,est:false},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'L',r:0.28,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.008322,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.156,s:0.1,est:false}],
-  6623:[{cat:'SLUG',id:19,name:'19X4.5 S/M',uom:'kg',r:3.367,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 23410 CT',uom:'kg',r:0.31,s:0.1,est:false},{cat:'CAP',id:80,name:'M-9 S/M SPR WHITE DIA 19',uom:'pcs',r:1000,s:0.1,est:false},{cat:'CARTON',id:3619,name:'20.5x510 5ply L21.5" W14.5" H6"',uom:'pcs',r:1.7,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.0034,s:0.1,est:false},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'L',r:0.1449,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.059,s:0.1,est:false}],
-  6624:[{cat:'SLUG',id:19,name:'19X4.5 S/M',uom:'kg',r:3.367,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 23410 CT',uom:'kg',r:0.31,s:0.1,est:false},{cat:'CAP',id:80,name:'M-9 S/M SPR WHITE DIA 19',uom:'pcs',r:1000,s:0.1,est:false},{cat:'CARTON',id:3619,name:'20.5x510 5ply L21.5" W14.5" H6"',uom:'pcs',r:1.7,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.0034,s:0.1,est:false},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'L',r:0.1449,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.059,s:0.1,est:false}],
   8001:[{cat:'PET RESIN',id:2680,name:'PET RESIN A-84',uom:'kg',r:22,s:0.15,est:false},{cat:'MASTER CARTON',id:5977,name:'MASTER CARTON 38"X24"X15.5"',uom:'pcs',r:1.087,s:0.15,est:false},{cat:'POLY BAG',id:2267,name:'POLY BAG 20X30 (LDPE)',uom:'pcs',r:8.696,s:0.15,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.027,s:0.15,est:false},{cat:'PLASTIC DOORI',id:3043,name:'PLASTIC DOORI',uom:'ROLL',r:0.005,s:0.15,est:false}],
   8005:[{cat:'PET RESIN',id:2680,name:'PET RESIN A-84',uom:'kg',r:17.1,s:0.15,est:false},{cat:'MASTERBATCH',id:4070,name:'MASTER BATCH ONCOLOR YELLOW NE12340208-ZN',uom:'kg',r:0.9,s:0.15,est:false},{cat:'POLY BAG',id:2267,name:'POLY BAG 20X30 (LDPE)',uom:'pcs',r:8.333,s:0.15,est:false},{cat:'PLASTIC DOORI',id:3043,name:'PLASTIC DOORI',uom:'ROLL',r:0.005,s:0.15,est:false}],
   8006:[{cat:'PET RESIN',id:2680,name:'PET RESIN A-84',uom:'kg',r:23.75,s:0.15,est:false},{cat:'MASTERBATCH',id:4070,name:'MASTER BATCH ONCOLOR YELLOW NE12340208-ZN',uom:'kg',r:1.25,s:0.15,est:false},{cat:'POLY BAG',id:3006,name:'POLY BAG 24X36 (LDPE)',uom:'pcs',r:8.333,s:0.15,est:false},{cat:'PLASTIC DOORI',id:3043,name:'PLASTIC DOORI',uom:'ROLL',r:0.005,s:0.15,est:false}],
@@ -821,21 +748,23 @@ const BOM = {
   8011:[{cat:'PET RESIN',id:2680,name:'PET RESIN A-84',uom:'kg',r:17.46,s:0.15,est:false},{cat:'MASTERBATCH',id:7412,name:'MASTER BATCH BLACK DP# 6411',uom:'kg',r:0.54,s:0.15,est:false},{cat:'POLY BAG',id:2267,name:'POLY BAG 20X30 (LDPE)',uom:'pcs',r:8.333,s:0.15,est:false},{cat:'PLASTIC DOORI',id:3043,name:'PLASTIC DOORI',uom:'ROLL',r:0.005,s:0.15,est:false}],
   8012:[{cat:'PET RESIN',id:2680,name:'PET RESIN A-84',uom:'kg',r:17.1,s:0.15,est:false},{cat:'MASTERBATCH',id:5816,name:'MASTER BATCH WHITE PRC-MC ET02340000',uom:'kg',r:0.9,s:0.15,est:false},{cat:'POLY BAG',id:2267,name:'POLY BAG 20X30 (LDPE)',uom:'pcs',r:8.333,s:0.15,est:false},{cat:'PLASTIC DOORI',id:3043,name:'PLASTIC DOORI',uom:'ROLL',r:0.005,s:0.15,est:false}],
   8013:[{cat:'PET RESIN',id:2680,name:'PET RESIN A-84',uom:'kg',r:50,s:0.15,est:false},{cat:'MASTER CARTON',id:3621,name:'MASTER CARTON 34.7 X 59.5 X 34.5',uom:'pcs',r:2.778,s:0.15,est:false},{cat:'POLY BAG',id:3006,name:'POLY BAG 24X36 (LDPE)',uom:'pcs',r:16.667,s:0.15,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.069,s:0.15,est:false},{cat:'PLASTIC DOORI',id:3043,name:'PLASTIC DOORI',uom:'ROLL',r:0.005,s:0.15,est:false}],
-  8014:[{cat:'PET RESIN',id:2680,name:'PET RESIN A-84',uom:'kg',r:23.75,s:0.15,est:false},{cat:'POLY BAG',id:3006,name:'POLY BAG 24X36 (LDPE)',uom:'pcs',r:8.333,s:0.15,est:false},{cat:'PLASTIC DOORI',id:3043,name:'PLASTIC DOORI',uom:'ROLL',r:0.005,s:0.15,est:false}]
+  8014:[{cat:'PET RESIN',id:2680,name:'PET RESIN A-84',uom:'kg',r:23.75,s:0.15,est:false},{cat:'POLY BAG',id:3006,name:'POLY BAG 24X36 (LDPE)',uom:'pcs',r:8.333,s:0.15,est:false},{cat:'PLASTIC DOORI',id:3043,name:'PLASTIC DOORI',uom:'ROLL',r:0.005,s:0.15,est:false}],
+  9002:[{cat:'SLUG',id:406,name:'30X4.5 S/M',uom:'kg',r:8,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.67,s:0.1,est:false},{cat:'LACQUER',id:4155,name:'E/P LACQUER 4000 A/R',uom:'kg',r:0.28,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.00832,s:0.1,est:false},{cat:'CAP',id:578,name:'M-12 S/M SPR WHITE DIA 30',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3598,name:'25x336 5Ply',uom:'pcs',r:6.06,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.168,s:0.1,est:false}],
+  9003:[{cat:'SLUG',id:19,name:'19X4.5 S/M',uom:'kg',r:3.367,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.385,s:0.1,est:false},{cat:'CAP',id:80,name:'M-9 S/M SPR WHITE DIA 19',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3619,name:'20.5x510 5ply',uom:'pcs',r:5,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.00409,s:0.1,est:false},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'L',r:0.24,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.059,s:0.1,est:false}],
+  9004:[{cat:'SLUG',id:33,name:'12.5X4.5X4.8',uom:'kg',r:1.2484,s:0.1,est:true},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.18,s:0.1,est:true},{cat:'CAP',id:9902,name:'CAP 12.5MM (est)',uom:'pcs',r:1000,s:0.02,est:true},{cat:'CARTON',id:9903,name:'CARTON 12.5MM (est)',uom:'pcs',r:5,s:0.1,est:true},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.0016,s:0.1,est:true},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.07,s:0.1,est:true},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'kg',r:0.17,s:0.1,est:true}],
+  9006:[{cat:'SLUG',id:6,name:'25X4.5 S/M',uom:'kg',r:5.917,s:0.1,est:false},{cat:'BASE COAT',id:3595,name:'POLYSTER BASE COAT WHITE 234',uom:'kg',r:0.385,s:0.1,est:false},{cat:'CAP',id:68,name:'M-11 S/M SPR WHITE DIA 25MM',uom:'pcs',r:1000,s:0.02,est:false},{cat:'CARTON',id:3598,name:'25x336 5Ply',uom:'pcs',r:2.976,s:0.1,est:false},{cat:'ZINC POWDER',id:194,name:'ZINC STEARATE',uom:'kg',r:0.00409,s:0.1,est:false},{cat:'LACQUER',id:185,name:'EPOXY LACQUER (1500)',uom:'L',r:0.24,s:0.1,est:false},{cat:'TAPE',id:3635,name:'PACKING TAPE 2" OF 60 YARDS',uom:'pcs',r:0.059,s:0.1,est:false}]
 };
 /* CATALOG_END */
 const CAT_ICON = {
   'SLUG':'⚙️','BASE COAT':'🎨','LACQUER':'✨','LATEX':'💧','ZINC POWDER':'🔬',
   'CAP':'🔵','CARTON':'📦','TAPE':'🗂️','THINNER':'🧪','INK':'🖊️',
-  'PET RESIN':'🧴','MASTER BATCH':'🎯','POLY BAG':'🛍️','PACKING':'📎','VARNISH':'🔆','MASTERBATCH':'🎯',
-  'STATIONARY':'🏷️','MASTER CARTON':'🗃️','PLASTIC DOORI':'🧵'
+  'PET RESIN':'🧴','MASTER BATCH':'🎯','POLY BAG':'🛍️','PACKING':'📎','VARNISH':'🔆','MASTERBATCH':'🎯'
 };
 const CAT_CLASS = {
   'SLUG':'ic-slug','BASE COAT':'ic-coat','LACQUER':'ic-lacq','LATEX':'ic-late',
   'ZINC POWDER':'ic-zinc','CAP':'ic-cap','CARTON':'ic-cart','TAPE':'ic-tape',
   'THINNER':'ic-thin','INK':'ic-ink','PET RESIN':'ic-pet','MASTER BATCH':'ic-mb',
-  'MASTERBATCH':'ic-mb','POLY BAG':'ic-misc','PACKING':'ic-misc','VARNISH':'ic-lacq',
-  'STATIONARY':'ic-tape','MASTER CARTON':'ic-cart','PLASTIC DOORI':'ic-misc'
+  'MASTERBATCH':'ic-mb','POLY BAG':'ic-misc','PACKING':'ic-misc','VARNISH':'ic-lacq'
 };
 
 const quantities = {};
@@ -959,7 +888,7 @@ function updateGrandTotal() {
     if (qty <= 0) return;
     totalPieces += qty; productCount++;
     const p = PRODUCTS.find(x => x.pid === parseInt(pid));
-    if (p) productLines.push({pid:parseInt(pid), name:p.name, customer:p.customer, dia:p.dia, qty});
+    if (p) productLines.push({pid:parseInt(pid), name:p.name, customer:p.customer, qty});
     calc(parseInt(pid), qty).forEach(m => {
       const key = `${m.id}|${m.name}|${m.uom}|${m.cat}`;
       if (!totals[key]) totals[key] = {id:m.id, name:m.name, uom:m.uom, cat:m.cat, total:0, est:m.est};
@@ -973,7 +902,6 @@ function updateGrandTotal() {
   if (productCount === 0) {
     sub.textContent = 'Enter quantities above to see totals.';
     wrap.innerHTML = '<div class="grand-total-empty"><div class="big">📋</div>No quantities entered yet.</div>';
-    updateJumpButton();
     return;
   }
   sub.textContent = `${productCount} product${productCount>1?'s':''} · ${totalPieces.toLocaleString()} total pieces`;
@@ -990,7 +918,7 @@ function updateGrandTotal() {
   });
 
   // ── Helper: render a product+materials block for one segment ──
-  function renderSegment(segLabel, segColor, segLines, segTotals, showDia) {
+  function renderSegment(segLabel, segColor, segLines, segTotals) {
     if (segLines.length === 0) return '';
     const segTotal = segLines.reduce((s,p)=>s+p.qty,0);
     // Group materials
@@ -1013,20 +941,18 @@ function updateGrandTotal() {
         <table style="width:100%;border-collapse:collapse">
           <thead><tr>
             <th style="text-align:left;font-size:10px;font-weight:600;color:var(--muted);padding:6px 10px;text-transform:uppercase;letter-spacing:.8px">Product</th>
-            ${showDia ? '<th style="text-align:left;font-size:10px;font-weight:600;color:var(--muted);padding:6px 10px;text-transform:uppercase;letter-spacing:.8px">Dia</th>' : ''}
             <th style="text-align:left;font-size:10px;font-weight:600;color:var(--muted);padding:6px 10px;text-transform:uppercase;letter-spacing:.8px">Customer</th>
             <th style="text-align:right;font-size:10px;font-weight:600;color:var(--muted);padding:6px 10px;text-transform:uppercase;letter-spacing:.8px">Pieces</th>
           </tr></thead><tbody>`;
     segLines.forEach(pl => {
       s += `<tr>
         <td style="padding:7px 10px;font-size:12px;font-weight:500;border-bottom:1px solid var(--border)">${pl.name}</td>
-        ${showDia ? `<td style="padding:7px 10px;font-size:11px;font-family:'DM Mono',monospace;color:var(--navy);border-bottom:1px solid var(--border);white-space:nowrap">${pl.dia}mm</td>` : ''}
         <td style="padding:7px 10px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border)">${pl.customer}</td>
         <td style="padding:7px 10px;font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:var(--navy);text-align:right;border-bottom:1px solid var(--border)">${pl.qty.toLocaleString()}</td>
       </tr>`;
     });
     s += `<tr style="background:rgba(0,0,0,.04)">
-      <td colspan="${showDia ? 3 : 2}" style="padding:7px 10px;font-size:12px;font-weight:700">TOTAL</td>
+      <td colspan="2" style="padding:7px 10px;font-size:12px;font-weight:700">TOTAL</td>
       <td style="padding:7px 10px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--navy);text-align:right">${segTotal.toLocaleString()}</td>
     </tr></tbody></table></div>`;
 
@@ -1071,10 +997,9 @@ function updateGrandTotal() {
   });
 
   let h = '';
-  h += renderSegment('Aluminum Tubes', '#2355a0', tubeLines, tubeTotals, true);
-  h += renderSegment('PET Bottles',    '#1a7a4a', petLines,  petTotals,  false);
+  h += renderSegment('Aluminum Tubes', '#2355a0', tubeLines, tubeTotals);
+  h += renderSegment('PET Bottles',    '#1a7a4a', petLines,  petTotals);
   wrap.innerHTML = h;
-  updateJumpButton();
 }
 
 // ─── DASHBOARD RENDER ───
@@ -1167,7 +1092,6 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('panel-'+name).classList.add('active');
-  updateJumpButton();
 }
 
 // ─── MATERIAL CALCULATOR ───
@@ -1254,26 +1178,6 @@ function filterProducts() {
   if (nr) nr.style.display = visible ? 'none' : 'block';
 }
 
-// ─── STICKY JUMP BUTTON ───
-function updateJumpButton() {
-  const hasQty = Object.keys(quantities).some(k => quantities[k] > 0);
-  const wrap = document.getElementById('jumpBtnWrap');
-  if (!wrap) return;
-  const isCalcActive = document.getElementById('panel-calc').classList.contains('active');
-  wrap.style.display = (hasQty && isCalcActive) ? 'block' : 'none';
-}
-
-function scrollToMaterials() {
-  const el = document.getElementById('grandTotal');
-  if (el) {
-    el.scrollIntoView({behavior:'smooth', block:'start'});
-    setTimeout(() => {
-      const wrap = document.getElementById('jumpBtnWrap');
-      if (wrap) wrap.style.display = 'none';
-    }, 600);
-  }
-}
-
 function loadRemainingOrders(type) {
   const orders = type === 'tube'
     ? (DASH_DATA.tubeOrders || [])
@@ -1298,14 +1202,13 @@ function loadRemainingOrders(type) {
     alert(`No remaining ${type.toUpperCase()} orders found. All complete or no data loaded yet.`);
   } else {
     updateGrandTotal();
+    // Show only products that have a quantity (hides all zeros)
     activeTypeFilter = 'active';
     activeDiaFilter  = 'all';
     document.querySelectorAll('[id^="flt-"],[id^="dia-"]').forEach(b=>b.classList.remove('active'));
     document.getElementById('flt-active').classList.add('active');
     document.getElementById('dia-all').classList.add('active');
     filterProducts();
-    // scroll to combined requirements after grid re-renders
-    setTimeout(scrollToMaterials, 180);
   }
 }
 
@@ -1343,19 +1246,9 @@ if('serviceWorker' in navigator){
 }
 </script>
 
-<!-- STICKY JUMP TO COMBINED REQUIREMENTS -->
-<div class="jump-btn-wrap" id="jumpBtnWrap">
-  <button class="jump-btn" onclick="scrollToMaterials()">
-    Combined Requirements <span class="arrow">↓</span>
-  </button>
-</div>
-
 <footer class="app-footer">
-  <div class="footer-left">
-    <div class="footer-name">Sikander - Planning Lead</div>
-    <div class="footer-role">Alpha Containers · Tubex Plant</div>
-  </div>
-  <span class="footer-right">0336-0842895</span>
+  <span class="footer-name">Sikander - Planning Lead</span>
+  <span class="footer-right">Contact #: 0336-0842895</span>
 </footer>
 </body>
 </html>

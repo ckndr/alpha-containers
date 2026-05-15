@@ -39,6 +39,9 @@ warnings.filterwarnings("ignore", message=".*extension.*")
 
 from openpyxl import load_workbook
 
+# Scripts live in AlphaContainers/Scripts/
+# Excel files live in AlphaContainers/ (one level up)
+DATA_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # -----------------------------------------------------------------------
 # Column constants (1-indexed for openpyxl)
@@ -52,12 +55,11 @@ INV_DATA_START = 3   # first data row
 
 # -----------------------------------------------------------------------
 def find_excel():
-    folder = os.path.dirname(os.path.abspath(__file__))
-    files = glob.glob(os.path.join(folder, "AlphaContainers*.xlsx"))
+    files = glob.glob(os.path.join(DATA_DIR, "AlphaContainers*.xlsx"))
     if not files:
-        print("  ERROR: No AlphaContainers*.xlsx found.")
+        print("  ERROR: No AlphaContainers*.xlsx found in: " + DATA_DIR)
         return None, None
-    return sorted(files)[-1], folder
+    return sorted(files)[-1], DATA_DIR
 
 
 def extract_dia(name):
@@ -83,9 +85,9 @@ def parse_wip_message(msg):
     msg = re.sub(r'[,\-]+', ' ', msg)
 
     result = {}
-    # Match patterns: optional # + number (with optional .5) + optional mm + whitespace + number + optional kg
+    # Match patterns: optional # + number + optional mm + optional space + number + optional kg
     pattern = re.compile(
-        r'#?\s*(\d+(?:\.\d+)?)\s*mm?\s+(\d+(?:\.\d+)?)\s*(?:kg)?',
+        r'#?\s*(\d+(?:\.\d+)?)\s*(?:mm)?\s*(\d+(?:\.\d+)?)\s*(?:kg)?',
         re.IGNORECASE
     )
     for m in pattern.finditer(msg):
@@ -224,7 +226,6 @@ def main():
 
     print("")
     print("  Saved: " + os.path.basename(excel_path))
-    print("  Run generate_snapshots.py (or Run All Updates) to rebuild images.")
     print(SEP)
 
 

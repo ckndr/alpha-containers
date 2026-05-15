@@ -10,13 +10,15 @@ CHANGE LOG v2:
     File must be named "inventory.xls" in the same folder.
   - Overwrites the same AlphaContainers file in place (no new version).
 
-USAGE: Double-click "Update Inventory.bat" in the same folder.
+USAGE: Double-click "Update Inventory.bat" in the Scripts folder.
 
 FOLDER STRUCTURE:
-    AlphaContainers_v9_xx.xlsx    (any version - latest is used)
-    inventory.xls                 (fresh ERP export - Item Wise Consolidated)
-    Update Inventory.bat          (double-click this)
-    update_inventory.py           (this script)
+    AlphaContainers/
+        AlphaContainers_v9_xx.xlsx    (any version - latest is used)
+        inventory.xls                 (fresh ERP export - Item Wise Consolidated)
+        Scripts/
+            Update_Inventory.bat      (double-click this)
+            update_inventory.py       (this script)
 
 ERP XLS FORMAT (Item Wise Consolidated Report):
   Col 0: Item ID (numeric rows) or category header (text rows)
@@ -46,24 +48,27 @@ warnings.filterwarnings("ignore", message=".*extension.*")
 import pandas as pd
 from openpyxl import load_workbook
 
+# Scripts live in AlphaContainers/Scripts/
+# Excel and ERP files live in AlphaContainers/ (one level up)
+DATA_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 def find_files():
-    folder = os.path.dirname(os.path.abspath(__file__))
-    excels = glob.glob(os.path.join(folder, "AlphaContainers*.xlsx"))
-    xls    = os.path.join(folder, "inventory.xls")
+    excels = glob.glob(os.path.join(DATA_DIR, "AlphaContainers*.xlsx"))
+    xls    = os.path.join(DATA_DIR, "inventory.xls")
 
     if not excels:
         print("  ERROR: No AlphaContainers*.xlsx found in folder:")
-        print("    " + folder)
+        print("    " + DATA_DIR)
         return None, None
     if not os.path.exists(xls):
         print("  ERROR: inventory.xls not found in folder:")
-        print("    " + folder)
-        print("  Export from ERP and save as 'inventory.xls' here.")
+        print("    " + DATA_DIR)
+        print("  Export from ERP and save as 'inventory.xls' there.")
         return None, None
 
     excel_file = sorted(excels)[-1]
-    print("  Folder:  " + folder)
+    print("  Folder:  " + DATA_DIR)
     print("  Excel:   " + os.path.basename(excel_file))
     print("  Source:  inventory.xls")
     return excel_file, xls
