@@ -23,6 +23,10 @@ __pycache__/
 # Local logs
 Logs/*.log
 
+# Local tools/apps that should not upload to GitHub
+Aerosol/
+*.exe
+
 # ── Windows junk ──
 Thumbs.db
 desktop.ini
