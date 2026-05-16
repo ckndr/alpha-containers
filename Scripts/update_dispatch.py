@@ -79,6 +79,7 @@ warnings.filterwarnings("ignore", message=".*Data Validation.*")
 warnings.filterwarnings("ignore", message=".*extension.*")
 import pandas as pd
 from openpyxl import load_workbook
+from alpha_checks import check_freshness, check_not_locked, log_mismatches
 
 
 # -----------------------------------------------------------------------
@@ -356,6 +357,12 @@ def main():
     print("  Dispatch PET:  " + os.path.basename(pet_path))
 
     print("")
+    print("[1a] Safety checks...")
+    check_not_locked(ac_path)
+    check_freshness(tube_path, max_hours=26, label="dispatch.xls")
+    check_freshness(pet_path, max_hours=26, label="dispatch_pet.xls")
+
+    print("")
     print("[1b] Loading Product_Catalog from Excel...")
     wb_temp = load_workbook(ac_path, read_only=True, data_only=True)
     catalog = load_catalog(wb_temp)
@@ -416,6 +423,7 @@ def main():
                 print("    Fix options:")
                 print("      A) If ERP name matches catalog col D exactly -> will auto-resolve next run.")
                 print("      B) If ERP uses a different name -> add to NAME_FIXES in script.")
+        log_mismatches("dispatch", unmapped_products)
 
     print("")
     print("[4/4] Updating Dashboard column K...")

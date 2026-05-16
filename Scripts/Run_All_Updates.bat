@@ -10,12 +10,30 @@ if not defined _KEEP_OPEN (
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
+:: ── LOGGING ──────────────────────────────────────────────────────────────────
+:: Re-launch self through PowerShell Tee-Object so all output goes to both
+:: the console AND a timestamped log file. The /logged flag prevents infinite
+:: re-entry.
+if not defined _LOGGED (
+    if not exist "..\Logs" mkdir "..\Logs"
+    for /f "tokens=1-3 delims=/ " %%a in ("%date%") do set "D=%%c%%a%%b"
+    for /f "tokens=1-2 delims=:." %%a in ("%time: =0%") do set "T=%%a%%b"
+    set "LOGFILE=%~dp0..\Logs\update_!D!_!T!.log"
+    set "_LOGGED=1"
+    set "_KEEP_OPEN=1"
+    powershell -NoProfile -Command "& { cmd /c 'set _LOGGED=1 && set _KEEP_OPEN=1 && \"%~f0\" /logged' 2>&1 | Tee-Object -FilePath '!LOGFILE!' }"
+    echo.
+    echo   Log saved: Logs\update_!D!_!T!.log
+    goto :eof
+)
+:: ── END LOGGING ──────────────────────────────────────────────────────────────
+
 echo.
 echo  ===========================================================
 echo   Alpha Containers -- Daily Update + Deploy
 echo  ===========================================================
 echo.
-echo  Sequence: Production -^> Inventory -^> Dispatch -^> HTML/GitHub
+echo  Sequence: Production -^> Inventory -^> Dispatch -^> Sort Dashboard -^> HTML/GitHub
 echo  Skipped (manual): MRP, WIP, update_from_images
 echo.
 
@@ -24,7 +42,7 @@ set FAIL_LIST=
 
 :: ── STEP 1: Production Log + FG Stock ────────────────────────────────────────
 :: Must run first — populates Production_Log which HTML and Dashboard read.
-echo [1/4] Updating Production Log + FG Stock...
+echo [1/5] Updating Production Log + FG Stock...
 echo       (reads Production.xlsx ^-^> writes Production_Log + FG Stock)
 python update_production.py
 if errorlevel 1 (
@@ -40,7 +58,7 @@ echo.
 
 :: ── STEP 2: Inventory ────────────────────────────────────────────────────────
 :: Independent of Production — reads inventory.xls, writes Inventory sheet.
-echo [2/4] Updating Inventory...
+echo [2/5] Updating Inventory...
 echo       (reads inventory.xls ^-^> writes Inventory sheet)
 python update_inventory.py
 if errorlevel 1 (
@@ -56,7 +74,7 @@ echo.
 :: ── STEP 3: Dispatch ─────────────────────────────────────────────────────────
 :: Reads dispatch.xls + dispatch_pet.xls, writes Dashboard col K.
 :: Must run before HTML (HTML reads col K for dispatch totals).
-echo [3/4] Updating Dispatch...
+echo [3/5] Updating Dispatch...
 echo       (reads dispatch.xls + dispatch_pet.xls ^-^> writes Dashboard col K)
 python update_dispatch.py
 if errorlevel 1 (
@@ -69,18 +87,34 @@ if errorlevel 1 (
 )
 echo.
 
-:: ── STEP 4: HTML Dashboard ───────────────────────────────────────────────────
+:: ── STEP 4: Sort Dashboard ────────────────────────────────────────────────────
+:: Sorts active products to top, inactive to bottom. Dynamic sizing.
+:: Must run after production/dispatch (needs fresh data), before HTML.
+echo [4/5] Sorting Dashboard (active/inactive)...
+echo       (reads orders + production + dispatch ^-^> sorts Tubex_Dashboard rows)
+python sort_dashboard.py
+if errorlevel 1 (
+    set /a FAIL_COUNT+=1
+    set "FAIL_LIST=!FAIL_LIST! | [4] sort_dashboard"
+    echo.
+    echo  !! STEP 4 FAILED — Dashboard not sorted. Products may be out of order.
+) else (
+    echo  ^^ Step 4 OK.
+)
+echo.
+
+:: ── STEP 5: HTML Dashboard ───────────────────────────────────────────────────
 :: Must run last — reads Production_Log, Dashboard (col K), Catalog, BOM.
-echo [4/4] Generating HTML Dashboard...
+echo [5/5] Generating HTML Dashboard...
 echo       (reads Excel ^-^> writes AlphaContainers_App.html)
 python update_html.py
 if errorlevel 1 (
     set /a FAIL_COUNT+=1
-    set "FAIL_LIST=!FAIL_LIST! | [4] update_html"
+    set "FAIL_LIST=!FAIL_LIST! | [5] update_html"
     echo.
-    echo  !! STEP 4 FAILED — HTML not updated. Check error above.
+    echo  !! STEP 5 FAILED — HTML not updated. Check error above.
 ) else (
-    echo  ^^ Step 4 OK.
+    echo  ^^ Step 5 OK.
 )
 echo.
 

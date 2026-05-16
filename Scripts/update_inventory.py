@@ -47,6 +47,7 @@ warnings.filterwarnings("ignore", message=".*Data Validation.*")
 warnings.filterwarnings("ignore", message=".*extension.*")
 import pandas as pd
 from openpyxl import load_workbook
+from alpha_checks import check_freshness, check_not_locked, log_mismatches
 
 # Scripts live in AlphaContainers/Scripts/
 # Excel and ERP files live in AlphaContainers/ (one level up)
@@ -218,7 +219,9 @@ def main():
         return
 
     print("")
-    print("[2/3] Reading ERP inventory.xls...")
+    print("[2/3] Safety checks + Reading ERP inventory.xls...")
+    check_not_locked(excel_path)
+    check_freshness(xls_path, max_hours=26, label="inventory.xls")
     xls_items, date_range = parse_inventory_xls(xls_path)
     print("  Found %d items" % len(xls_items))
     if date_range:
@@ -253,6 +256,7 @@ def main():
             print("    ID %5d: %-38s  Bal=%s %s" % (item_id, name[:38], bal, unit))
         if len(not_in_excel) > 8:
             print("    ...and %d more" % (len(not_in_excel) - 8))
+        log_mismatches("inventory", not_in_excel)
 
     print("")
     print("  Open Excel and press Ctrl+Shift+F9 to recalculate.")
