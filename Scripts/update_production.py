@@ -569,7 +569,9 @@ def read_production_source(prod_path):
                 return default
 
         if pid is None:
-            no_pid.append((catalog_name, dia_raw, cust_norm))
+            # Varnish passes are supposed to be not counted and do not require a PID
+            if not ("(varnish)" in catalog_name.lower() or "(varnish)" in name_raw.lower()):
+                no_pid.append((catalog_name, dia_raw, cust_norm))
 
         rows.append({
             'date':                 d,
@@ -748,7 +750,9 @@ def read_fg_stock(prod_path):
             customer_display = CUSTOMER_MAP.get(cust_key, raw_customer)
 
         if pid is None:
-            no_pid.append((raw_product, raw_dia, raw_customer))
+            # Varnish passes are supposed to be not counted and do not require a PID
+            if not ("(varnish)" in catalog_name.lower() or "(varnish)" in raw_product.lower()):
+                no_pid.append((raw_product, raw_dia, raw_customer))
 
         rows.append({
             'sr':               i,

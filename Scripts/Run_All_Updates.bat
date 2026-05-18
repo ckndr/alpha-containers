@@ -28,6 +28,9 @@ if not defined _LOGGED (
 )
 :: ── END LOGGING ──────────────────────────────────────────────────────────────
 
+:: Clear previous mismatches log to capture only new issues for this run
+if exist "%~dp0..\Logs\mismatches.log" del /f /q "%~dp0..\Logs\mismatches.log"
+
 echo.
 echo  ===========================================================
 echo   Alpha Containers -- Daily Update + Deploy
@@ -160,6 +163,15 @@ if errorlevel 1 (
 
 :summary
 echo.
+if exist "%~dp0..\Logs\mismatches.log" (
+    echo  ===========================================================
+    echo   MISMATCHES ^& WARNINGS DETECTED DURING RUN:
+    echo  ===========================================================
+    type "%~dp0..\Logs\mismatches.log"
+    echo  ===========================================================
+    echo.
+)
+
 echo  ===========================================================
 if !FAIL_COUNT! == 0 (
     echo   ALL STEPS COMPLETED SUCCESSFULLY.
