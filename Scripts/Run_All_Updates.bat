@@ -1,4 +1,4 @@
-@echo off
+@echo on
 :: If not already inside a persistent window, relaunch inside cmd /k so the
 :: window stays open after the script finishes. Plain pause is unreliable when
 :: double-clicking from Explorer in some Windows configurations.
