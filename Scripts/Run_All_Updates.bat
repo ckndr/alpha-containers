@@ -1,4 +1,4 @@
-@echo on
+@echo off
 :: If not already inside a persistent window, relaunch inside cmd /k so the
 :: window stays open after the script finishes. Plain pause is unreliable when
 :: double-clicking from Explorer in some Windows configurations.
@@ -163,14 +163,14 @@ if errorlevel 1 (
 
 :summary
 echo.
-if exist "%~dp0..\Logs\mismatches.log" (
-    echo  ===========================================================
-    echo   MISMATCHES ^& WARNINGS DETECTED DURING RUN:
-    echo  ===========================================================
-    type "%~dp0..\Logs\mismatches.log"
-    echo  ===========================================================
-    echo.
-)
+if not exist "%~dp0..\Logs\mismatches.log" goto :skip_mismatches
+echo  ===========================================================
+echo   MISMATCHES ^& WARNINGS DETECTED DURING RUN:
+echo  ===========================================================
+type "%~dp0..\Logs\mismatches.log"
+echo  ===========================================================
+echo.
+:skip_mismatches
 
 echo  ===========================================================
 if !FAIL_COUNT! == 0 (
