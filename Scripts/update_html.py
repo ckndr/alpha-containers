@@ -482,9 +482,9 @@ if os.path.exists(SW_PATH):
                 f"const CACHE_NAME = '{new_cache}';", sw)
     with open(SW_PATH, 'w', encoding='utf-8') as f:
         f.write(sw)
-    print(f"  SW cache version → {new_cache}")
+    print(f"  SW cache version -> {new_cache}")
 
-print(f"\n✓ HTML updated successfully → {os.path.basename(HTML_PATH)}")
+print(f"\n[OK] HTML updated successfully -> {os.path.basename(HTML_PATH)}")
 print(f"  Dashboard orders: {len(tube_orders)} tube + {len(pet_orders)} PET")
 print(f"  Products in catalog: {len(products_list)}  |  BOM products: {len(bom_dict)}")
 print(f"  Open in Chrome on PC or Android to view dashboard.")
