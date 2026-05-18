@@ -179,7 +179,7 @@ if !FAIL_COUNT! == 0 (
     echo   Next: Open Excel and press Ctrl+Shift+F9 to recalculate.
     echo   Then: Check dashboard is live on GitHub Pages.
 ) else (
-    echo   COMPLETED WITH !FAIL_COUNT! FAILURE(S):
+    echo   COMPLETED WITH !FAIL_COUNT! FAILURE^(S^):
     echo   !FAIL_LIST!
     echo.
     echo   Scroll up to see the error output for each failed step.
