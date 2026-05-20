@@ -1,6 +1,9 @@
 """
-Alpha Containers - Inventory Auto-Updater v3
+Alpha Containers - Inventory Auto-Updater v4
 =============================================
+CHANGE LOG v4 (vs v3):
+  - Removed warning message / mismatch logging for ERP items not present in the Inventory sheet.
+
 CHANGE LOG v3 (vs v2):
   ADDED: warnings.filterwarnings to suppress openpyxl Data Validation
   UserWarning from cluttering the issues summary.
@@ -209,7 +212,7 @@ def main():
 
     print("")
     print(SEP)
-    print("  Alpha Containers - Inventory Updater v3")
+    print("  Alpha Containers - Inventory Updater v4")
     print(SEP)
 
     print("")
@@ -249,14 +252,7 @@ def main():
     else:
         print("  No changes - inventory already matches ERP.")
 
-    if not_in_excel:
-        print("")
-        print("  %d ERP items NOT in Inventory sheet (not added):" % len(not_in_excel))
-        for item_id, name, bal, unit in not_in_excel[:8]:
-            print("    ID %5d: %-38s  Bal=%s %s" % (item_id, name[:38], bal, unit))
-        if len(not_in_excel) > 8:
-            print("    ...and %d more" % (len(not_in_excel) - 8))
-        log_mismatches("inventory", not_in_excel)
+
 
     print("")
     print("  Open Excel and press Ctrl+Shift+F9 to recalculate.")

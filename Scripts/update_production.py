@@ -1,6 +1,11 @@
 """
-Alpha Containers - Production Log Auto-Updater v19
+Alpha Containers - Production Log Auto-Updater v20
 ──────────────────────────────────────────────────
+CHANGE LOG v20 (vs v19):
+  ALIAS ADD:
+    ("alpha lab\ttrp bottle", "150 ml") -> TRANSPARENT BOTTLE 150ML (PID 8001)
+    ("mabley beauty\tvince nutural", "30") -> VINCE NURTURAL (PID 5814)
+
 CHANGE LOG v19 (vs v18):
   VARNISH POLICY — no varnish-only BOMs, no PID assigned to varnish passes.
   All varnish ALIASES entries updated: PID set to None.
@@ -207,6 +212,8 @@ ALIASES = {
     ("samsol black bottle",       "120 ml"): ("BLACK SMALL BOTTLE 120ML",          8011),
     ("yellow bottle",             "120 ml"): ("PET BOTTLE SMALL (120ML) YELLOW",   8005),
     ("trp bottle",                "130 ml"): ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
+    ("alpha lab\ttrp bottle",      "150 ml"): ("TRANSPARENT BOTTLE 150ML",          8001),
+    ("mabley beauty\tvince nutural", "30"): ("VINCE NURTURAL",                     5814),
 }
 
 
@@ -866,7 +873,7 @@ def write_fg_stock(ac_path, fg_rows, latest_date):
 
 def main():
     print("\n" + "="*60)
-    print("  Alpha Containers -- Production Log Updater v17")
+    print("  Alpha Containers -- Production Log Updater v20")
     print("="*60 + "\n")
 
     print("[1/5] Finding files...")
