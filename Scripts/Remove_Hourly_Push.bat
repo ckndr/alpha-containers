@@ -7,11 +7,11 @@ if not defined _KEEP_OPEN (
 )
 setlocal
 
-set "TASK_NAME=Alpha Containers Hourly Push"
+set "TASK_NAME=Tubex Hourly Push"
 
 echo.
 echo  ===========================================================
-echo   Alpha Containers -- Remove Hourly GitHub Push
+echo   Tubex -- Remove Hourly GitHub Push
 echo  ===========================================================
 echo.
 

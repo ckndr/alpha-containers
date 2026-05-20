@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 > nul
 echo ============================================================
-echo   Alpha Containers - Update Production from WhatsApp Images
+echo   Tubex - Update Production from WhatsApp Images
 echo ============================================================
 echo.
 echo   Installing new Google GenAI library...

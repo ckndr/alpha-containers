@@ -1,5 +1,5 @@
 """
-Alpha Containers - Inventory Auto-Updater v4
+Tubex - Inventory Auto-Updater v4
 =============================================
 CHANGE LOG v4 (vs v3):
   - Removed warning message / mismatch logging for ERP items not present in the Inventory sheet.
@@ -16,8 +16,8 @@ CHANGE LOG v2:
 USAGE: Double-click "Update Inventory.bat" in the Scripts folder.
 
 FOLDER STRUCTURE:
-    AlphaContainers/
-        AlphaContainers_v9_xx.xlsx    (any version - latest is used)
+    Tubex/
+        Tubex_v9_xx.xlsx    (any version - latest is used)
         inventory.xls                 (fresh ERP export - Item Wise Consolidated)
         Scripts/
             Update_Inventory.bat      (double-click this)
@@ -52,8 +52,8 @@ import pandas as pd
 from openpyxl import load_workbook
 from alpha_checks import check_freshness, check_not_locked, log_mismatches
 
-# Scripts live in AlphaContainers/Scripts/
-# Excel and ERP files live in AlphaContainers/ (one level up)
+# Scripts live in Tubex/Scripts/
+# Excel and ERP files live in Tubex/ (one level up)
 DATA_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -82,11 +82,11 @@ def replace_copy_export(folder, target_name):
 def find_files():
     replace_copy_export(DATA_DIR, "inventory.xls")
 
-    excels = glob.glob(os.path.join(DATA_DIR, "AlphaContainers*.xlsx"))
+    excels = glob.glob(os.path.join(DATA_DIR, "Tubex*.xlsx"))
     xls    = os.path.join(DATA_DIR, "inventory.xls")
 
     if not excels:
-        print("  ERROR: No AlphaContainers*.xlsx found in folder:")
+        print("  ERROR: No Tubex*.xlsx found in folder:")
         print("    " + DATA_DIR)
         return None, None
     if not os.path.exists(xls):
@@ -212,7 +212,7 @@ def main():
 
     print("")
     print(SEP)
-    print("  Alpha Containers - Inventory Updater v4")
+    print("  Tubex - Inventory Updater v4")
     print(SEP)
 
     print("")

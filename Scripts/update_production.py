@@ -75,7 +75,7 @@ CHANGE LOG v15 (vs v14):
   Added read_fg_stock() — reads 'FG Stock In hand' sheet from Production.xlsx,
   filters to latest date only (all older dates discarded), maps product/customer
   names to catalog names and PIDs using FG_ALIASES dict.
-  Added write_fg_stock() — wipes and rewrites FG Stock sheet in AlphaContainers.
+  Added write_fg_stock() — wipes and rewrites FG Stock sheet in Tubex.
   Title row updated with latest date on each run.
   Row colour coding: green fill = OK/Ready, orange fill = Not Ready / In Progress.
   FG_ALIASES key: (product_desc_lower, normalised_dia, customer_lower).
@@ -441,17 +441,17 @@ def find_files():
     folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     replace_copy_export(folder, "Production.xlsx")
 
-    ac_files   = glob.glob(os.path.join(folder, "AlphaContainers*.xlsx"))
+    ac_files   = glob.glob(os.path.join(folder, "Tubex*.xlsx"))
     prod_files = glob.glob(os.path.join(folder, "Production*.xlsx"))
     if not ac_files:
-        print("  ERROR: No AlphaContainers*.xlsx found in: " + folder)
+        print("  ERROR: No Tubex*.xlsx found in: " + folder)
         return None, None
     if not prod_files:
         print("  ERROR: No Production*.xlsx found in: " + folder)
         return None, None
     ac   = sorted(ac_files)[-1]
     prod = sorted(prod_files)[-1]
-    print("  Alpha File: " + os.path.basename(ac))
+    print("  Tubex File: " + os.path.basename(ac))
     print("  Production: " + os.path.basename(prod))
     return ac, prod
 
@@ -812,7 +812,7 @@ def write_fg_stock(ac_path, fg_rows, latest_date):
     wb = openpyxl.load_workbook(ac_path)
 
     if 'FG Stock' not in wb.sheetnames:
-        print("  WARNING: 'FG Stock' sheet not found in AlphaContainers file. Skipping FG update.")
+        print("  WARNING: 'FG Stock' sheet not found in Tubex file. Skipping FG update.")
         wb.close()
         return 0
 
@@ -881,7 +881,7 @@ def write_fg_stock(ac_path, fg_rows, latest_date):
 
 def main():
     print("\n" + "="*60)
-    print("  Alpha Containers -- Production Log Updater v20")
+    print("  Tubex -- Production Log Updater v20")
     print("="*60 + "\n")
 
     print("[1/5] Finding files...")

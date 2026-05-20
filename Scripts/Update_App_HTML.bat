@@ -4,7 +4,7 @@ cd /d "%~dp0"
 
 echo.
 echo  ================================================
-echo   Alpha Containers - Update HTML + Publish
+echo   Tubex - Update HTML + Publish
 echo   (Manual: runs HTML only, skips Production/Inventory/Dispatch)
 echo  ================================================
 echo.
@@ -36,7 +36,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-git -C "%~dp0.." add AlphaContainers_App.html
+git -C "%~dp0.." add Tubex.html
 if exist "%~dp0..\sw.js"         git -C "%~dp0.." add sw.js
 if exist "%~dp0..\manifest.json" git -C "%~dp0.." add manifest.json
 if exist "%~dp0..\icon-192.png"  git -C "%~dp0.." add icon-192.png

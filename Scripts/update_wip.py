@@ -1,5 +1,5 @@
 """
-Alpha Containers - WIP (Work In Process) Updater v1
+Tubex - WIP (Work In Process) Updater v1
 ====================================================
 PURPOSE:
   Parses a WhatsApp-style WIP message from Aurangzeb and writes
@@ -39,8 +39,8 @@ warnings.filterwarnings("ignore", message=".*extension.*")
 
 from openpyxl import load_workbook
 
-# Scripts live in AlphaContainers/Scripts/
-# Excel files live in AlphaContainers/ (one level up)
+# Scripts live in Tubex/Scripts/
+# Excel files live in Tubex/ (one level up)
 DATA_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # -----------------------------------------------------------------------
@@ -55,9 +55,9 @@ INV_DATA_START = 3   # first data row
 
 # -----------------------------------------------------------------------
 def find_excel():
-    files = glob.glob(os.path.join(DATA_DIR, "AlphaContainers*.xlsx"))
+    files = glob.glob(os.path.join(DATA_DIR, "Tubex*.xlsx"))
     if not files:
-        print("  ERROR: No AlphaContainers*.xlsx found in: " + DATA_DIR)
+        print("  ERROR: No Tubex*.xlsx found in: " + DATA_DIR)
         return None, None
     return sorted(files)[-1], DATA_DIR
 
@@ -136,7 +136,7 @@ def main():
 
     print("")
     print(SEP)
-    print("  Alpha Containers - WIP Updater v1")
+    print("  Tubex - WIP Updater v1")
     print(SEP)
     print("")
 

@@ -3,8 +3,8 @@
 *.xls
 *.xlsm
 
-# Keep the main versioned Alpha workbook synced for home/office work.
-!AlphaContainers_v*.xlsx
+# Keep the main versioned Tubex workbook synced for home/office work.
+!Tubex_v*.xlsx
 
 # ── ERP export files ──
 *.pdf

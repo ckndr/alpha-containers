@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 > nul
 echo ============================================================
-echo   Alpha Containers - Inventory Updater
+echo   Tubex - Inventory Updater
 echo ============================================================
 echo.
 cd /d "%~dp0"

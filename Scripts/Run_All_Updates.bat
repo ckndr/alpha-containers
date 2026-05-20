@@ -33,7 +33,7 @@ if exist "%~dp0..\Logs\mismatches.log" del /f /q "%~dp0..\Logs\mismatches.log"
 
 echo.
 echo  ===========================================================
-echo   Alpha Containers -- Daily Update + Deploy
+echo   Tubex -- Daily Update + Deploy
 echo  ===========================================================
 echo.
 echo  Sequence: Production -^> Inventory -^> Dispatch -^> Sort Dashboard -^> HTML/GitHub
@@ -109,7 +109,7 @@ echo.
 :: ── STEP 5: HTML Dashboard ───────────────────────────────────────────────────
 :: Must run last — reads Production_Log, Dashboard (col K), Catalog, BOM.
 echo [5/5] Generating HTML Dashboard...
-echo       (reads Excel ^-^> writes AlphaContainers_App.html)
+echo       (reads Excel ^-^> writes Tubex.html)
 python update_html.py
 if errorlevel 1 (
     set /a FAIL_COUNT+=1
@@ -138,7 +138,7 @@ git -C "%~dp0.." rev-parse --git-dir >nul 2>&1
 if errorlevel 1 (
     set /a FAIL_COUNT+=1
     set "FAIL_LIST=!FAIL_LIST! | [Git] Not a repo yet"
-    echo  !! AlphaContainers folder is not a git repo. See SETUP_GUIDE Step 4.
+    echo  !! Tubex folder is not a git repo. See SETUP_GUIDE Step 4.
     goto :summary
 )
 

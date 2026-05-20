@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 > nul
 echo ============================================================
-echo   Alpha Containers - Production Log Updater
+echo   Tubex - Production Log Updater
 echo ============================================================
 echo.
 cd /d "%~dp0"

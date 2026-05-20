@@ -1,8 +1,8 @@
 {
-  "name": "Alpha Containers",
-  "short_name": "AlphaAC",
+  "name": "Tubex",
+  "short_name": "Tubex",
   "description": "Tubex Production Dashboard & Material Calculator",
-  "start_url": "./AlphaContainers_App.html",
+  "start_url": "./Tubex.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",

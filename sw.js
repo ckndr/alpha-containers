@@ -1,10 +1,10 @@
-// Alpha Containers Service Worker v3
+// Tubex Service Worker v3
 // Network-first: always fetches fresh data when online
 // Falls back to cache only when offline
 
-const CACHE_NAME = 'alpha-containers-202605201639';
+const CACHE_NAME = 'tubex-202605201651';
 const ASSETS = [
-  './AlphaContainers_App.html',
+  './Tubex.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',

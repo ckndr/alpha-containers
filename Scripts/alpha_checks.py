@@ -1,12 +1,12 @@
 """
-Alpha Containers - Pre-Run Safety Checks
+Tubex - Pre-Run Safety Checks
 =========================================
 Shared helper functions used by all updater scripts.
 
 WHAT THIS MODULE DOES (3 things):
   1. FRESHNESS CHECK — Warns if an ERP file (dispatch.xls, inventory.xls, etc.)
      hasn't been modified recently. Catches the "forgot to download fresh export" mistake.
-  2. EXCEL LOCK GUARD — Checks if AlphaContainers*.xlsx is open in Excel.
+  2. EXCEL LOCK GUARD — Checks if Tubex*.xlsx is open in Excel.
      If it is, the script stops immediately to prevent silent data corruption.
   3. MISMATCH LOGGING — Saves unmatched product names to Logs/mismatches.log
      so you can review them later without scrolling through console output.

@@ -9,10 +9,10 @@ from datetime import datetime
 # CONFIGURATION — Edit this section to control what gets exported
 # ==============================================================================
 
-# Scripts live in AlphaContainers/Scripts/
-# Excel files live in AlphaContainers/ (one level up)
+# Scripts live in Tubex/Scripts/
+# Excel files live in Tubex/ (one level up)
 SCRIPT_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
-DATA_DIR   = SCRIPT_DIR.parent   # AlphaContainers root
+DATA_DIR   = SCRIPT_DIR.parent   # Tubex root
 
 # Output JSON saved in root folder (easy to find and upload to Claude)
 OUTPUT_JSON = DATA_DIR / "excel_for_ai.json"
@@ -249,9 +249,9 @@ print("=" * 60)
 print(f"SCANNING: {DATA_DIR}")
 print("=" * 60)
 
-excel_files = list(DATA_DIR.glob("AlphaContainers*.xlsx"))
+excel_files = list(DATA_DIR.glob("Tubex*.xlsx"))
 if not excel_files:
-    print(f"ERROR: No AlphaContainers*.xlsx files found in {DATA_DIR}.")
+    print(f"ERROR: No Tubex*.xlsx files found in {DATA_DIR}.")
     exit()
 
 latest_file = max(excel_files, key=lambda x: x.stat().st_mtime)

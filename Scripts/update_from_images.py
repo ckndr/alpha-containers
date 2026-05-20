@@ -7,16 +7,15 @@ import pandas as pd
 from PIL import Image
 from google import genai
 
-# --- PATH SETUP ---
-# Scripts live in AlphaContainers/Scripts/
-# All data files (Excel, images) live in AlphaContainers/ (one level up)
+# Scripts live in Tubex/Scripts/
+# All data files (Excel, images) live in Tubex/ (one level up)
 DATA_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # --- CONFIGURATION ---
 API_KEY = "AIzaSyCiFKtV61J3Of22GzUR0pOAKAG2BMXXAlA"
 
-# Auto-detect latest AlphaContainers Excel in parent folder
-_excel_files = sorted(glob.glob(os.path.join(DATA_DIR, "AlphaContainers*.xlsx")))
+# Auto-detect latest Tubex Excel in parent folder
+_excel_files = sorted(glob.glob(os.path.join(DATA_DIR, "Tubex*.xlsx")))
 EXCEL_FILE = _excel_files[-1] if _excel_files else ""
 
 # Image files expected in parent folder (copy them there before running)
@@ -58,7 +57,7 @@ def load_aliases_from_main_script():
 
 def main():
     if not EXCEL_FILE:
-        print(f"Error: No AlphaContainers*.xlsx found in {DATA_DIR}")
+        print(f"Error: No Tubex*.xlsx found in {DATA_DIR}")
         return
 
     print(f"Excel file: {os.path.basename(EXCEL_FILE)}")

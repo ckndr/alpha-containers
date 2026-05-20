@@ -11,7 +11,7 @@ if not defined _KEEP_OPEN if not defined _BATCH_MODE (
 )
 setlocal enabledelayedexpansion
 cd /d "%~dp0.."
-set "ONEDRIVE_BACKUP=C:\Users\HP\OneDrive\AlphaContainers"
+set "ONEDRIVE_BACKUP=C:\Users\HP\OneDrive\Tubex"
 set "GIT_TERMINAL_PROMPT=0"
 set "GCM_INTERACTIVE=Never"
 
@@ -29,7 +29,7 @@ if /i "%~1"=="/run" goto :run_push
 :run_push
 echo.
 echo  ===========================================================
-echo   Alpha Containers -- Push Full Backup to GitHub
+echo   Tubex -- Push Full Backup to GitHub
 echo  ===========================================================
 echo.
 

@@ -7,12 +7,12 @@ if not defined _KEEP_OPEN (
 )
 setlocal
 
-set "TASK_NAME=Alpha Containers Hourly Push"
+set "TASK_NAME=Tubex Hourly Push"
 set "PUSH_BAT=%~dp0Push.bat"
 
 echo.
 echo  ===========================================================
-echo   Alpha Containers -- Install Hourly GitHub Push
+echo   Tubex -- Install Hourly GitHub Push
 echo  ===========================================================
 echo.
 echo  This will create a Windows scheduled task:

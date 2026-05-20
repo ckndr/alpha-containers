@@ -1,9 +1,9 @@
 """
 update_html.py
-Alpha Containers — Dashboard HTML Auto-Updater
+Tubex — Dashboard HTML Auto-Updater
 ------------------------------------------------
-Reads AlphaContainers_vX_XX.xlsx → calculates live KPIs, MTD production,
-downtime, and order compliance → injects into AlphaContainers_App.html.
+Reads Tubex_vX_XX.xlsx → calculates live KPIs, MTD production,
+downtime, and order compliance → injects into Tubex.html.
 
 Also rebuilds PRODUCTS array and BOM dict directly from Excel on every run.
 New or re-activated products are automatically picked up — no manual HTML edits needed.
@@ -24,15 +24,15 @@ import os, re, json, glob
 from datetime import datetime, date
 
 # ── PATH SETUP ──────────────────────────────────────────────
-# Scripts live in AlphaContainers/Scripts/ — Excel and HTML are one level up
+# Scripts live in Tubex/Scripts/ — Excel and HTML are one level up
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-excel_pattern = os.path.join(DIR, 'AlphaContainers_v*.xlsx')
+excel_pattern = os.path.join(DIR, 'Tubex_v*.xlsx')
 excel_files   = sorted(glob.glob(excel_pattern))
 if not excel_files:
-    raise FileNotFoundError(f"No AlphaContainers_v*.xlsx found in {DIR}")
+    raise FileNotFoundError(f"No Tubex_v*.xlsx found in {DIR}")
 EXCEL_PATH = excel_files[-1]
-HTML_PATH  = os.path.join(DIR, 'AlphaContainers_App.html')
+HTML_PATH  = os.path.join(DIR, 'Tubex.html')
 
 print(f"Reading:  {os.path.basename(EXCEL_PATH)}")
 print(f"Updating: {os.path.basename(HTML_PATH)}")
@@ -477,7 +477,7 @@ SW_PATH = os.path.join(DIR, 'sw.js')
 if os.path.exists(SW_PATH):
     with open(SW_PATH, 'r', encoding='utf-8') as f:
         sw = f.read()
-    new_cache = f"alpha-containers-{now.strftime('%Y%m%d%H%M')}"
+    new_cache = f"tubex-{now.strftime('%Y%m%d%H%M')}"
     sw = re.sub(r"const CACHE_NAME = '[^']+';",
                 f"const CACHE_NAME = '{new_cache}';", sw)
     with open(SW_PATH, 'w', encoding='utf-8') as f:

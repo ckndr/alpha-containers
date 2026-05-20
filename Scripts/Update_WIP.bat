@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 > nul
 echo ============================================================
-echo   Alpha Containers - WIP Updater
+echo   Tubex - WIP Updater
 echo   (Manual step - paste Aurangzeb's WIP message when prompted)
 echo ============================================================
 echo.

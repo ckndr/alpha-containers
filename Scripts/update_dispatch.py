@@ -1,5 +1,5 @@
 """
-Alpha Containers - Dispatch Updater v10
+Tubex - Dispatch Updater v10
 ----------------------------------------------------------------------
 CHANGE LOG v10:
   BUGFIX — 19mm S-43 / S-45 disambiguation:
@@ -38,24 +38,10 @@ CHANGE LOG v7:
   - Stale K30 formula patch updated to K32.
 
 CHANGE LOG v5:
-  - Replaced manual DISPATCH_ALIASES (required a PID entry for every product)
-    with automatic catalog matching. Script now reads Product_Catalog sheet
-    from the AlphaContainers Excel file at runtime and builds a name->PID
-    map automatically. Any product added to Product_Catalog is automatically
-    supported -- no script changes needed.
-
-  - NAME_FIXES dict retained but now much smaller: only needed for products
-    where the ERP dispatch name differs from the Product_Catalog name.
-    Currently only 3 PET entries. Everything else matches by name directly.
-
-  - PIDs are still used internally to locate the correct Dashboard row
-    (Dashboard col F holds PIDs). The user never needs to know or enter PIDs.
-
-PURPOSE:
-  Reads dispatch.xls (TUBEX-ALUM) and dispatch_pet.xls (TUBEX-PET)
+  - Reads dispatch.xls (TUBEX-ALUM) and dispatch_pet.xls (TUBEX-PET)
   from the same folder, then writes MTD dispatch quantities into
   column K of the Tubex_Dashboard sheet in the latest
-  AlphaContainers*.xlsx file.
+  Tubex*.xlsx file.
 
 HOW IT WORKS:
   - Both dispatch files are ERP "Dispatch Report (Date Wise)" exports.
@@ -277,9 +263,9 @@ def find_files(folder):
     replace_copy_export(folder, "dispatch.xls")
     replace_copy_export(folder, "dispatch_pet.xls")
 
-    ac_files = glob.glob(os.path.join(folder, "AlphaContainers*.xlsx"))
+    ac_files = glob.glob(os.path.join(folder, "Tubex*.xlsx"))
     if not ac_files:
-        print("  ERROR: No AlphaContainers*.xlsx found in: " + folder)
+        print("  ERROR: No Tubex*.xlsx found in: " + folder)
         return None, None, None
     ac = sorted(ac_files)[-1]
 
@@ -342,7 +328,7 @@ def main():
 
     print("")
     print(SEP)
-    print("  Alpha Containers - Dispatch Updater v10")
+    print("  Tubex - Dispatch Updater v10")
     print(SEP)
     print("")
 
@@ -352,7 +338,7 @@ def main():
     ac_path, tube_path, pet_path = find_files(folder)
     if not ac_path:
         return
-    print("  Alpha File:    " + os.path.basename(ac_path))
+    print("  Tubex File:    " + os.path.basename(ac_path))
     print("  Dispatch Tube: " + os.path.basename(tube_path))
     print("  Dispatch PET:  " + os.path.basename(pet_path))
 
