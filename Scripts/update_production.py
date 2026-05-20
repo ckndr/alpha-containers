@@ -1,6 +1,12 @@
 """
-Alpha Containers - Production Log Auto-Updater v20
+Alpha Containers - Production Log Auto-Updater v21
 ──────────────────────────────────────────────────
+CHANGE LOG v21 (vs v20):
+  ALIAS ADD:
+    ("trp bottle", "150 ml") -> TRANSPARENT BOTTLE 150ML (PID 8001)
+  CUSTOMER RENAME:
+    "Alpha Lab" -> "Alpha Labs PVT LTD" (PID 8001 and mappings)
+
 CHANGE LOG v20 (vs v19):
   ALIAS ADD:
     ("alpha lab\ttrp bottle", "150 ml") -> TRANSPARENT BOTTLE 150ML (PID 8001)
@@ -111,7 +117,7 @@ KEY BUSINESS RULES:
     Varnish passes are tracked by name only. No BOM, no PID, no ERP product.
     Regular print pass → actual ERP PID (e.g. Vince Nurtural → 5814).
   - PET BOMs are placeholder only (PIDs 8001–8013). No ERP BOMs yet.
-  - Alpha Lab = Alpha Containers' Karachi subsidiary. Maps to "Alpha Lab".
+  - Alpha Lab = Alpha Containers' Karachi subsidiary. Maps to "Alpha Labs PVT LTD".
   - Mabley's 130ml bottle is written "150ml" by Imran. Script fixes to PID 8010.
   - Samsol 43 at 20.5mm = ERP "S-43 DIA 20.5" (PID 5699). Verified Apr-2026.
   - FG Stock: only latest date rows are kept. Older dates discarded every run.
@@ -212,6 +218,7 @@ ALIASES = {
     ("samsol black bottle",       "120 ml"): ("BLACK SMALL BOTTLE 120ML",          8011),
     ("yellow bottle",             "120 ml"): ("PET BOTTLE SMALL (120ML) YELLOW",   8005),
     ("trp bottle",                "130 ml"): ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
+    ("trp bottle",                "150 ml"): ("TRANSPARENT BOTTLE 150ML",          8001),
     ("alpha lab\ttrp bottle",      "150 ml"): ("TRANSPARENT BOTTLE 150ML",          8001),
     ("mabley beauty\tvince nutural", "30"): ("VINCE NURTURAL",                     5814),
 }
@@ -275,6 +282,7 @@ FG_ALIASES = {
     # ── PET ─────────────────────────────────────────────────────────────────
     ("trp bottle",      "150ml", "alpha lab"):       ("TRANSPARENT BOTTLE 150ML",           8001),
     ("trp bottle",       "150ml","alpha lab"):       ("TRANSPARENT BOTTLE 150ML",           8001),
+    ("trp bottle",      "150ml", "alpha labs pvt ltd"): ("TRANSPARENT BOTTLE 150ML",        8001),
     ("yellow bottle",   "120ml", "samsol"):          ("PET BOTTLE SMALL (120ML) YELLOW",    8005),
     ("yellow bottle",   "200ml", "samsol"):          ("YELLOW LARGE BOTTLE 200ML",          8006),
     ("white bottle",    "200ml", "samsol"):          ("WHITE BOTTLE 200ML",                 8007),
@@ -296,8 +304,8 @@ CUSTOMER_MAP = {
     "mabley beauty":          "Mablay Beauty PVT LTD.",
     "mega grey":              "Muhammad Hashim Khan",
     "al rehman group":        "Al-Rehman Group",
-    "alpha lab":              "Alpha Lab",
-    "alpha container":        "Alpha Lab",
+    "alpha lab":              "Alpha Labs PVT LTD",
+    "alpha container":        "Alpha Labs PVT LTD",
     "hashim khan":            "Muhammad Hashim Khan",
     "m hashim khan":          "Muhammad Hashim Khan",
     "active pro":             "Al-Rehman Group",
@@ -348,7 +356,7 @@ PID_TO_CUSTOMER = {
     6624: "Samsol International Private Limited",  # S-45 DIA 19MM (BOM 192) — confirmed ERP PID
     9004: "Bahadur",
     9006: "Samsol International Private Limited",
-    8001: "Alpha Lab",
+    8001: "Alpha Labs PVT LTD",
     8005: "Samsol International Private Limited",
     8006: "Samsol International Private Limited",
     8007: "Samsol International Private Limited",
