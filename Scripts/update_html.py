@@ -51,9 +51,23 @@ ws_cat = wb['Product_Catalog']
 
 # ── MONTH FILTER ─────────────────────────────────────────────
 now        = datetime.now()
-cur_month  = now.month
-cur_year   = now.year
-month_name = now.strftime('%B %Y')
+
+# Dynamically resolve reporting month from Production_Log
+dates_in_log = []
+for r in range(3, ws_pl.max_row + 1):
+    val = ws_pl.cell(row=r, column=1).value
+    if val and isinstance(val, (date, datetime)):
+        dates_in_log.append(val)
+
+if dates_in_log:
+    latest_log_date = max(dates_in_log)
+    cur_month  = latest_log_date.month
+    cur_year   = latest_log_date.year
+    month_name = latest_log_date.strftime('%B %Y')
+else:
+    cur_month  = now.month
+    cur_year   = now.year
+    month_name = now.strftime('%B %Y')
 
 # ── READ PRODUCTION LOG ──────────────────────────────────────
 # Cols (1-based): A=Date B=Machine C=Customer D=Product E=Dia F=PID
@@ -94,10 +108,13 @@ for row in ws_pl.iter_rows(min_row=3, values_only=True):
     if latest_date is None or row_dt.date() > latest_date:
         latest_date = row_dt.date()
 
-    for cat, col_idx in downtime_cols.items():
-        val = row[col_idx - 1]
-        if val and isinstance(val, (int, float)):
-            dt_totals[cat] += float(val)
+    mach_up = str(machine).upper()
+    is_press_print = mach_up.startswith('PRESS') or mach_up.startswith('PRINT') or mach_up.startswith('PLINE')
+    if is_press_print:
+        for cat, col_idx in downtime_cols.items():
+            val = row[col_idx - 1]
+            if val and isinstance(val, (int, float)):
+                dt_totals[cat] += float(val)
 
     if not pid or not good_qty: continue
     good_qty = int(good_qty)

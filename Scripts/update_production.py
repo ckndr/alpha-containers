@@ -682,8 +682,8 @@ def write_production_log(ac_path, source_rows):
         ws.cell(row=r, column=14).value = row['changeover_dt']
         ws.cell(row=r, column=15).value = row['operations_dt']
         ws.cell(row=r, column=16).value = row['power_shutdown_dt']
-        ws.cell(row=r, column=18).value = row['gas_shutdown_dt']
-        ws.cell(row=r, column=19).value = row['workers_shortage_dt']
+        ws.cell(row=r, column=17).value = row['gas_shutdown_dt']
+        ws.cell(row=r, column=18).value = row['workers_shortage_dt']
 
         for c in range(1, 20):
             cell = ws.cell(row=r, column=c)

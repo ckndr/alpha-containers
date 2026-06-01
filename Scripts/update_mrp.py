@@ -69,8 +69,8 @@ def main():
         '=SUMPRODUCT((Production_Log!$F$3:$F$8963=D8)'
         '*(LEFT(Production_Log!$B$3:$B$8963,5)="Print")'
         '*(ISERROR(SEARCH("(Varnish)",Production_Log!$D$3:$D$8963)))'
-        '*(MONTH(Production_Log!$A$3:$A$8963)=MONTH(TODAY()))'
-        '*(YEAR(Production_Log!$A$3:$A$8963)=YEAR(TODAY()))'
+        '*(MONTH(Production_Log!$A$3:$A$8963)=MONTH($H$1))'
+        '*(YEAR(Production_Log!$A$3:$A$8963)=YEAR($H$1))'
         '*Production_Log!$H$3:$H$8963)'
     )
     ws.cell(row=8, column=7, value=g8_formula)
@@ -80,49 +80,81 @@ def main():
     
     print("New Row 8 populated.")
     
-    # 3. Update Total Row formulas (now at row 14)
-    print("Updating Total Row (Row 14) formulas...")
-    ws.cell(row=14, column=6, value="=SUM(F3:F13)")
-    ws.cell(row=14, column=7, value="=SUM(G3:G13)")
-    ws.cell(row=14, column=8, value='=SUMIF(H3:H13, ">0")')
+    # 3. Update Total Row formulas (now at row 15)
+    print("Updating Total Row (Row 15) formulas...")
+    ws.cell(row=15, column=6, value="=SUM(F3:F14)")
+    ws.cell(row=15, column=7, value="=SUM(G3:G14)")
+    ws.cell(row=15, column=8, value='=SUMIF(H3:H14, ">0")')
     
-    # 4. Update the second section (Material Requirement Plan)
-    # The items start at Row 17 and go up to Row 156
-    print("Updating Material Requirement Plan section formulas (Rows 17 to 156)...")
-    active_rows = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13]  # Skipping row 12 (V-HC Brown - on hold)
+    # 4. Update the Material Requirement Plan sections
+    # After inserting row 8, we have three sections:
+    # A. Tubes Material Plan (rows 19 to 101)
+    # B. PET Material Plan (rows 116 to 123)
+    # C. INK Table (rows 127 to 158)
     
-    for r in range(17, 157):
+    # --- A. Tubes Material Plan (rows 19 to 101) ---
+    print("Updating Tubes Material Plan (Rows 19 to 101)...")
+    active_rows_tubes = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14]  # Skipping row 13 (V-HC Brown - on hold)
+    for r in range(19, 102):
         item_id = ws.cell(row=r, column=1).value
-        # Check if this row is an actual item row (has a numeric Item ID)
         if not is_numeric_item_id(item_id):
-            print(f"  Skipping row {r} (non-item: {item_id})")
             continue
-            
         # Column E: Required Qty formula
-        ws.cell(row=r, column=5, value=f"=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D$3:$D$13,TableBOM[Product ID],$H$3:$H$13)/1000)")
+        ws.cell(row=r, column=5, value=f"=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D$3:$D$14,TableBOM[Product ID],$H$3:$H$14)/1000)")
         
         # Column H: Product Name(s) formula
         inner_parts_h = [
             f'IF((COUNTIFS(TableBOM[Product ID],$D${x},TableBOM[Item ID],$A{r})>0)*($H${x}>0),$C${x}&\", \",\"\")'
-            for x in active_rows
+            for x in active_rows_tubes
         ]
         concat_h = " & ".join(inner_parts_h)
         formula_h = f'=IF(LEN({concat_h})>1,LEFT({concat_h},LEN({concat_h})-2),\"\")'
         ws.cell(row=r, column=8, value=formula_h)
         
-        # Column I: Job Order #(s) formula
-        inner_parts_i = [
-            f'IF((COUNTIFS(TableBOM[Product ID],$D${x},TableBOM[Item ID],$A{r})>0)*($H${x}>0),$E${x}&\", \",\"\")'
-            for x in active_rows
-        ]
-        concat_i = " & ".join(inner_parts_i)
-        formula_i = f'=IF(LEN({concat_i})>1,LEFT({concat_i},LEN({concat_i})-2),\"\")'
-        ws.cell(row=r, column=9, value=formula_i)
+        # Column I: Status formula
+        ws.cell(row=r, column=9, value=f'=IF(E{r}=0,"Not needed",IF(G{r}<0,"SHORTAGE",IF(G{r}<F{r}*0.1,"LOW","OK")))')
         
-    # 5. Update CAPS ON HOLD sub-section (now at Rows 162 to 165)
-    print("Updating CAPS ON HOLD sub-section formulas (Rows 162 to 165)...")
-    for r in range(162, 166):
-        ws.cell(row=r, column=5, value=f'=IFERROR(INDEX($C$50:$C$71,MATCH(D{r},$A$50:$A$71,0)),"-")')
+    # --- B. PET Material Plan (rows 116 to 123) ---
+    print("Updating PET Material Plan (Rows 116 to 123)...")
+    active_rows_pet = range(106, 112) # rows 106 to 111
+    for r in range(116, 124):
+        item_id = ws.cell(row=r, column=1).value
+        if not is_numeric_item_id(item_id):
+            continue
+        # Column E: Required Qty formula
+        ws.cell(row=r, column=5, value=f"=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D$106:$D$111,TableBOM[Product ID],$H$106:$H$111)/1000)")
+        
+        # Column H: Product Name(s) formula
+        inner_parts_h = [
+            f'IF((COUNTIFS(TableBOM[Product ID],$D${x},TableBOM[Item ID],$A{r})>0)*($H${x}>0),$C${x}&\", \",\"\")'
+            for x in active_rows_pet
+        ]
+        concat_h = " & ".join(inner_parts_h)
+        formula_h = f'=IF(LEN({concat_h})>1,LEFT({concat_h},LEN({concat_h})-2),\"\")'
+        ws.cell(row=r, column=8, value=formula_h)
+        
+        # Column I: Status formula
+        ws.cell(row=r, column=9, value=f'=IF(E{r}=0,"Not needed",IF(G{r}<0,"SHORTAGE",IF(G{r}<F{r}*0.1,"LOW","OK")))')
+        
+    # --- C. INK Table (rows 127 to 158) ---
+    print("Updating INK Table (Rows 127 to 158)...")
+    for r in range(127, 159):
+        item_id = ws.cell(row=r, column=1).value
+        if not is_numeric_item_id(item_id):
+            continue
+        # Column E: Avg Monthly Usage formula
+        ws.cell(row=r, column=5, value=f"=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D$3:$D$14,TableBOM[Product ID],$H$3:$H$14)/1000)")
+        # Column H: Current Stock (indexed from inventory)
+        ws.cell(row=r, column=8, value=f"=IFERROR(INDEX(TableInventory[Store Balance],MATCH(A{r},TableInventory[Item ID],0)),0)+IFERROR(INDEX(TableInventory[Work In Process],MATCH(A{r},TableInventory[Item ID],0)),0)")
+        # Column F: Days of Stock Left
+        ws.cell(row=r, column=6, value=f"=IF(E{r}=0,0,ROUND(H{r}/E{r}*30,1))")
+        # Column G: Status
+        ws.cell(row=r, column=7, value=f'=IF(E{r}=0,"Not needed",IF(H{r}-E{r}<0,"SHORTAGE",IF(H{r}-E{r}<E{r},"LOW","OK")))')
+
+    # 5. Update CAPS ON HOLD sub-section (now at Rows 164 to 167)
+    print("Updating CAPS ON HOLD sub-section formulas (Rows 164 to 167)...")
+    for r in range(164, 168):
+        ws.cell(row=r, column=5, value=f'=IFERROR(INDEX($C$52:$C$73,MATCH(D{r},$A$52:$A$73,0)),"-")')
         
     # 6. Save workbook
     print(f"Saving changes to {os.path.basename(path)}...")
