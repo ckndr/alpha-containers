@@ -80,7 +80,7 @@ print(f"  Production Log: {len(mtd_by_pid)} PIDs with MTD production")
 # Scan rows 11 onward; collect every row with Type = TUBE or PET.
 # Skip TOTAL rows (col D = "TOTAL") and blank rows.
 
-DATA_COLS = range(2, 12)  # columns B(2) through K(11)
+DATA_COLS = range(2, 13)  # columns B(2) through L(12)
 
 def read_product_row(ws, r):
     """Read a product row's data as a dict."""
@@ -94,6 +94,7 @@ def read_product_row(ws, r):
 
     orders_raw   = ws.cell(r, 7).value   # col G
     dispatch_raw = ws.cell(r, 11).value  # col K
+    remarks_raw  = ws.cell(r, 12).value  # col L
 
     # Parse orders (always a plain value)
     try:
@@ -118,6 +119,7 @@ def read_product_row(ws, r):
         'pid':      pid_int,               # col F
         'orders':   orders_raw,            # col G (keep original value)
         'dispatch_raw': ws.cell(r, 11).value,  # col K (preserve formula or value)
+        'remarks':  remarks_raw,           # col L
         'produced': produced,
         'is_active': is_active,
         'orig_row': r,
@@ -289,10 +291,14 @@ PRODUCT_COL_STYLES = {
     9:  {'bold': False, 'nf': '#,##0',    'halign': 'center'},  # I = Remaining
     10: {'bold': False, 'nf': '0%',       'halign': 'center'},  # J = Compliance
     11: {'bold': True,  'nf': '#,##0',    'halign': 'center'},  # K = Dispatch
+    12: {'bold': True,  'nf': 'General',  'halign': 'left'},    # L = Remarks
 }
 
 def apply_product_format(ws, r):
     """Apply standard product row formatting to all data columns in row r."""
+    thin_side = Side(style='thin')
+    thin_border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
+
     for c in DATA_COLS:
         cell = ws.cell(r, c)
         style = PRODUCT_COL_STYLES.get(c, {})
@@ -300,7 +306,7 @@ def apply_product_format(ws, r):
         cell.alignment = Alignment(horizontal=style.get('halign', 'center'), vertical='center')
         cell.number_format = style.get('nf', 'General')
         cell.fill = PatternFill()  # clear any fill
-        cell.border = Border()    # clear any border
+        cell.border = thin_border
 
 # ── CLEAR ALL DATA ROWS ─────────────────────────────────────
 # Clear from row 11 down to the old last used row (generous)
@@ -331,6 +337,9 @@ def write_product_row(ws, r, data):
 
     # K = Dispatch (preserve original value/formula)
     ws.cell(r, 11).value = data['dispatch_raw']
+
+    # L = Remarks (preserve original value)
+    ws.cell(r, 12).value = data.get('remarks')
 
     # Apply consistent product formatting
     apply_product_format(ws, r)
