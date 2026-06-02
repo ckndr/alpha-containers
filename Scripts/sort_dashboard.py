@@ -18,6 +18,7 @@ Version: 1.0
 import os
 import sys
 import glob
+import re
 from datetime import datetime, date
 from copy import copy
 
@@ -44,10 +45,76 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from alpha_checks import check_not_locked
 check_not_locked(EXCEL_PATH)
 
+# ── READ ACTUAL VALUES FOR ORDERS AND DISPATCH ────────────────
+# Since we load the main workbook with data_only=False to preserve formula strings,
+# reading cells in G and K would return formulas (e.g. '=IFERROR(...)').
+# To classify active/inactive products correctly, we load a temporary copy with data_only=True.
+wb_val = load_workbook(EXCEL_PATH, data_only=True, read_only=True)
+ws_val = wb_val['Tubex_Dashboard']
+
+def safe_eval_math(expr):
+    if not expr:
+        return 0
+    if isinstance(expr, (int, float)):
+        return int(expr)
+    expr_str = str(expr).lstrip('=').strip()
+    if re.match(r'^[0-9+\-*/().\s]+$', expr_str):
+        try:
+            return int(float(eval(expr_str)))
+        except Exception:
+            return 0
+    return 0
+
+orders_by_row = {}
+dispatch_by_row = {}
+
+for r in range(11, 200):
+    # Column G (7) = Orders
+    o_val = ws_val.cell(r, 7).value
+    try:
+        orders_by_row[r] = int(o_val) if o_val else 0
+    except (TypeError, ValueError):
+        orders_by_row[r] = 0
+
+    # Column K (11) = Dispatch
+    d_val = ws_val.cell(r, 11).value
+    try:
+        dispatch_by_row[r] = int(d_val) if d_val else 0
+    except (TypeError, ValueError):
+        dispatch_by_row[r] = 0
+
+# Read MRP sheet to resolve Tube order formula lookup values
+mrp_orders = {}
+if 'MRP' in wb_val.sheetnames:
+    ws_mrp = wb_val['MRP']
+    for r_mrp in range(3, 100):
+        pid_val = ws_mrp.cell(r_mrp, 4).value # col D = PID
+        ord_val = ws_mrp.cell(r_mrp, 6).value # col F = Orders
+        if pid_val is not None:
+            try:
+                mrp_orders[int(pid_val)] = int(ord_val) if ord_val else 0
+            except (TypeError, ValueError):
+                pass
+
+wb_val.close()
+
+
 # ── OPEN WORKBOOK ────────────────────────────────────────────
 wb = load_workbook(EXCEL_PATH, data_only=False)
 ws = wb['Tubex_Dashboard']
 ws_pl = wb['Production_Log']
+
+# Fallback check: evaluate simple arithmetic formulas if data_only read returned None/0
+for r in range(11, 200):
+    if not orders_by_row.get(r):
+        raw_o = ws.cell(r, 7).value
+        if raw_o:
+            orders_by_row[r] = safe_eval_math(raw_o)
+
+    if not dispatch_by_row.get(r):
+        raw_d = ws.cell(r, 11).value
+        if raw_d:
+            dispatch_by_row[r] = safe_eval_math(raw_d)
 
 # ── COMPUTE MTD PRODUCTION FROM PRODUCTION_LOG ───────────────
 # Since user only keeps current month in Production_Log, no month
@@ -96,19 +163,14 @@ def read_product_row(ws, r):
     dispatch_raw = ws.cell(r, 11).value  # col K
     remarks_raw  = ws.cell(r, 12).value  # col L
 
-    # Parse orders (always a plain value)
-    try:
-        orders = int(orders_raw) if orders_raw else 0
-    except (TypeError, ValueError):
-        orders = 0
+    # Look up actual evaluated values from pre-read maps or MRP lookup
+    orders   = orders_by_row.get(r, 0)
+    if not orders and pid_int in mrp_orders:
+        orders = mrp_orders[pid_int]
 
-    # Parse dispatch (could be value or simple formula like =8232+24696)
-    try:
-        dispatch = int(dispatch_raw) if dispatch_raw else 0
-    except (TypeError, ValueError):
-        dispatch = 0
-
+    dispatch = dispatch_by_row.get(r, 0)
     produced = mtd_by_pid.get(pid_int, 0)
+
     is_active = (orders > 0) or (produced > 0) or (dispatch > 0)
 
     return {
@@ -158,7 +220,6 @@ inactive_pets  = [p for p in all_pets  if not p['is_active']]
 # ── SORT BY DIAMETER (low → high) ───────────────────────────
 # Tubes: dia is numeric (int/float like 16, 19, 20.5, 25, 30)
 # PETs:  dia is string like "120 ml", "200 ml" — extract the number
-import re
 
 def dia_sort_key(row_data):
     """Extract numeric dia for sorting. Returns float."""
@@ -323,7 +384,12 @@ def write_product_row(ws, r, data):
     ws.cell(r, 4).value = data['product']    # D = Product Name
     ws.cell(r, 5).value = data['dia']        # E = Dia
     ws.cell(r, 6).value = data['pid']        # F = Prod ID
-    ws.cell(r, 7).value = data['orders']     # G = Orders
+
+    # G = Orders: If it is a formula string, update F{row}/D{row} reference to current row r
+    orders_val = data['orders']
+    if isinstance(orders_val, str) and orders_val.startswith('='):
+        orders_val = re.sub(r'\b([FD])\d+\b', r'\g<1>' + str(r), orders_val)
+    ws.cell(r, 7).value = orders_val
 
     # H = MTD Produced (formula — rebuild for this row position)
     if data['type'] == 'TUBE':

@@ -2,11 +2,16 @@
 
 ## Excel Workbook Versioning
 
-When editing an Excel workbook, do not overwrite the existing file. Save the edited workbook as a new version instead.
-
-- For normal incremental workbook edits, increase the final minor number. Example: `Tubex_v10_26.xlsx` becomes `Tubex_v10_27.xlsx`.
-- For major structural or logic changes, increase the main version. Example: `Tubex_v10_26.xlsx` becomes `Tubex_v11_1.xlsx`.
+When editing an Excel workbook:
+- Do not overwrite the existing file. Save the edited workbook as a new version instead.
+- For normal incremental workbook edits, increase the final minor number. Example: `Tubex_v10_28.xlsx` becomes `Tubex_v10_29.xlsx`.
+- For major structural or logic changes, increase the main version. Example: `Tubex_v10_28.xlsx` becomes `Tubex_v11_1.xlsx`.
 - Keep the previous workbook file in place so it remains available as a backup/reference.
+
+## Temporary Files Cleanup
+
+- Always delete any temporary scripts, log dumps, or automation files (e.g. `fix_mrp_formulas.py` or `fix_mrp_v28_formulas.py`) created in the repository root directory before finishing a task.
+- Keep the workspace clean and tidy to prevent cluttering version control.
 
 ## GitHub Sync Workflow
 
