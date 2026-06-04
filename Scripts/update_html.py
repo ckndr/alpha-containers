@@ -424,6 +424,252 @@ dash_data = {
     'petOrders':  pet_orders,
 }
 
+# ── READ INVENTORY ───────────────────────────────────────────
+inventory_data = []
+ws_inv = wb['Inventory']
+for r in range(2, ws_inv.max_row + 1):
+    item_id = ws_inv.cell(row=r, column=1).value
+    if item_id is None:
+        continue
+    try:
+        item_id = int(item_id)
+    except (TypeError, ValueError):
+        continue
+    
+    cat      = str(ws_inv.cell(row=r, column=2).value or '').strip()
+    name     = str(ws_inv.cell(row=r, column=3).value or '').strip()
+    uom      = str(ws_inv.cell(row=r, column=4).value or '').strip()
+    opening  = float(ws_inv.cell(row=r, column=5).value or 0)
+    received = float(ws_inv.cell(row=r, column=6).value or 0)
+    issued   = float(ws_inv.cell(row=r, column=7).value or 0)
+    balance  = ws_inv.cell(row=r, column=8).value
+    wip      = ws_inv.cell(row=r, column=9).value
+    
+    # balance and wip may be formulas — data_only=True gives calculated values
+    balance = float(balance) if balance and isinstance(balance, (int, float)) else 0.0
+    wip     = float(wip) if wip and isinstance(wip, (int, float)) else 0.0
+    
+    if not name:
+        continue
+    
+    inventory_data.append({
+        'id': item_id,
+        'cat': cat,
+        'name': name,
+        'uom': uom,
+        'opening': round(opening, 2),
+        'received': round(received, 2),
+        'issued': round(issued, 2),
+        'balance': round(balance, 2),
+        'wip': round(wip, 2),
+    })
+
+inv_title = str(ws_inv.cell(row=1, column=1).value or 'Inventory')
+
+# ── READ PRODUCTION LOG FOR HTML ─────────────────────────────
+prodlog_data = []
+for row in ws_pl.iter_rows(min_row=3, values_only=True):
+    row_date = row[0]
+    machine  = row[1]
+    if not row_date or not machine:
+        continue
+    if not isinstance(row_date, (date, datetime)):
+        continue
+    row_dt = row_date if isinstance(row_date, datetime) else datetime(row_date.year, row_date.month, row_date.day)
+    if row_dt.month != cur_month or row_dt.year != cur_year:
+        continue
+    
+    good    = int(row[7]) if row[7] and isinstance(row[7], (int, float)) else 0
+    reject  = int(row[8]) if row[8] and isinstance(row[8], (int, float)) else 0
+    total   = int(row[6]) if row[6] and isinstance(row[6], (int, float)) else 0
+    
+    prodlog_data.append({
+        'date': row_dt.strftime('%d-%b'),
+        'machine': str(machine).strip(),
+        'customer': str(row[2] or '').strip(),
+        'product': str(row[3] or '').strip(),
+        'dia': str(row[4] or '').strip(),
+        'pid': int(row[5]) if row[5] else None,
+        'total': total,
+        'good': good,
+        'reject': reject,
+    })
+
+# ── READ FG STOCK ────────────────────────────────────────────
+fg_data = []
+ws_fg = wb['FG Stock']
+fg_title = str(ws_fg.cell(row=1, column=1).value or 'FG Stock')
+
+for r in range(4, ws_fg.max_row + 1):
+    pid_val = ws_fg.cell(row=r, column=2).value
+    product = ws_fg.cell(row=r, column=4).value
+    if not product:
+        continue
+    
+    fg_qty = ws_fg.cell(row=r, column=6).value
+    fg_qty = int(fg_qty) if fg_qty and isinstance(fg_qty, (int, float)) else 0
+    
+    fg_data.append({
+        'sr': ws_fg.cell(row=r, column=1).value,
+        'pid': int(pid_val) if pid_val else None,
+        'customer': str(ws_fg.cell(row=r, column=3).value or '').strip(),
+        'product': str(product).strip(),
+        'dia': str(ws_fg.cell(row=r, column=5).value or '').strip(),
+        'qty': fg_qty,
+        'status': str(ws_fg.cell(row=r, column=7).value or '').strip(),
+        'remarks': str(ws_fg.cell(row=r, column=8).value or '').strip(),
+    })
+
+# ── READ MRP DATA ────────────────────────────────────────────
+ws_mrp = wb['MRP']
+mrp_title = str(ws_mrp.cell(row=1, column=1).value or 'Material Requirement Plan')
+
+# Read orders (rows 3-14)
+mrp_orders = []
+for r in range(3, 15):
+    pid = ws_mrp.cell(row=r, column=4).value
+    if not pid:
+        continue
+    try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        continue
+    
+    required = ws_mrp.cell(row=r, column=6).value
+    produced = ws_mrp.cell(row=r, column=7).value
+    remaining = ws_mrp.cell(row=r, column=8).value
+    
+    mrp_orders.append({
+        'dia': ws_mrp.cell(row=r, column=1).value,
+        'customer': str(ws_mrp.cell(row=r, column=2).value or '').strip(),
+        'product': str(ws_mrp.cell(row=r, column=3).value or '').strip(),
+        'pid': pid,
+        'jobOrder': str(ws_mrp.cell(row=r, column=5).value or '').strip(),
+        'required': float(required) if required and isinstance(required, (int, float)) else 0,
+        'produced': float(produced) if produced and isinstance(produced, (int, float)) else 0,
+        'remaining': float(remaining) if remaining and isinstance(remaining, (int, float)) else 0,
+        'remarks': str(ws_mrp.cell(row=r, column=9).value or '').strip(),
+    })
+
+# Read material requirements (rows 18-101 for tubes)
+mrp_materials = []
+for r in range(18, 102):
+    item_id = ws_mrp.cell(row=r, column=1).value
+    if item_id is None:
+        continue
+    try:
+        item_id_int = int(item_id)
+    except (TypeError, ValueError):
+        continue
+    
+    cat      = str(ws_mrp.cell(row=r, column=2).value or '').strip()
+    name     = str(ws_mrp.cell(row=r, column=3).value or '').strip()
+    uom      = str(ws_mrp.cell(row=r, column=4).value or '').strip()
+    req_qty  = ws_mrp.cell(row=r, column=5).value
+    stock    = ws_mrp.cell(row=r, column=6).value
+    surplus  = ws_mrp.cell(row=r, column=7).value
+    products = str(ws_mrp.cell(row=r, column=8).value or '').strip()
+    status   = str(ws_mrp.cell(row=r, column=9).value or '').strip()
+    
+    req_qty = round(float(req_qty), 2) if req_qty and isinstance(req_qty, (int, float)) else 0
+    stock   = round(float(stock), 2) if stock and isinstance(stock, (int, float)) else 0
+    surplus = round(float(surplus), 2) if surplus and isinstance(surplus, (int, float)) else 0
+    
+    if not name:
+        continue
+    
+    mrp_materials.append({
+        'id': item_id_int,
+        'cat': cat,
+        'name': name,
+        'uom': uom,
+        'required': req_qty,
+        'stock': stock,
+        'surplus': surplus,
+        'products': products,
+        'status': status,
+        'section': 'tube',
+    })
+
+# Read PET material requirements (rows 116-123)
+for r in range(116, 124):
+    item_id = ws_mrp.cell(row=r, column=1).value
+    if item_id is None:
+        continue
+    try:
+        item_id_int = int(item_id)
+    except (TypeError, ValueError):
+        continue
+    
+    cat      = str(ws_mrp.cell(row=r, column=2).value or '').strip()
+    name     = str(ws_mrp.cell(row=r, column=3).value or '').strip()
+    uom      = str(ws_mrp.cell(row=r, column=4).value or '').strip()
+    req_qty  = ws_mrp.cell(row=r, column=5).value
+    stock    = ws_mrp.cell(row=r, column=6).value
+    surplus  = ws_mrp.cell(row=r, column=7).value
+    products = str(ws_mrp.cell(row=r, column=8).value or '').strip()
+    status   = str(ws_mrp.cell(row=r, column=9).value or '').strip()
+    
+    req_qty = round(float(req_qty), 2) if req_qty and isinstance(req_qty, (int, float)) else 0
+    stock   = round(float(stock), 2) if stock and isinstance(stock, (int, float)) else 0
+    surplus = round(float(surplus), 2) if surplus and isinstance(surplus, (int, float)) else 0
+    
+    if not name:
+        continue
+    
+    mrp_materials.append({
+        'id': item_id_int,
+        'cat': cat,
+        'name': name,
+        'uom': uom,
+        'required': req_qty,
+        'stock': stock,
+        'surplus': surplus,
+        'products': products,
+        'status': status,
+        'section': 'pet',
+    })
+
+# Read INK table (rows 127-158)
+mrp_inks = []
+for r in range(127, 159):
+    item_id = ws_mrp.cell(row=r, column=1).value
+    if item_id is None:
+        continue
+    try:
+        item_id_int = int(item_id)
+    except (TypeError, ValueError):
+        continue
+    
+    name    = str(ws_mrp.cell(row=r, column=3).value or '').strip()
+    uom     = str(ws_mrp.cell(row=r, column=4).value or '').strip()
+    avg_use = ws_mrp.cell(row=r, column=5).value  # Avg Monthly Usage
+    days    = ws_mrp.cell(row=r, column=6).value   # Days of Stock
+    status  = str(ws_mrp.cell(row=r, column=7).value or '').strip()
+    stock   = ws_mrp.cell(row=r, column=8).value   # Current Stock
+    
+    avg_use = round(float(avg_use), 2) if avg_use and isinstance(avg_use, (int, float)) else 0
+    days    = round(float(days), 1) if days and isinstance(days, (int, float)) else 0
+    stock   = round(float(stock), 2) if stock and isinstance(stock, (int, float)) else 0
+    
+    if not name:
+        continue
+    
+    mrp_inks.append({
+        'id': item_id_int,
+        'name': name,
+        'uom': uom,
+        'avgUse': avg_use,
+        'daysLeft': days,
+        'status': status,
+        'stock': stock,
+    })
+
+print(f"\nInventory items loaded: {len(inventory_data)}")
+print(f"Production Log rows (current month): {len(prodlog_data)}")
+print(f"FG Stock rows: {len(fg_data)}")
+print(f"MRP orders: {len(mrp_orders)}  |  Materials: {len(mrp_materials)}  |  Inks: {len(mrp_inks)}")
+
 # ── INJECT INTO HTML ─────────────────────────────────────────
 if not os.path.exists(HTML_PATH):
     raise FileNotFoundError(f"HTML not found: {HTML_PATH}")
@@ -445,6 +691,18 @@ if '/* CATALOG_START */' not in html:
         html = html.replace('\nconst CAT_ICON', '\n/* CATALOG_END */\nconst CAT_ICON', 1)
     else:
         raise RuntimeError("Could not locate 'const CAT_ICON' to place CATALOG_END marker.")
+
+if '/* INVENTORY_START */' not in html:
+    print("  First run: adding new data markers to HTML...")
+    # Insert after CATALOG_END
+    html = html.replace(
+        '/* CATALOG_END */',
+        '/* CATALOG_END */\n'
+        '/* INVENTORY_START */\n/* INVENTORY_END */\n'
+        '/* PRODLOG_START */\n/* PRODLOG_END */\n'
+        '/* FGSTOCK_START */\n/* FGSTOCK_END */\n'
+        '/* MRP_START */\n/* MRP_END */'
+    )
 
 # ── INJECT DASH_DATA ─────────────────────────────────────────
 marker_start = '/* DATA_START */'
@@ -484,6 +742,23 @@ new_catalog_block = (
     f"{cat_end}"
 )
 html = html[:pos_cs] + new_catalog_block + html[pos_ce + len(cat_end):]
+
+# ── INJECT NEW DATA CONSTANTS ────────────────────────────────
+def inject_block(html, start_marker, end_marker, js_content):
+    ps = html.find(start_marker)
+    pe = html.find(end_marker)
+    if ps == -1 or pe == -1:
+        raise RuntimeError(f"{start_marker} / {end_marker} markers not found.")
+    return html[:ps] + f"{start_marker}\n{js_content}\n{end_marker}" + html[pe + len(end_marker):]
+
+html = inject_block(html, '/* INVENTORY_START */', '/* INVENTORY_END */',
+    f"const INVENTORY_DATA = {json.dumps({'title': inv_title, 'items': inventory_data}, ensure_ascii=False)};")
+html = inject_block(html, '/* PRODLOG_START */', '/* PRODLOG_END */',
+    f"const PRODUCTION_LOG_DATA = {json.dumps({'month': month_name, 'rows': prodlog_data}, ensure_ascii=False)};")
+html = inject_block(html, '/* FGSTOCK_START */', '/* FGSTOCK_END */',
+    f"const FG_STOCK_DATA = {json.dumps({'title': fg_title, 'rows': fg_data}, ensure_ascii=False)};")
+html = inject_block(html, '/* MRP_START */', '/* MRP_END */',
+    f"const MRP_DATA = {json.dumps({'title': mrp_title, 'orders': mrp_orders, 'materials': mrp_materials, 'inks': mrp_inks}, ensure_ascii=False)};")
 
 # ── WRITE HTML ───────────────────────────────────────────────
 with open(HTML_PATH, 'w', encoding='utf-8') as f:
