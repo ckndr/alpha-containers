@@ -287,7 +287,83 @@ table.orders tr:hover td{background:#f7f9ff}
   .jump-btn{font-size:12px;padding:10px 16px}
 }
 
+/* ══ PRODUCTION LOG TAB ══ */
+.prodlog-filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.prodlog-filters .search-wrap{flex:1;min-width:200px}
+.date-chip{padding:6px 12px;border:2px solid var(--border);border-radius:8px;background:var(--card);font-family:"DM Sans",sans-serif;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:.2s;white-space:nowrap}
+.date-chip:hover,.date-chip.active{border-color:var(--blue);color:var(--blue);background:#eef3ff}
+.date-chip.active{background:var(--blue);color:#fff}
+.machine-badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:600;letter-spacing:.3px}
+.machine-badge.press{background:#e8f0fe;color:#2355a0}
+.machine-badge.print{background:#1a2f52;color:#fff}
+.machine-badge.pet{background:var(--green-bg);color:var(--green)}
+.machine-badge.pline{background:#f3e8ff;color:#7c3aed}
+.machine-badge.other{background:var(--light);color:var(--muted)}
 
+/* ══ FG STOCK TAB ══ */
+.fg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.fg-card{background:var(--card);border-radius:12px;border:2px solid var(--border);padding:16px;transition:.2s;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.fg-card:hover{box-shadow:0 4px 16px rgba(13,31,60,.08);transform:translateY(-1px)}
+.fg-card.status-ok{border-left:4px solid var(--green)}
+.fg-card.status-warn{border-left:4px solid var(--orange)}
+.fg-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.fg-product{font-size:14px;font-weight:600;color:var(--text);line-height:1.3}
+.fg-customer{font-size:11px;color:var(--muted);margin-top:2px}
+.fg-qty{font-family:"DM Mono",monospace;font-size:22px;font-weight:600;color:var(--navy);text-align:right}
+.fg-qty-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;text-align:right}
+.fg-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.fg-dia{font-family:"DM Mono",monospace;font-size:11px;color:var(--muted);background:var(--light);padding:2px 8px;border-radius:4px}
+.fg-remarks{font-size:11px;color:var(--muted);font-style:italic;margin-top:6px}
+
+/* ══ STATUS BADGES (shared) ══ */
+.status-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.status-pill.ok{background:var(--green-bg);color:var(--green)}
+.status-pill.low{background:var(--orange-bg);color:var(--orange)}
+.status-pill.shortage{background:var(--red-bg);color:var(--red)}
+.status-pill.not-needed{background:var(--light);color:var(--muted)}
+.status-pill.not-ready{background:var(--orange-bg);color:var(--orange)}
+.status-pill.in-progress{background:#e8f0fe;color:#2355a0}
+
+/* ══ INVENTORY TAB ══ */
+.inv-toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.inv-stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:18px}
+.inv-stat{background:var(--card);border-radius:10px;border:2px solid var(--border);padding:12px;text-align:center}
+.inv-stat .val{font-family:"DM Mono",monospace;font-size:20px;font-weight:600;color:var(--navy)}
+.inv-stat .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+table.inv-table{width:100%;border-collapse:collapse;background:var(--card)}
+table.inv-table th{text-align:left;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:10px 10px;background:var(--light);white-space:nowrap;position:sticky;top:0;z-index:1}
+table.inv-table th:nth-child(n+5){text-align:right}
+table.inv-table td{padding:9px 10px;font-size:12px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.inv-table td:nth-child(n+5){text-align:right;font-family:"DM Mono",monospace}
+table.inv-table tr:hover td{background:#f7f9ff}
+table.inv-table tr.zero-stock td{background:#fff5f5}
+table.inv-table tr.low-stock td{background:#fffbeb}
+.cat-filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+
+/* ══ MRP TAB ══ */
+.mrp-section{margin-bottom:24px}
+.mrp-section-title{font-family:"DM Serif Display",serif;font-size:16px;font-weight:400;color:var(--navy);margin-bottom:12px}
+table.mrp-table{width:100%;border-collapse:collapse;background:var(--card)}
+table.mrp-table th{text-align:left;font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:10px 10px;background:var(--light);white-space:nowrap}
+table.mrp-table th:nth-child(n+4){text-align:right}
+table.mrp-table td{padding:9px 10px;font-size:12px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.mrp-table td:nth-child(n+4){text-align:right;font-family:"DM Mono",monospace}
+table.mrp-table tr:hover td{background:#f7f9ff}
+.surplus-val{color:var(--green);font-weight:600}
+.deficit-val{color:var(--red);font-weight:600}
+.mrp-filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+
+/* ══ MOBILE OVERRIDES FOR NEW TABS ══ */
+@media(max-width:768px){
+  .fg-grid{grid-template-columns:1fr}
+  .fg-qty{font-size:18px}
+  .inv-toolbar{flex-direction:column}
+  .inv-stat-row{grid-template-columns:repeat(2,1fr)}
+  .prodlog-filters{flex-direction:column}
+  table.inv-table th,table.inv-table td{padding:7px 6px;font-size:10.5px}
+  table.mrp-table th,table.mrp-table td{padding:7px 6px;font-size:10.5px}
+  .mrp-section-title{font-size:14px}
+}
 
   /* ── FOOTER ── */
   .app-footer{
@@ -320,7 +396,11 @@ table.orders tr:hover td{background:#f7f9ff}
   </div>
   <div class="tabs">
     <button class="tab active" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
-    <button class="tab" onclick="switchTab('calc',this)">🧮 Material Calculator</button>
+    <button class="tab" onclick="switchTab('calc',this)">🧮 Material Calc</button>
+    <button class="tab" onclick="switchTab('prodlog',this)">🏭 Production</button>
+    <button class="tab" onclick="switchTab('fgstock',this)">📋 FG Stock</button>
+    <button class="tab" onclick="switchTab('inventory',this)">📦 Inventory</button>
+    <button class="tab" onclick="switchTab('mrp',this)">⚖️ MRP</button>
   </div>
 </div>
 
@@ -413,6 +493,155 @@ table.orders tr:hover td{background:#f7f9ff}
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
+  <!-- PRODUCTION LOG TAB                          -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="tab-panel" id="panel-prodlog">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;margin-top:4px">
+      <div class="month-badge">🏭 <span id="prodlog-month">—</span></div>
+      <span class="sec-badge" id="prodlog-count">—</span>
+    </div>
+    
+    <div class="prodlog-filters">
+      <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" type="text" id="prodlogSearch" placeholder="Search product, customer, machine…" oninput="filterProdLog()">
+      </div>
+      <div id="prodlog-date-chips" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+    </div>
+    
+    <div class="tbl-wrap">
+      <table class="orders" id="prodlog-table">
+        <thead><tr>
+          <th>Date</th><th>Machine</th><th>Product</th>
+          <th style="text-align:right">Good</th><th style="text-align:right">Reject</th>
+          <th style="text-align:right">Total</th>
+        </tr></thead>
+        <tbody id="prodlog-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- FG STOCK TAB                                -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="tab-panel" id="panel-fgstock">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;margin-top:4px">
+      <div class="month-badge">📋 <span id="fgstock-title">FG Stock</span></div>
+      <span class="sec-badge" id="fgstock-count">—</span>
+    </div>
+    
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+      <div class="search-wrap" style="flex:1;min-width:200px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" type="text" id="fgSearch" placeholder="Search product or customer…" oninput="filterFGStock()">
+      </div>
+      <button class="filter-btn active" id="fg-all" onclick="setFGFilter('all',this)">All</button>
+      <button class="filter-btn" id="fg-ok" onclick="setFGFilter('ok',this)">✅ OK</button>
+      <button class="filter-btn" id="fg-warn" onclick="setFGFilter('warn',this)">⚠️ Not Ready</button>
+    </div>
+    
+    <div class="fg-grid" id="fgstock-grid"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- INVENTORY TAB                               -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="tab-panel" id="panel-inventory">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;margin-top:4px">
+      <div class="month-badge">📦 <span id="inv-title">Inventory</span></div>
+      <span class="sec-badge" id="inv-count">—</span>
+    </div>
+    
+    <div class="inv-stat-row" id="inv-stats"></div>
+    
+    <div class="inv-toolbar">
+      <div class="search-wrap" style="flex:1;min-width:200px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" type="text" id="invSearch" placeholder="Search item name or ID…" oninput="filterInventory()">
+      </div>
+      <div class="cat-filter-row" id="inv-cat-filters"></div>
+    </div>
+    
+    <div class="tbl-wrap">
+      <table class="inv-table" id="inv-table">
+        <thead><tr>
+          <th>ID</th><th>Category</th><th>Item Name</th><th>UOM</th>
+          <th style="text-align:right">Opening</th><th style="text-align:right">Received</th>
+          <th style="text-align:right">Issued</th><th style="text-align:right">Balance</th>
+          <th style="text-align:right">WIP</th>
+        </tr></thead>
+        <tbody id="inv-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- MATERIAL REQUIREMENT TAB                    -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="tab-panel" id="panel-mrp">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;margin-top:4px">
+      <div class="month-badge">⚖️ <span id="mrp-title">Material Requirement</span></div>
+    </div>
+
+    <!-- Required Orders Section -->
+    <div class="mrp-section">
+      <div class="sec-hdr"><h2>Required Orders (Tubes)</h2><span class="sec-badge" id="mrp-orders-badge">—</span></div>
+      <div class="tbl-wrap">
+        <table class="orders" id="mrp-orders-table">
+          <thead><tr>
+            <th>Dia</th><th>Product</th><th>Customer</th>
+            <th style="text-align:right">Required</th><th style="text-align:right">Produced</th>
+            <th style="text-align:right">Remaining</th><th>Remarks</th>
+          </tr></thead>
+          <tbody id="mrp-orders-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Material Status Section -->
+    <div class="mrp-section">
+      <div class="sec-hdr"><h2>Raw Material Status</h2><span class="sec-badge" id="mrp-mat-badge">—</span></div>
+      
+      <div class="mrp-filter-bar">
+        <div class="search-wrap" style="flex:1;min-width:200px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="search-input" type="text" id="mrpSearch" placeholder="Search material…" oninput="filterMRP()">
+        </div>
+        <button class="filter-btn active" id="mrp-f-all" onclick="setMRPFilter('all',this)">All</button>
+        <button class="filter-btn" id="mrp-f-shortage" onclick="setMRPFilter('SHORTAGE',this)">🔴 Shortage</button>
+        <button class="filter-btn" id="mrp-f-low" onclick="setMRPFilter('LOW',this)">🟡 Low</button>
+        <button class="filter-btn" id="mrp-f-ok" onclick="setMRPFilter('OK',this)">🟢 OK</button>
+      </div>
+      
+      <div class="tbl-wrap">
+        <table class="mrp-table" id="mrp-mat-table">
+          <thead><tr>
+            <th>ID</th><th>Category</th><th>Item Name</th>
+            <th style="text-align:right">Required</th><th style="text-align:right">Stock</th>
+            <th style="text-align:right">Surplus / Deficit</th><th>Status</th>
+          </tr></thead>
+          <tbody id="mrp-mat-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INK Status Section -->
+    <div class="mrp-section">
+      <div class="sec-hdr"><h2>Ink Stock Status</h2><span class="sec-badge" id="mrp-ink-badge">—</span></div>
+      <div class="tbl-wrap">
+        <table class="mrp-table" id="mrp-ink-table">
+          <thead><tr>
+            <th>ID</th><th>Ink Name</th>
+            <th style="text-align:right">Avg Monthly Use</th><th style="text-align:right">Current Stock</th>
+            <th style="text-align:right">Days Left</th><th>Status</th>
+          </tr></thead>
+          <tbody id="mrp-ink-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
   <!-- MATERIAL CALCULATOR TAB                    -->
   <!-- ═══════════════════════════════════════════ -->
   <div class="tab-panel" id="panel-calc">
@@ -463,10 +692,15 @@ table.orders tr:hover td{background:#f7f9ff}
       <div id="grandTableWrap">
         <div class="grand-total-empty"><div class="big">📋</div>No quantities entered yet.</div>
       </div>
-      <button class="print-btn" onclick="window.print()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Print / Export
-      </button>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px">
+        <button class="print-btn" onclick="window.print()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print / Export
+        </button>
+        <button id="toggleStockBtn" class="print-btn" style="background:var(--blue-light);display:none" onclick="toggleStockComparison()">
+          📦 Compare with Stock
+        </button>
+      </div>
     </div>
   </div>
 
@@ -476,12 +710,12 @@ table.orders tr:hover td{background:#f7f9ff}
 <script>
 /* ═══════════════════════════════════════════════════════
    LIVE DATA — auto-generated by update_html.py
-   Last generated: 03-Jun-2026 15:41
+   Last generated: 04-Jun-2026 09:52
    ════════════════════════════════════════════════════ */
 /*/* DATA_START */
 const DASH_DATA = {
   "month": "June 2026",
-  "lastUpdated": "Updated 03-Jun-2026 15:41 from Tubex_v10_29.xlsx",
+  "lastUpdated": "Updated 04-Jun-2026 09:52 from Tubex_v10_29.xlsx",
   "kpi": {
     "tubeYest": 12432,
     "tubeMTD": 24794,
@@ -534,11 +768,20 @@ const DASH_DATA = {
   ],
   "tubeOrders": [
     {
+      "pid": 6561,
+      "product": "ECZEMUS OINTMENT 0.03% 10G",
+      "customer": "Brookes Pharma Private Limited",
+      "dia": "16mm",
+      "ordered": 25000,
+      "produced": 0,
+      "dispatch": 0
+    },
+    {
       "pid": 3726,
       "product": "TUBES",
       "customer": "Samsol International Private Limited",
       "dia": "25mm",
-      "ordered": 0,
+      "ordered": 25000,
       "produced": 22176,
       "dispatch": 0
     },
@@ -576,6 +819,24 @@ const DASH_DATA = {
       "dia": "30mm",
       "ordered": 0,
       "produced": 2618,
+      "dispatch": 0
+    },
+    {
+      "pid": 5814,
+      "product": "VINCE NURTURAL",
+      "customer": "Mablay Beauty PVT LTD.",
+      "dia": "30mm",
+      "ordered": 22000,
+      "produced": 0,
+      "dispatch": 0
+    },
+    {
+      "pid": 6530,
+      "product": "V- HC BROWN",
+      "customer": "Adore",
+      "dia": "35mm",
+      "ordered": 13350,
+      "produced": 0,
       "dispatch": 0
     }
   ],
@@ -734,6 +995,18 @@ const BOM = {
   8014:[{cat:'PET RESIN',id:2680,name:'PET RESIN A-84',uom:'kg',r:23.75,s:0.15,est:false},{cat:'POLY BAG',id:3006,name:'POLY BAG 24X36 (LDPE)',uom:'pcs',r:8.333,s:0.15,est:false},{cat:'PLASTIC DOORI',id:3043,name:'PLASTIC DOORI',uom:'ROLL',r:0.005,s:0.15,est:false}]
 };
 /* CATALOG_END */
+/* INVENTORY_START */
+const INVENTORY_DATA = {"title": "Slugs Inventory — June 2026 MONTH TO DATE", "items": [{"id": 31, "cat": "Slug", "name": "13.5X4.2", "uom": "kg", "opening": 71.5, "received": 0.0, "issued": 0.0, "balance": 71.5, "wip": 0.0}, {"id": 2799, "cat": "Slug", "name": "16x4.5", "uom": "kg", "opening": 88.0, "received": 0.0, "issued": 0.0, "balance": 88.0, "wip": 0.0}, {"id": 19, "cat": "Slug", "name": "19X4.5 S/M", "uom": "kg", "opening": 525.0, "received": 0.0, "issued": 0.0, "balance": 525.0, "wip": 0.0}, {"id": 4179, "cat": "Slug", "name": "20.5x4.5", "uom": "kg", "opening": 182.0, "received": 0.0, "issued": 0.0, "balance": 182.0, "wip": 0.0}, {"id": 6, "cat": "Slug", "name": "25X4.5 S/M", "uom": "kg", "opening": 1215.0, "received": 0.0, "issued": 0.0, "balance": 1215.0, "wip": 0.0}, {"id": 406, "cat": "Slug", "name": "30X4.5 S/M", "uom": "kg", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 3935, "cat": "Slug", "name": "32x5.0", "uom": "kg", "opening": 444.0, "received": 0.0, "issued": 0.0, "balance": 444.0, "wip": 0.0}, {"id": 3503, "cat": "Slug", "name": "35X5.0", "uom": "kg", "opening": 133.0, "received": 0.0, "issued": 0.0, "balance": 133.0, "wip": 0.0}, {"id": 184, "cat": "Lacquer", "name": "LACQUAR IMP 49989", "uom": "kg", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 185, "cat": "Lacquer", "name": "EPOXY LACQUER (1500)", "uom": "L", "opening": 175.0, "received": 0.0, "issued": 0.0, "balance": 175.0, "wip": 0.0}, {"id": 188, "cat": "Lacquer", "name": "LACQUAR RHENANIA (ACTEGA COLL 299)", "uom": "kg", "opening": 91.0, "received": 0.0, "issued": 0.0, "balance": 91.0, "wip": 0.0}, {"id": 1065, "cat": "Lacquer", "name": "PIGMENTED LACQUAR 57300", "uom": "kg", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 4155, "cat": "Lacquer", "name": "E/P LACQUAR 4000 A/R", "uom": "kg", "opening": 200.0, "received": 0.0, "issued": 0.0, "balance": 200.0, "wip": 0.0}, {"id": 170, "cat": "Base Coat", "name": "WHITE 5711200001", "uom": "kg", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 175, "cat": "Base Coat", "name": "GOLD 5725100018", "uom": "kg", "opening": 30.0, "received": 0.0, "issued": 0.0, "balance": 30.0, "wip": 0.0}, {"id": 192, "cat": "Base Coat", "name": "TRANSPARENT 234-786", "uom": "kg", "opening": 50.0, "received": 0.0, "issued": 0.0, "balance": 50.0, "wip": 0.0}, {"id": 3595, "cat": "Base Coat", "name": "POLYSTER BASE COAT WHITE 23410", "uom": "kg", "opening": 180.0, "received": 0.0, "issued": 30.0, "balance": 150.0, "wip": 0.0}, {"id": 3869, "cat": "Base Coat", "name": "POLYESTER BASE COAT BEIGE 234-999", "uom": "kg", "opening": 60.0, "received": 0.0, "issued": 0.0, "balance": 60.0, "wip": 0.0}, {"id": 4156, "cat": "Base Coat", "name": "BEIGE 5711200007", "uom": "kg", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 4157, "cat": "Base Coat", "name": "SILVER METALLIC 5725100011", "uom": "kg", "opening": 240.0, "received": 0.0, "issued": 0.0, "balance": 240.0, "wip": 0.0}, {"id": 5895, "cat": "Base Coat", "name": "GOLD METALLIC ALM-550-234", "uom": "kg", "opening": 50.0, "received": 0.0, "issued": 0.0, "balance": 50.0, "wip": 0.0}, {"id": 5974, "cat": "Base Coat", "name": "P11 TBX HT VARNISH (PC 176)", "uom": "L", "opening": 50.0, "received": 0.0, "issued": 0.0, "balance": 50.0, "wip": 0.0}, {"id": 177, "cat": "Base Coat", "name": "YELLOW IMP 5711200008", "uom": "kg", "opening": 450.0, "received": 0.0, "issued": 0.0, "balance": 450.0, "wip": 0.0}, {"id": 6132, "cat": "Base Coat", "name": "VR SCHEKOLIN 57251", "uom": "kg", "opening": 60.0, "received": 0.0, "issued": 0.0, "balance": 60.0, "wip": 0.0}, {"id": 186, "cat": "Latex", "name": "LATEX IMP 574010002", "uom": "kg", "opening": 105.0, "received": 0.0, "issued": 15.0, "balance": 90.0, "wip": 0.0}, {"id": 194, "cat": "Zinc Powder", "name": "ZINC STEARATE", "uom": "kg", "opening": 25.5, "received": 0.0, "issued": 0.0, "balance": 25.5, "wip": 0.0}, {"id": 69, "cat": "Cap", "name": "M-7 S/M F/P (S) WHITE", "uom": "PCS", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 99, "cat": "Cap", "name": "M-7 OPHTHALMIC  PINK", "uom": "pcs", "opening": 10000.0, "received": 0.0, "issued": 0.0, "balance": 10000.0, "wip": 0.0}, {"id": 72, "cat": "Cap", "name": "M-9 S/M SPR BLACK DIA 16MM", "uom": "pcs", "opening": 23741.0, "received": 0.0, "issued": 0.0, "balance": 23741.0, "wip": 0.0}, {"id": 79, "cat": "Cap", "name": "M-9 S/M SPR WHITE LORINE", "uom": "pcs", "opening": 83600.0, "received": 0.0, "issued": 0.0, "balance": 83600.0, "wip": 0.0}, {"id": 80, "cat": "Cap", "name": "M-9 S/M SPR WHITE DIA 19", "uom": "PCS", "opening": 100000.0, "received": 0.0, "issued": 0.0, "balance": 100000.0, "wip": 0.0}, {"id": 81, "cat": "Cap", "name": "M-9 S/M F/P WHITE (S)", "uom": "PCS", "opening": 553124.0, "received": 0.0, "issued": 0.0, "balance": 553124.0, "wip": 0.0}, {"id": 1800, "cat": "Cap", "name": "M-9 S/M SPR BLACK DIA 19", "uom": "PCS", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 3211, "cat": "Cap", "name": "M-9 S/M SPR WHITE DIA 22 AUTO", "uom": "PCS", "opening": 5000.0, "received": 0.0, "issued": 0.0, "balance": 5000.0, "wip": 0.0}, {"id": 4015, "cat": "Cap", "name": "M-9 S/M F/P ORANGE (NORMAL)", "uom": "PCS", "opening": 475000.0, "received": 0.0, "issued": 0.0, "balance": 475000.0, "wip": 0.0}, {"id": 4044, "cat": "Cap", "name": "M-9 S/M SPR BEIGE DIA 20.5", "uom": "PCS", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 4088, "cat": "Cap", "name": "M-9 S/M SPR WHITE DIA 16MM", "uom": "PCS", "opening": 60000.0, "received": 0.0, "issued": 0.0, "balance": 60000.0, "wip": 0.0}, {"id": 4143, "cat": "Cap", "name": "M-9 S/M F/P Normal White", "uom": "PCS", "opening": 65000.0, "received": 0.0, "issued": 0.0, "balance": 65000.0, "wip": 0.0}, {"id": 6971, "cat": "Cap", "name": "M-9 S/M SPR WHITE DIA 20.5MM", "uom": "PCS", "opening": 0.0, "received": 38000.0, "issued": 38000.0, "balance": 0.0, "wip": 0.0}, {"id": 7370, "cat": "Cap", "name": "M-9 S/M SPR BLACK DIA 20.5MM", "uom": "PCS", "opening": 49400.0, "received": 0.0, "issued": 0.0, "balance": 49400.0, "wip": 0.0}, {"id": 68, "cat": "Cap", "name": "M-11 S/M SPR WHITE DIA 25MM", "uom": "PCS", "opening": 70000.0, "received": 0.0, "issued": 0.0, "balance": 70000.0, "wip": 0.0}, {"id": 102, "cat": "Cap", "name": "M-11 S/M SPR ORANGE DIA 25", "uom": "pcs", "opening": 30000.0, "received": 0.0, "issued": 0.0, "balance": 30000.0, "wip": 0.0}, {"id": 1073, "cat": "Cap", "name": "M-11 S/M F/P BLACK", "uom": "PCS", "opening": 0.0, "received": 80000.0, "issued": 80000.0, "balance": 0.0, "wip": 0.0}, {"id": 1285, "cat": "Cap", "name": "M-11 S/M F/P WHITE (LARGE)", "uom": "PCS", "opening": 130000.0, "received": 0.0, "issued": 130000.0, "balance": 0.0, "wip": 0.0}, {"id": 3522, "cat": "Cap", "name": "M-11 S/M SPR DARK BLUE DIA 25MM", "uom": "PCS", "opening": 75000.0, "received": 0.0, "issued": 0.0, "balance": 75000.0, "wip": 0.0}, {"id": 3866, "cat": "Cap", "name": "M-11 S/M SPR BEIGE DIA 25", "uom": "PCS", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 578, "cat": "Cap", "name": "M-12 S/M SPR WHITE DIA 30", "uom": "PCS", "opening": 30000.0, "received": 0.0, "issued": 30000.0, "balance": 0.0, "wip": 0.0}, {"id": 9902, "cat": "Cap", "name": "CAP 12.5MM (est)", "uom": "PCS", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 9903, "cat": "Carton", "name": "CARTON 12.5MM (est)", "uom": "PCS", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 36, "cat": "Carton", "name": "16X200 3Ply", "uom": "PCS", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 200, "cat": "Carton", "name": "DIA 16 5Ply", "uom": "PCS", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 39, "cat": "Carton", "name": "19X200 3Ply", "uom": "PCS", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 3619, "cat": "Carton", "name": "20.5x510 5ply", "uom": "PCS", "opening": 292.0, "received": 0.0, "issued": 0.0, "balance": 292.0, "wip": 0.0}, {"id": 3598, "cat": "Carton", "name": "25x336 5Ply", "uom": "PCS", "opening": 301.0, "received": 0.0, "issued": 0.0, "balance": 301.0, "wip": 0.0}, {"id": 45, "cat": "Carton", "name": "30X150 3Ply", "uom": "PCS", "opening": 600.0, "received": 0.0, "issued": 0.0, "balance": 600.0, "wip": 0.0}, {"id": 3988, "cat": "Carton", "name": "35x165 5ply", "uom": "PCS", "opening": 349.0, "received": 0.0, "issued": 0.0, "balance": 349.0, "wip": 0.0}, {"id": 5977, "cat": "Carton", "name": "MASTER CARTON 38\"X24\"X15.5\"", "uom": "PCS", "opening": 94.0, "received": 0.0, "issued": 0.0, "balance": 94.0, "wip": 0.0}, {"id": 3635, "cat": "Tape", "name": "PACKING TAPE 2\" OF 60 YARDS", "uom": "PCS", "opening": 627.0, "received": 0.0, "issued": 0.0, "balance": 627.0, "wip": 0.0}, {"id": 190, "cat": "Thinner", "name": "THINNER FOR LACQUER SOL R/C", "uom": "L", "opening": 250.0, "received": 0.0, "issued": 0.0, "balance": 250.0, "wip": 0.0}, {"id": 191, "cat": "Thinner", "name": "THINNER LACQUAR SOL EPOXY", "uom": "L", "opening": 200.0, "received": 0.0, "issued": 0.0, "balance": 200.0, "wip": 0.0}, {"id": 104, "cat": "Ink", "name": "VIOLET 501 IMP", "uom": "kg", "opening": 2.0, "received": 0.0, "issued": 0.0, "balance": 2.0, "wip": 0.0}, {"id": 105, "cat": "Ink", "name": "VIOLET 502 IMP", "uom": "kg", "opening": 1.0, "received": 0.0, "issued": 0.0, "balance": 1.0, "wip": 0.0}, {"id": 110, "cat": "Ink", "name": "GREEN 165000", "uom": "kg", "opening": 2.0, "received": 0.0, "issued": 0.0, "balance": 2.0, "wip": 0.0}, {"id": 124, "cat": "Ink", "name": "BROWN 157662", "uom": "kg", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 127, "cat": "Ink", "name": "BLUE 126039", "uom": "kg", "opening": 2.0, "received": 0.0, "issued": 0.0, "balance": 2.0, "wip": 0.0}, {"id": 129, "cat": "Ink", "name": "MEGENTA RED 152166", "uom": "kg", "opening": 2.0, "received": 0.0, "issued": 0.0, "balance": 2.0, "wip": 0.0}, {"id": 130, "cat": "Ink", "name": "BLUE 165743", "uom": "kg", "opening": 1.0, "received": 0.0, "issued": 0.0, "balance": 1.0, "wip": 0.0}, {"id": 1928, "cat": "Ink", "name": "BLACK (LOCAL) 77660", "uom": "kg", "opening": 2.0, "received": 0.0, "issued": 2.0, "balance": 0.0, "wip": 0.0}, {"id": 2284, "cat": "Ink", "name": "YELLOW (PASTAL-C)", "uom": "kg", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 3642, "cat": "Ink", "name": "INK JET BLACK 77842", "uom": "kg", "opening": 1.0, "received": 0.0, "issued": 0.0, "balance": 1.0, "wip": 0.0}, {"id": 3734, "cat": "Ink", "name": "MAGENTA (LOCAL) 32500", "uom": "kg", "opening": 1.0, "received": 0.0, "issued": 0.0, "balance": 1.0, "wip": 0.0}, {"id": 3736, "cat": "Ink", "name": "WHITE (LOCAL) 07094", "uom": "kg", "opening": 3.6, "received": 0.0, "issued": 0.0, "balance": 3.6, "wip": 0.0}, {"id": 3754, "cat": "Ink", "name": "RED BRONZE (LOCAL) 32519", "uom": "kg", "opening": 4.0, "received": 0.0, "issued": 0.0, "balance": 4.0, "wip": 0.0}, {"id": 3755, "cat": "Ink", "name": "INK BLUE ES 164", "uom": "kg", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 3800, "cat": "Ink", "name": "VIOLET 400484", "uom": "kg", "opening": 1.0, "received": 0.0, "issued": 0.0, "balance": 1.0, "wip": 0.0}, {"id": 3857, "cat": "Ink", "name": "ORANGE (LOCAL)", "uom": "kg", "opening": 0.0, "received": 1.0, "issued": 1.0, "balance": 0.0, "wip": 0.0}, {"id": 3858, "cat": "Ink", "name": "GOLD (LOCAL) 97035", "uom": "kg", "opening": 0.0, "received": 3.0, "issued": 3.0, "balance": 0.0, "wip": 0.0}, {"id": 3955, "cat": "Ink", "name": "GERANIUM (EVER SHINE) ES-130", "uom": "kg", "opening": 1.0, "received": 0.0, "issued": 1.0, "balance": 0.0, "wip": 0.0}, {"id": 3968, "cat": "Ink", "name": "BLUE BRONZE (LOCAL) 51168", "uom": "kg", "opening": 4.0, "received": 0.0, "issued": 0.0, "balance": 4.0, "wip": 0.0}, {"id": 4216, "cat": "Ink", "name": "PINK FLUORESCENT", "uom": "kg", "opening": 1.0, "received": 0.0, "issued": 0.0, "balance": 1.0, "wip": 0.0}, {"id": 4306, "cat": "Ink", "name": "VIOLET TUB 400011", "uom": "kg", "opening": 3.0, "received": 0.0, "issued": 0.0, "balance": 3.0, "wip": 0.0}, {"id": 5107, "cat": "Ink", "name": "YELLOW LEMON 18600", "uom": "kg", "opening": 2.0, "received": 0.0, "issued": 2.0, "balance": 0.0, "wip": 0.0}, {"id": 6038, "cat": "Ink", "name": "INK BLUE PC", "uom": "kg", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 6040, "cat": "Ink", "name": "INK CYAN PROCESS 51650", "uom": "kg", "opening": 2.0, "received": 0.0, "issued": 0.0, "balance": 2.0, "wip": 0.0}, {"id": 6935, "cat": "Ink", "name": "GOLD V0221267-RF-401363", "uom": "kg", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 7094, "cat": "Ink", "name": "INK GOLD V0221267AT-401363 IMP", "uom": "kg", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 7095, "cat": "Ink", "name": "INK BLACK 158000 IMPORTED", "uom": "kg", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 7152, "cat": "Ink", "name": "INK GREEN ES 166", "uom": "kg", "opening": 1.0, "received": 0.0, "issued": 0.0, "balance": 1.0, "wip": 0.0}, {"id": 7398, "cat": "Ink", "name": "PURPLE 48054", "uom": "kg", "opening": 6.0, "received": 0.0, "issued": 0.0, "balance": 6.0, "wip": 0.0}, {"id": 2680, "cat": "PET Resin", "name": "PET RESIN A-84", "uom": "kg", "opening": 3000.0, "received": 0.0, "issued": 0.0, "balance": 3000.0, "wip": 0.0}, {"id": 3492, "cat": "Master Batch", "name": "MASTER BATCH (PA M27) GREEN", "uom": "kg", "opening": 75.0, "received": 0.0, "issued": 0.0, "balance": 75.0, "wip": 0.0}, {"id": 4002, "cat": "Master Batch", "name": "MASTER BATCH YELLOW CMN# 3087", "uom": "kg", "opening": 25.0, "received": 0.0, "issued": 0.0, "balance": 25.0, "wip": 0.0}, {"id": 4070, "cat": "Master Batch", "name": "MASTER BATCH ONCOLOR YELLOW NE12340208-ZN", "uom": "kg", "opening": 0.0, "received": 0.0, "issued": 0.0, "balance": 0.0, "wip": 0.0}, {"id": 4310, "cat": "Master Batch", "name": "MASTER BATCH BEIGE (RCW-25)", "uom": "kg", "opening": 36.23, "received": 0.0, "issued": 0.0, "balance": 36.23, "wip": 0.0}, {"id": 5625, "cat": "Master Batch", "name": "MASTER BATCH AMBAR BR-535n", "uom": "kg", "opening": 48.5, "received": 0.0, "issued": 0.0, "balance": 48.5, "wip": 0.0}, {"id": 5816, "cat": "Master Batch", "name": "MASTER BATCH WHITE PRC-MC ET02340000", "uom": "kg", "opening": 22.0, "received": 0.0, "issued": 0.0, "balance": 22.0, "wip": 0.0}, {"id": 6135, "cat": "Master Batch", "name": "MASTER BATCH RENOL-GREEN NE60340193-MN", "uom": "kg", "opening": 200.0, "received": 0.0, "issued": 0.0, "balance": 200.0, "wip": 0.0}, {"id": 7133, "cat": "Master Batch", "name": "MASTER BATCH GREEN PE63340532-ZN FA", "uom": "kg", "opening": 20.0, "received": 0.0, "issued": 0.0, "balance": 20.0, "wip": 0.0}, {"id": 7412, "cat": "Master Batch", "name": "MASTER BATCH BLACK DP# 6411", "uom": "kg", "opening": 25.0, "received": 0.0, "issued": 0.0, "balance": 25.0, "wip": 0.0}, {"id": 3752, "cat": "Granules", "name": "HIGH DENSITY POLY ETHYLINE (HDPE) 200050", "uom": "kg", "opening": 56.0, "received": 0.0, "issued": 0.0, "balance": 56.0, "wip": 0.0}, {"id": 4248, "cat": "Granules", "name": "LOW DENSITY POLY ETHYLENE ( LDPE 4025AS AB247Y01)", "uom": "kg", "opening": 250.0, "received": 0.0, "issued": 0.0, "balance": 250.0, "wip": 0.0}, {"id": 6042, "cat": "Granules", "name": "HDPE BLOW NATURAL ( MARLEX )", "uom": "kg", "opening": 25.0, "received": 0.0, "issued": 0.0, "balance": 25.0, "wip": 0.0}, {"id": 2267, "cat": "Poly Bag", "name": "POLY BAG 20X30 (LDPE)", "uom": "PCS", "opening": 125.0, "received": 0.0, "issued": 0.0, "balance": 125.0, "wip": 0.0}, {"id": 3006, "cat": "Poly Bag", "name": "POLY BAG 24X36 (LDPE)", "uom": "PCS", "opening": 201.0, "received": 0.0, "issued": 0.0, "balance": 201.0, "wip": 0.0}, {"id": 3043, "cat": "Packing", "name": "PLASTIC DOORI", "uom": "ROLL", "opening": 7.0, "received": 0.0, "issued": 0.0, "balance": 7.0, "wip": 0.0}]};
+/* INVENTORY_END */
+/* PRODLOG_START */
+const PRODUCTION_LOG_DATA = {"month": "June 2026", "rows": [{"date": "01-Jun", "machine": "Lacquer-02", "customer": "Samsol International Private Limited", "product": "TUBES", "dia": "25", "pid": 3726, "total": 14000, "good": 13770, "reject": 230}, {"date": "01-Jun", "machine": "Lacquer-04", "customer": "Golden Pearl Cosmetics (PVT) LTD", "product": "HELLO HAIR COLOR", "dia": "30", "pid": 6206, "total": 3000, "good": 2940, "reject": 60}, {"date": "01-Jun", "machine": "Latex-01", "customer": "Golden Pearl Cosmetics (PVT) LTD", "product": "HELLO HAIR COLOR", "dia": "30", "pid": 6206, "total": 26000, "good": 25990, "reject": 10}, {"date": "01-Jun", "machine": "PF Machine", "customer": "Alpha Labs PVT LTD", "product": "TRANSPARENT BOTTLE 150ML", "dia": "150 ml", "pid": 8001, "total": 0, "good": 0, "reject": 0}, {"date": "01-Jun", "machine": "Press-04", "customer": "Mablay Beauty PVT LTD.", "product": "VINCE NURTURAL", "dia": "30", "pid": 5814, "total": 0, "good": 0, "reject": 0}, {"date": "01-Jun", "machine": "Press-06", "customer": "Samsol International Private Limited", "product": "TUBES", "dia": "25", "pid": 3726, "total": 20000, "good": 19890, "reject": 110}, {"date": "01-Jun", "machine": "Printing-03", "customer": "Samsol International Private Limited", "product": "TUBES", "dia": "25", "pid": 3726, "total": 9999, "good": 9744, "reject": 255}, {"date": "01-Jun", "machine": "Printing-04", "customer": "Golden Pearl Cosmetics (PVT) LTD", "product": "HELLO HAIR COLOR", "dia": "30", "pid": 6206, "total": 2728, "good": 2618, "reject": 110}, {"date": "02-Jun", "machine": "Lacquer-02", "customer": "Samsol International Private Limited", "product": "TUBES", "dia": "25", "pid": 3726, "total": 8000, "good": 7880, "reject": 120}, {"date": "02-Jun", "machine": "Lacquer-04", "customer": "Golden Pearl Cosmetics (PVT) LTD", "product": "HELLO HAIR COLOR", "dia": "30", "pid": 6206, "total": 4000, "good": 3905, "reject": 95}, {"date": "02-Jun", "machine": "Latex-01", "customer": "Golden Pearl Cosmetics (PVT) LTD", "product": "HELLO HAIR COLOR", "dia": "30", "pid": 6206, "total": 22134, "good": 22124, "reject": 10}, {"date": "02-Jun", "machine": "PF Machine", "customer": "Alpha Labs PVT LTD", "product": "TRANSPARENT BOTTLE 150ML", "dia": "150 ml", "pid": 8001, "total": 0, "good": 0, "reject": 0}, {"date": "02-Jun", "machine": "Press-04", "customer": "Mablay Beauty PVT LTD.", "product": "VINCE NURTURAL", "dia": "30", "pid": 5814, "total": 0, "good": 0, "reject": 0}, {"date": "02-Jun", "machine": "Press-06", "customer": "Samsol International Private Limited", "product": "TUBES", "dia": "25", "pid": 3726, "total": 1000, "good": 980, "reject": 20}, {"date": "02-Jun", "machine": "Printing-03", "customer": "Samsol International Private Limited", "product": "TUBES", "dia": "25", "pid": 3726, "total": 12687, "good": 12432, "reject": 255}, {"date": "02-Jun", "machine": "Printing-04", "customer": "Golden Pearl Cosmetics (PVT) LTD", "product": "HELLO HAIR COLOR", "dia": "30", "pid": 6206, "total": 0, "good": 0, "reject": 0}]};
+/* PRODLOG_END */
+/* FGSTOCK_START */
+const FG_STOCK_DATA = {"title": "FG STOCK IN HAND — Last Updated: 03-Jun-2026", "rows": [{"sr": 1, "pid": 8001, "customer": "Alpha Labs PVT LTD", "product": "TRANSPARENT BOTTLE 150ML", "dia": "150ml", "qty": 33465, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 2, "pid": 3726, "customer": "Samsol International Private Limited", "product": "TUBES", "dia": "25", "qty": 22512, "status": "OK", "remarks": "No JOF"}, {"sr": 3, "pid": 3447, "customer": "Samsol International Private Limited", "product": "S 43 25MM", "dia": "25", "qty": 89000, "status": "OK", "remarks": "No JOF"}, {"sr": 4, "pid": 4050, "customer": "Professional Beauty Solution (PVT) LTD.Pakistan", "product": "EAZICOLOR PREMIUM HAIR COLOUR 60ML", "dia": "30", "qty": 9450, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 5, "pid": 6337, "customer": "Al-Rehman Group", "product": "ACTIVE PRO HAIR COLOR CREAM 60ML", "dia": "30", "qty": 15680, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 6, "pid": 6416, "customer": "Al-Rehman Group", "product": "SIGNATURE HAIR COLOR CREAM 60ML", "dia": "30", "qty": 15435, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 7, "pid": 5782, "customer": "Mega Grey", "product": "M.G", "dia": "32", "qty": 63648, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 8, "pid": 6531, "customer": "Adore", "product": "V-HC BLACK", "dia": "35", "qty": 4380, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 9, "pid": 6206, "customer": "Golden Pearl Cosmetics (PVT) LTD", "product": "HELLO HAIR COLOR", "dia": "30", "qty": 35000, "status": "OK", "remarks": "No JOF"}, {"sr": 10, "pid": 6515, "customer": "Samsol International Private Limited", "product": "H.H 100GM", "dia": "32", "qty": 38896, "status": "Not Ready", "remarks": "To be dispatch after packing"}, {"sr": 11, "pid": 6530, "customer": "Adore", "product": "V- HC BROWN", "dia": "35", "qty": 15000, "status": "Not Ready", "remarks": "To be dispatch after packing"}, {"sr": 12, "pid": 6206, "customer": "Golden Pearl Cosmetics (PVT) LTD", "product": "HELLO HAIR COLOR", "dia": "30", "qty": 63674, "status": "Not Ready", "remarks": "To be dispatch after packing"}, {"sr": 13, "pid": 3726, "customer": "Samsol International Private Limited", "product": "TUBES", "dia": "25", "qty": 22176, "status": "Not Ready", "remarks": "To be dispatch after packing"}, {"sr": 14, "pid": 5782, "customer": "Mega Grey", "product": "M.G", "dia": "32", "qty": 10500, "status": "Not Ready", "remarks": "Cap Not Available"}, {"sr": 15, "pid": 6624, "customer": "Samsol International Private Limited", "product": "S-45 DIA 19MM", "dia": "19", "qty": 15288, "status": "Not Ready", "remarks": "Cap Not Available"}, {"sr": 16, "pid": 5699, "customer": "Samsol International Private Limited", "product": "S-43 DIA 20.5", "dia": "20.5", "qty": 13770, "status": "Not Ready", "remarks": "To be dispatch after packing"}, {"sr": 17, "pid": 5731, "customer": "Samsol International Private Limited", "product": "SAMSOL HAIR COLOR 45 DIA 20.5 MM", "dia": "20.5", "qty": 13260, "status": "Not Ready", "remarks": "To be dispatch after packing"}, {"sr": 18, "pid": 5731, "customer": "Samsol International Private Limited", "product": "SAMSOL HAIR COLOR 45 DIA 20.5 MM", "dia": "20.5", "qty": 37740, "status": "Not Ready", "remarks": "Cap Not Available"}]};
+/* FGSTOCK_END */
+/* MRP_START */
+const MRP_DATA = {"title": "June 2026 Tube Required Orders", "orders": [{"dia": 16, "customer": "Brookes Pharma Private Limited", "product": "ECZEMUS OINTMENT 0.03% 10G", "pid": 6561, "jobOrder": "6849", "required": 25000.0, "produced": 0, "remaining": 25000.0, "remarks": "CAPS Not Approved"}, {"dia": 25, "customer": "Samsol International Private Limited", "product": "TUBES", "pid": 3726, "jobOrder": "6888", "required": 25000.0, "produced": 22176.0, "remaining": 2824.0, "remarks": ""}, {"dia": 30, "customer": "Mablay Beauty PVT LTD.", "product": "VINCE NURTURAL", "pid": 5814, "jobOrder": "6887", "required": 22000.0, "produced": 0, "remaining": 22000.0, "remarks": ""}, {"dia": 35, "customer": "Adore", "product": "V- HC BROWN", "pid": 6530, "jobOrder": "6884", "required": 13350.0, "produced": 0, "remaining": 13350.0, "remarks": "Hold"}, {"dia": 25, "customer": "Samsol International Private Limited", "product": "TUBES", "pid": 3726, "jobOrder": "Approval Pending", "required": 6000.0, "produced": 0, "remaining": 6000.0, "remarks": "50k Order, 44k already in FG Stock"}, {"dia": 25, "customer": "Samsol International Private Limited", "product": "S 43 25MM", "pid": 3447, "jobOrder": "Approval Pending", "required": 31000.0, "produced": 0, "remaining": 31000.0, "remarks": "120k Order, 89k already in FG Stock"}, {"dia": 25, "customer": "Samsol International Private Limited", "product": "TUBE COMMON PURPLE", "pid": 6532, "jobOrder": "Approval Pending", "required": 30000.0, "produced": 0, "remaining": 30000.0, "remarks": ""}, {"dia": 25, "customer": "Samsol International Private Limited", "product": "TUBES COMMON RED", "pid": 6470, "jobOrder": "Approval Pending", "required": 61776.0, "produced": 0, "remaining": 61776.0, "remarks": ""}], "materials": [{"id": 22, "cat": "SLUG", "name": "19X4.2", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 19, "cat": "SLUG", "name": "19X4.5 S/M", "uom": "kg", "required": 0, "stock": 525.0, "surplus": 525.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4179, "cat": "SLUG", "name": "20.5x4.5", "uom": "kg", "required": 0, "stock": 182.0, "surplus": 182.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6, "cat": "SLUG", "name": "25X4.5 S/M", "uom": "kg", "required": 856.54, "stock": 1215.0, "surplus": 358.46, "products": "TUBES, TUBES, S 43 25MM, TUBE COMMON PURPLE, TUBES COMMON RED", "status": "OK", "section": "tube"}, {"id": 10, "cat": "SLUG", "name": "25X4.8 S/M", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 2, "cat": "SLUG", "name": "30X4.3", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 406, "cat": "SLUG", "name": "30X4.5 S/M", "uom": "kg", "required": 193.6, "stock": 0, "surplus": -193.6, "products": "VINCE NURTURAL", "status": "SHORTAGE", "section": "tube"}, {"id": 6961, "cat": "SLUG", "name": "32X5.2", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3935, "cat": "SLUG", "name": "32x5.0", "uom": "kg", "required": 0, "stock": 444.0, "surplus": 444.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3503, "cat": "SLUG", "name": "35X5.0", "uom": "kg", "required": 188.26, "stock": 133.0, "surplus": -55.26, "products": "V- HC BROWN", "status": "Hold", "section": "tube"}, {"id": 184, "cat": "LACQUER", "name": "LACQUER IMP 49989", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 185, "cat": "LACQUER", "name": "EPOXY LACQUER (1500)", "uom": "L", "required": 49.73, "stock": 175.0, "surplus": 125.27, "products": "ECZEMUS OINTMENT 0.03% 10G, TUBES, TUBES, S 43 25MM, TUBE COMMON PURPLE, TUBES COMMON RED", "status": "OK", "section": "tube"}, {"id": 188, "cat": "LACQUER", "name": "LACQUER RHENANIA (ACTEGA COLL 299)", "uom": "kg", "required": 0, "stock": 91.0, "surplus": 91.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 1065, "cat": "LACQUER", "name": "PIGMENTED LACQUER 57300", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4155, "cat": "LACQUER", "name": "E/P LACQUER 4000 A/R", "uom": "kg", "required": 9.51, "stock": 200.0, "surplus": 190.49, "products": "VINCE NURTURAL, V- HC BROWN", "status": "OK", "section": "tube"}, {"id": 170, "cat": "BASE COAT", "name": "WHITE 5711200001", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 175, "cat": "BASE COAT", "name": "GOLD 5725100018", "uom": "kg", "required": 0, "stock": 30.0, "surplus": 30.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 192, "cat": "BASE COAT", "name": "TRANSPARENT 234-786", "uom": "kg", "required": 0, "stock": 50.0, "surplus": 50.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3595, "cat": "BASE COAT", "name": "POLYSTER BASE COAT WHITE 23410", "uom": "kg", "required": 124.13, "stock": 150.0, "surplus": 25.87, "products": "ECZEMUS OINTMENT 0.03% 10G, TUBES, VINCE NURTURAL, V- HC BROWN, TUBES, S 43 25MM, TUBE COMMON PURPLE, TUBES COMMON RED", "status": "OK", "section": "tube"}, {"id": 3869, "cat": "BASE COAT", "name": "POLYESTER BASE COAT BEIGE 234-999", "uom": "kg", "required": 0, "stock": 60.0, "surplus": 60.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4156, "cat": "BASE COAT", "name": "BEIGE 5711200007", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4157, "cat": "BASE COAT", "name": "SILVER METALLIC 5725100011", "uom": "kg", "required": 0, "stock": 240.0, "surplus": 240.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5895, "cat": "BASE COAT", "name": "GOLD METALLIC ALM-550-234", "uom": "kg", "required": 0, "stock": 50.0, "surplus": 50.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5974, "cat": "BASE COAT", "name": "P11 TBX HT VARNISH (PC 176)", "uom": "L", "required": 0, "stock": 50.0, "surplus": 50.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 177, "cat": "BASE COAT", "name": "YELLOW IMP 5711200008", "uom": "kg", "required": 0, "stock": 450.0, "surplus": 450.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6132, "cat": "BASE COAT", "name": "VR SCHEKOLIN 57251", "uom": "kg", "required": 0, "stock": 60.0, "surplus": 60.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 186, "cat": "LATEX", "name": "LATEX IMP 574010002", "uom": "kg", "required": 2.9, "stock": 90.0, "surplus": 87.1, "products": "VINCE NURTURAL", "status": "OK", "section": "tube"}, {"id": 194, "cat": "ZINC POWDER", "name": "ZINC STEARATE", "uom": "kg", "required": 1.16, "stock": 25.5, "surplus": 24.34, "products": "ECZEMUS OINTMENT 0.03% 10G, TUBES, V- HC BROWN, TUBES, S 43 25MM, TUBE COMMON PURPLE, TUBES COMMON RED", "status": "OK", "section": "tube"}, {"id": 4165, "cat": "ZINC POWDER", "name": "ZINC ARCHIMATE", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 69, "cat": "CAP", "name": "M-7 S/M F/P (S) WHITE", "uom": "PCS", "required": 25500.0, "stock": 0, "surplus": -25500.0, "products": "ECZEMUS OINTMENT 0.03% 10G", "status": "CAPS Not Approved", "section": "tube"}, {"id": 99, "cat": "CAP", "name": "M-7 OPHTHALMIC  PINK", "uom": "PCS", "required": 0, "stock": 10000.0, "surplus": 10000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 72, "cat": "CAP", "name": "M-9 S/M SPR BLACK DIA 16MM", "uom": "PCS", "required": 0, "stock": 23741.0, "surplus": 23741.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 79, "cat": "CAP", "name": "M-9 S/M SPR WHITE LORINE", "uom": "PCS", "required": 0, "stock": 83600.0, "surplus": 83600.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 80, "cat": "CAP", "name": "M-9 S/M SPR WHITE DIA 19", "uom": "PCS", "required": 0, "stock": 100000.0, "surplus": 100000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 81, "cat": "CAP", "name": "M-9 S/M F/P WHITE (S)", "uom": "PCS", "required": 0, "stock": 553124.0, "surplus": 553124.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 1800, "cat": "CAP", "name": "M-9 S/M SPR BLACK DIA 19", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3211, "cat": "CAP", "name": "M-9 S/M SPR WHITE DIA 22 AUTO", "uom": "PCS", "required": 0, "stock": 5000.0, "surplus": 5000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4015, "cat": "CAP", "name": "M-9 S/M F/P ORANGE (NORMAL)", "uom": "PCS", "required": 0, "stock": 475000.0, "surplus": 475000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4044, "cat": "CAP", "name": "M-9 S/M SPR BEIGE DIA 20.5", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4088, "cat": "CAP", "name": "M-9 S/M SPR WHITE DIA 16MM", "uom": "PCS", "required": 0, "stock": 60000.0, "surplus": 60000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4143, "cat": "CAP", "name": "M-9 S/M F/P Normal White", "uom": "PCS", "required": 0, "stock": 65000.0, "surplus": 65000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6971, "cat": "CAP", "name": "M-9 S/M SPR WHITE DIA 20.5MM", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 7370, "cat": "CAP", "name": "M-9 S/M SPR BLACK DIA 20.5MM", "uom": "PCS", "required": 0, "stock": 49400.0, "surplus": 49400.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 68, "cat": "CAP", "name": "M-11 S/M SPR WHITE DIA 25MM", "uom": "PCS", "required": 134232.0, "stock": 70000.0, "surplus": -64232.0, "products": "TUBES, TUBES, S 43 25MM, TUBE COMMON PURPLE, TUBES COMMON RED", "status": "SHORTAGE", "section": "tube"}, {"id": 102, "cat": "CAP", "name": "M-11 S/M SPR ORANGE DIA 25", "uom": "PCS", "required": 0, "stock": 30000.0, "surplus": 30000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 1073, "cat": "CAP", "name": "M-11 S/M F/P BLACK", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 1285, "cat": "CAP", "name": "M-11 S/M F/P WHITE (LARGE)", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3522, "cat": "CAP", "name": "M-11 S/M SPR DARK BLUE DIA 25MM", "uom": "PCS", "required": 0, "stock": 75000.0, "surplus": 75000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3866, "cat": "CAP", "name": "M-11 S/M SPR BEIGE DIA 25", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 578, "cat": "CAP", "name": "M-12 S/M SPR WHITE DIA 30", "uom": "PCS", "required": 36057.0, "stock": 0, "surplus": -36057.0, "products": "VINCE NURTURAL, V- HC BROWN", "status": "SHORTAGE", "section": "tube"}, {"id": 9902, "cat": "CAP", "name": "CAP 12.5MM (est)", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 9903, "cat": "CARTON", "name": "CARTON 12.5MM (est)", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 36, "cat": "CARTON", "name": "16X200 3Ply", "uom": "PCS", "required": 137.5, "stock": 0, "surplus": -137.5, "products": "ECZEMUS OINTMENT 0.03% 10G", "status": "Hold. CAPS Not Approved", "section": "tube"}, {"id": 200, "cat": "CARTON", "name": "DIA 16 5Ply", "uom": "PCS", "required": 15.13, "stock": 0, "surplus": -15.13, "products": "ECZEMUS OINTMENT 0.03% 10G", "status": "Hold. CAPS Not Approved", "section": "tube"}, {"id": 39, "cat": "CARTON", "name": "19X200 3Ply", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3619, "cat": "CARTON", "name": "20.5x510 5ply", "uom": "PCS", "required": 0, "stock": 292.0, "surplus": 292.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3598, "cat": "CARTON", "name": "25x336 5Ply", "uom": "PCS", "required": 430.81, "stock": 301.0, "surplus": -129.81, "products": "TUBES, TUBES, S 43 25MM, TUBE COMMON PURPLE, TUBES COMMON RED", "status": "SHORTAGE", "section": "tube"}, {"id": 45, "cat": "CARTON", "name": "30X150 3Ply", "uom": "PCS", "required": 0, "stock": 600.0, "surplus": 600.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3988, "cat": "CARTON", "name": "35x165 5ply", "uom": "PCS", "required": 88.99, "stock": 349.0, "surplus": 260.01, "products": "V- HC BROWN", "status": "OK", "section": "tube"}, {"id": 5977, "cat": "CARTON", "name": "MASTER CARTON 38\"X24\"X15.5\"", "uom": "PCS", "required": 0, "stock": 94.0, "surplus": 94.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3635, "cat": "TAPE", "name": "PACKING TAPE 2\" OF 60 YARDS", "uom": "PCS", "required": 178.94, "stock": 627.0, "surplus": 448.06, "products": "ECZEMUS OINTMENT 0.03% 10G, TUBES, VINCE NURTURAL, V- HC BROWN, TUBES, S 43 25MM, TUBE COMMON PURPLE, TUBES COMMON RED", "status": "OK", "section": "tube"}, {"id": 190, "cat": "THINNER", "name": "THINNER FOR LACQUER SOL R/C", "uom": "L", "required": 1.65, "stock": 250.0, "surplus": 248.35, "products": "ECZEMUS OINTMENT 0.03% 10G", "status": "OK", "section": "tube"}, {"id": 191, "cat": "THINNER", "name": "THINNER LACQUER SOL EPOXY", "uom": "L", "required": 0, "stock": 200.0, "surplus": 200.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 2680, "cat": "PET RESIN", "name": "PET RESIN A-84", "uom": "kg", "required": 0, "stock": 3000.0, "surplus": 3000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3492, "cat": "MASTER BATCH", "name": "MASTER BATCH (PA M27) GREEN", "uom": "kg", "required": 0, "stock": 75.0, "surplus": 75.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4002, "cat": "MASTER BATCH", "name": "MASTER BATCH YELLOW CMN# 3087", "uom": "kg", "required": 0, "stock": 25.0, "surplus": 25.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4070, "cat": "MASTER BATCH", "name": "MASTER BATCH ONCOLOR YELLOW NE12340208-ZN", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4310, "cat": "MASTER BATCH", "name": "MASTER BATCH BEIGE (RCW-25)", "uom": "kg", "required": 0, "stock": 36.23, "surplus": 36.23, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5625, "cat": "MASTER BATCH", "name": "MASTER BATCH AMBAR BR-535n", "uom": "kg", "required": 0, "stock": 48.5, "surplus": 48.5, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5816, "cat": "MASTER BATCH", "name": "MASTER BATCH WHITE PRC-MC ET02340000", "uom": "kg", "required": 0, "stock": 22.0, "surplus": 22.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6135, "cat": "MASTER BATCH", "name": "MASTER BATCH RENOL-GREEN NE60340193-MN", "uom": "kg", "required": 0, "stock": 200.0, "surplus": 200.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 7133, "cat": "MASTER BATCH", "name": "MASTER BATCH GREEN PE63340532-ZN FA", "uom": "kg", "required": 0, "stock": 20.0, "surplus": 20.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 7412, "cat": "MASTER BATCH", "name": "MASTER BATCH BLACK DP# 6411", "uom": "kg", "required": 0, "stock": 25.0, "surplus": 25.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3752, "cat": "GRANULES", "name": "HIGH DENSITY POLY ETHYLINE (HDPE) 200050", "uom": "kg", "required": 0, "stock": 56.0, "surplus": 56.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4248, "cat": "GRANULES", "name": "LOW DENSITY POLY ETHYLENE ( LDPE 4025AS AB247Y01)", "uom": "kg", "required": 0, "stock": 250.0, "surplus": 250.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6042, "cat": "GRANULES", "name": "HDPE BLOW NATURAL ( MARLEX )", "uom": "kg", "required": 0, "stock": 25.0, "surplus": 25.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 2267, "cat": "POLY BAG", "name": "POLY BAG 20X30 (LDPE)", "uom": "PCS", "required": 0, "stock": 125.0, "surplus": 125.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3043, "cat": "PACKING", "name": "PLASTIC DOORI", "uom": "ROLL", "required": 0, "stock": 7.0, "surplus": 7.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3043, "cat": "PACKING", "name": "PLASTIC DOORI", "uom": "ROLL", "required": 0, "stock": 94.0, "surplus": 0, "products": "", "status": "Not needed", "section": "pet"}, {"id": 3734, "cat": "INK", "name": "MAGENTA (LOCAL) 32500", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "7", "status": "6.38", "section": "pet"}, {"id": 6038, "cat": "INK", "name": "INK BLUE PC", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "2.9", "section": "pet"}, {"id": 3858, "cat": "INK", "name": "GOLD (LOCAL) 97035", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "2.8", "section": "pet"}, {"id": 3754, "cat": "INK", "name": "RED BRONZE (LOCAL) 32519", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "#VALUE!", "status": "2.67", "section": "pet"}], "inks": [{"id": 3736, "name": "WHITE (LOCAL) 07094", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 4.0}, {"id": 3955, "name": "GERANIUM (EVER SHINE) ES-130", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 0}, {"id": 7398, "name": "PURPLE 48054", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 0}, {"id": 3857, "name": "ORANGE (LOCAL)", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 0}, {"id": 6040, "name": "INK CYAN PROCESS 51650", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 3.6}, {"id": 5107, "name": "YELLOW LEMON 18600", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 0}, {"id": 7152, "name": "INK GREEN ES 166", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 6.0}, {"id": 7095, "name": "INK BLACK 158000 IMPORTED", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 0}, {"id": 118, "name": "SILVER (LOCAL)", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 2.0}, {"id": 2284, "name": "YELLOW (PASTAL-C)", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 0}, {"id": 110, "name": "GREEN 165000", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 1.0}, {"id": 129, "name": "MEGENTA RED 152166", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 0}, {"id": 6049, "name": "DARK BLUE EAZI COLOR 401168", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 0}, {"id": 3770, "name": "GREEN PC", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 0}, {"id": 130, "name": "BLUE 165743", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 2.0}, {"id": 124, "name": "BROWN 157662", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 2.0}, {"id": 3968, "name": "BLUE BRONZE (LOCAL) 51168", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 0}, {"id": 3642, "name": "INK JET BLACK 77842", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 0}, {"id": 104, "name": "VIOLET 501 IMP", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 1.0}, {"id": 105, "name": "VIOLET 502 IMP", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 0}, {"id": 127, "name": "BLUE 126039", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 4.0}, {"id": 3800, "name": "VIOLET 400484", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 1.0}, {"id": 4216, "name": "PINK FLUORESCENT", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 2.0}, {"id": 4306, "name": "VIOLET TUB 400011", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 1.0}, {"id": 6935, "name": "GOLD V0221267-RF-401363", "uom": "kg", "avgUse": 0, "daysLeft": 0, "status": "Not needed", "stock": 2.0}, {"id": 5782, "name": "-", "uom": "1285", "avgUse": 0, "daysLeft": 0, "status": "Included in ORDER QTY above", "stock": 0}, {"id": 6624, "name": "-", "uom": "80", "avgUse": 0, "daysLeft": 0, "status": "Included in ORDER QTY above", "stock": 0}]};
+/* MRP_END */
 const CAT_ICON = {
   'SLUG':'⚙️','BASE COAT':'🎨','LACQUER':'✨','LATEX':'💧','ZINC POWDER':'🔬',
   'CAP':'🔵','CARTON':'📦','TAPE':'🗂️','THINNER':'🧪','INK':'🖊️',
@@ -880,11 +1153,17 @@ function updateGrandTotal() {
 
   const sub  = document.getElementById('grandSub');
   const wrap = document.getElementById('grandTableWrap');
+  const toggleBtn = document.getElementById('toggleStockBtn');
   if (productCount === 0) {
     sub.textContent = 'Enter quantities above to see totals.';
     wrap.innerHTML = '<div class="grand-total-empty"><div class="big">📋</div>No quantities entered yet.</div>';
+    if (toggleBtn) toggleBtn.style.display = 'none';
     updateJumpButton();
     return;
+  }
+  if (toggleBtn) {
+    toggleBtn.style.display = 'inline-flex';
+    toggleBtn.textContent = showStockComparison ? '📋 Show Requirements Only' : '📦 Compare with Stock';
   }
   sub.textContent = `${productCount} product${productCount>1?'s':''} · ${totalPieces.toLocaleString()} total pieces`;
 
@@ -942,13 +1221,42 @@ function updateGrandTotal() {
 
     // Materials
     s += `<div class="grand-total-table-scroll"><table class="grand-total-table">
-      <thead><tr><th>Material</th><th style="text-align:right">Total Required</th></tr></thead><tbody>`;
+      <thead><tr>
+        <th>Material</th>
+        <th style="text-align:right">Total Required</th>
+        ${showStockComparison ? `
+          <th style="text-align:right">Current Stock</th>
+          <th style="text-align:right">Difference</th>
+        ` : ''}
+      </tr></thead><tbody>`;
     sorted.forEach(([cat, items]) => {
-      s += `<tr><td colspan="2" style="padding:7px 10px 3px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);background:var(--light)">${CAT_ICON[cat]||''} ${cat}</td></tr>`;
+      s += `<tr><td colspan="${showStockComparison ? 4 : 2}" style="padding:7px 10px 3px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted);background:var(--light)">${CAT_ICON[cat]||''} ${cat}</td></tr>`;
       items.forEach(t => {
+        let stockCells = '';
+        if (showStockComparison) {
+          const inv = (typeof INVENTORY_DATA !== 'undefined') ? INVENTORY_DATA : { items: [] };
+          let stockVal = 0;
+          let hasStock = false;
+          if (inv && inv.items) {
+            const match = inv.items.find(item => item.id === t.id);
+            if (match) {
+              stockVal = (match.balance || 0) + (match.wip || 0);
+              hasStock = true;
+            }
+          }
+          const diff = stockVal - t.total;
+          const diffClass = diff < 0 ? 'deficit-val' : diff > 0 ? 'surplus-val' : '';
+          const diffPrefix = diff > 0 ? '+' : '';
+          stockCells = `
+            <td style="text-align:right;font-family:'DM Mono',monospace">${hasStock ? `${fmtNum(stockVal, t.uom)} <span style="font-size:10px;color:var(--muted)">${t.uom}</span>` : '—'}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="${diffClass}">${hasStock ? `${diffPrefix}${fmtNum(diff, t.uom)} <span style="font-size:10px;color:var(--muted)">${t.uom}</span>` : '—'}</td>
+          `;
+        }
+
         s += `<tr>
           <td><div class="cat-cell"><div class="cat-icon ${CAT_CLASS[cat]||'ic-misc'}">${CAT_ICON[cat]||'📌'}</div>${t.name}${t.est?' <span class="est-tag">⚠ est</span>':''}</div></td>
-          <td><strong style="font-family:'DM Mono',monospace;${t.est?'color:var(--red)':''}">${fmt(t.total,t.uom)}</strong> <span style="font-size:11px;color:var(--muted)">${t.uom}</span></td>
+          <td style="text-align:right"><strong style="font-family:'DM Mono',monospace;${t.est?'color:var(--red)':''}">${fmt(t.total,t.uom)}</strong> <span style="font-size:11px;color:var(--muted)">${t.uom}</span></td>
+          ${stockCells}
         </tr>`;
       });
     });
@@ -1238,10 +1546,409 @@ function renderGrid() {
   filterProducts();
 }
 
+// ─── DEFENSIVE DATA ACCESSORS ───
+const _prodLog = (typeof PRODUCTION_LOG_DATA !== 'undefined') ? PRODUCTION_LOG_DATA : { month: '', rows: [] };
+const _fgStock = (typeof FG_STOCK_DATA !== 'undefined') ? FG_STOCK_DATA : { title: '', rows: [] };
+const _inventory = (typeof INVENTORY_DATA !== 'undefined') ? INVENTORY_DATA : { title: '', items: [] };
+const _mrp = (typeof MRP_DATA !== 'undefined') ? MRP_DATA : { title: '', orders: [], materials: [], inks: [] };
+
+// ─── PRODUCTION LOG ───
+let prodlogDateFilter = 'all';
+let showStockComparison = false;
+
+function toggleStockComparison() {
+  showStockComparison = !showStockComparison;
+  updateGrandTotal();
+}
+
+function getMachineBadge(machine) {
+  const m = machine.toUpperCase();
+  let cls = 'other';
+  if (m.startsWith('PRESS')) cls = 'press';
+  else if (m.startsWith('PRINT')) cls = 'print';
+  else if (m.startsWith('PLINE')) cls = 'pline';
+  else if (m.startsWith('PF') || m.startsWith('PET')) cls = 'pet';
+  return `<span class="machine-badge ${cls}">${machine}</span>`;
+}
+
+function renderProductionLog() {
+  const data = _prodLog;
+  if (!data || !data.rows || data.rows.length === 0) {
+    document.getElementById('prodlog-body').innerHTML = '<tr><td colspan="6" class="no-data"><div class="big">🏭</div>No production log data available.</td></tr>';
+    return;
+  }
+  
+  document.getElementById('prodlog-month').textContent = data.month;
+  document.getElementById('prodlog-count').textContent = data.rows.length + ' entries';
+  
+  // Build unique date chips
+  const dates = [...new Set(data.rows.map(r => r.date))];
+  const chipDiv = document.getElementById('prodlog-date-chips');
+  chipDiv.innerHTML = '<button class="date-chip active" onclick="setProdLogDate(\'all\',this)">All Dates</button>' +
+    dates.map(d => `<button class="date-chip" onclick="setProdLogDate('${d}',this)">${d}</button>`).join('');
+  
+  filterProdLog();
+}
+
+function setProdLogDate(d, btn) {
+  prodlogDateFilter = d;
+  document.querySelectorAll('#prodlog-date-chips .date-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterProdLog();
+}
+
+function filterProdLog() {
+  const data = _prodLog;
+  const q = (document.getElementById('prodlogSearch').value || '').toLowerCase();
+  const tbody = document.getElementById('prodlog-body');
+  
+  let html = '';
+  let totalGood = 0, totalReject = 0, totalTotal = 0;
+  let visibleCount = 0;
+  
+  data.rows.forEach(r => {
+    // Date filter
+    if (prodlogDateFilter !== 'all' && r.date !== prodlogDateFilter) return;
+    // Search filter
+    if (q && !r.product.toLowerCase().includes(q) && !r.customer.toLowerCase().includes(q) && !r.machine.toLowerCase().includes(q)) return;
+    
+    visibleCount++;
+    totalGood += r.good;
+    totalReject += r.reject;
+    totalTotal += r.total;
+    
+    html += `<tr>
+      <td style="white-space:nowrap;font-family:'DM Mono',monospace;font-size:11px">${r.date}</td>
+      <td>${getMachineBadge(r.machine)}</td>
+      <td style="font-weight:500">${r.product}<div style="font-size:10px;color:var(--muted)">${r.customer}</div></td>
+      <td style="font-weight:600;color:var(--navy)">${r.good > 0 ? r.good.toLocaleString() : '—'}</td>
+      <td style="color:${r.reject > 0 ? 'var(--red)' : 'var(--muted)'}">${r.reject > 0 ? r.reject.toLocaleString() : '—'}</td>
+      <td>${r.total > 0 ? r.total.toLocaleString() : '—'}</td>
+    </tr>`;
+  });
+  
+  // Total row
+  if (visibleCount > 0) {
+    html += `<tr class="total-row">
+      <td colspan="3">TOTAL (${visibleCount} entries)</td>
+      <td>${totalGood.toLocaleString()}</td>
+      <td>${totalReject.toLocaleString()}</td>
+      <td>${totalTotal.toLocaleString()}</td>
+    </tr>`;
+  } else {
+    html = '<tr><td colspan="6" class="no-data">No entries match your filters.</td></tr>';
+  }
+  
+  tbody.innerHTML = html;
+}
+
+// ─── FG STOCK ───
+let fgFilter = 'all';
+
+function getStatusPill(status) {
+  const s = (status || '').toLowerCase();
+  if (s === 'ok') return '<span class="status-pill ok">OK</span>';
+  if (s === 'not ready') return '<span class="status-pill not-ready">Not Ready</span>';
+  if (s === 'in progress') return '<span class="status-pill in-progress">In Progress</span>';
+  if (s.includes('short')) return '<span class="status-pill shortage">Shortage</span>';
+  if (s) return `<span class="status-pill not-ready">${status}</span>`;
+  return '<span class="status-pill not-needed">—</span>';
+}
+
+function renderFGStock() {
+  const data = _fgStock;
+  if (!data || !data.rows || data.rows.length === 0) {
+    document.getElementById('fgstock-grid').innerHTML = '<div class="no-data"><div class="big">📋</div>No FG Stock data available.</div>';
+    return;
+  }
+  
+  document.getElementById('fgstock-title').textContent = data.title || 'FG Stock';
+  document.getElementById('fgstock-count').textContent = data.rows.length + ' products · ' + data.rows.reduce((s,r) => s + r.qty, 0).toLocaleString() + ' total pcs';
+  
+  filterFGStock();
+}
+
+function setFGFilter(f, btn) {
+  fgFilter = f;
+  document.querySelectorAll('#panel-fgstock .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterFGStock();
+}
+
+function filterFGStock() {
+  const data = _fgStock;
+  const q = (document.getElementById('fgSearch').value || '').toLowerCase();
+  const grid = document.getElementById('fgstock-grid');
+  
+  let html = '';
+  let visible = 0;
+  
+  data.rows.forEach(r => {
+    const statusLower = (r.status || '').toLowerCase();
+    const isOk = statusLower === 'ok';
+    
+    // Filter
+    if (fgFilter === 'ok' && !isOk) return;
+    if (fgFilter === 'warn' && isOk) return;
+    if (q && !r.product.toLowerCase().includes(q) && !r.customer.toLowerCase().includes(q)) return;
+    
+    visible++;
+    html += `<div class="fg-card ${isOk ? 'status-ok' : 'status-warn'}">
+      <div class="fg-card-top">
+        <div>
+          <div class="fg-product">${r.product}</div>
+          <div class="fg-customer">${r.customer}</div>
+        </div>
+        <div>
+          <div class="fg-qty">${r.qty.toLocaleString()}</div>
+          <div class="fg-qty-label">pieces</div>
+        </div>
+      </div>
+      <div class="fg-meta">
+        <span class="fg-dia">${r.dia || '—'}</span>
+        ${r.pid ? `<span class="pid-tag">PID ${r.pid}</span>` : ''}
+        ${getStatusPill(r.status)}
+      </div>
+      ${r.remarks ? `<div class="fg-remarks">📝 ${r.remarks}</div>` : ''}
+    </div>`;
+  });
+  
+  if (visible === 0) {
+    html = '<div class="no-data" style="grid-column:1/-1"><div class="big">📋</div>No products match your filters.</div>';
+  }
+  
+  grid.innerHTML = html;
+}
+
+// ─── INVENTORY ───
+let invCatFilter = 'all';
+
+function fmtNum(v, uom) {
+  if (v === 0) return '0';
+  if (uom === 'pcs') return Math.round(v).toLocaleString();
+  if (Math.abs(v) >= 100) return Math.round(v).toLocaleString();
+  return v.toFixed(2);
+}
+
+function renderInventory() {
+  const data = _inventory;
+  if (!data || !data.items || data.items.length === 0) {
+    document.getElementById('inv-body').innerHTML = '<tr><td colspan="9" class="no-data"><div class="big">📦</div>No inventory data available.</td></tr>';
+    return;
+  }
+  
+  document.getElementById('inv-title').textContent = data.title || 'Inventory';
+  document.getElementById('inv-count').textContent = data.items.length + ' items';
+  
+  // Category stats
+  const cats = {};
+  data.items.forEach(item => {
+    if (!cats[item.cat]) cats[item.cat] = {count:0, zeroCount:0};
+    cats[item.cat].count++;
+    if (item.balance <= 0 && item.wip <= 0) cats[item.cat].zeroCount++;
+  });
+  
+  // Stats cards
+  const statsDiv = document.getElementById('inv-stats');
+  const totalItems = data.items.length;
+  const zeroStock = data.items.filter(i => i.balance <= 0 && i.wip <= 0).length;
+  statsDiv.innerHTML = `
+    <div class="inv-stat"><div class="val">${totalItems}</div><div class="lbl">Total Items</div></div>
+    <div class="inv-stat"><div class="val" style="color:var(--green)">${totalItems - zeroStock}</div><div class="lbl">In Stock</div></div>
+    <div class="inv-stat"><div class="val" style="color:var(--red)">${zeroStock}</div><div class="lbl">Zero Stock</div></div>
+    <div class="inv-stat"><div class="val">${Object.keys(cats).length}</div><div class="lbl">Categories</div></div>
+  `;
+  
+  // Category filter buttons
+  const catDiv = document.getElementById('inv-cat-filters');
+  catDiv.innerHTML = '<button class="filter-btn active" onclick="setInvCat(\'all\',this)">All</button>' +
+    Object.keys(cats).sort().map(c => 
+      `<button class="filter-btn" onclick="setInvCat('${c}',this)">${c} <span style="font-size:10px;opacity:.6">(${cats[c].count})</span></button>`
+    ).join('');
+  
+  filterInventory();
+}
+
+function setInvCat(cat, btn) {
+  invCatFilter = cat;
+  document.querySelectorAll('#inv-cat-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterInventory();
+}
+
+function filterInventory() {
+  const data = _inventory;
+  const q = (document.getElementById('invSearch').value || '').toLowerCase();
+  const tbody = document.getElementById('inv-body');
+  
+  let html = '';
+  let visible = 0;
+  
+  data.items.forEach(item => {
+    if (invCatFilter !== 'all' && item.cat !== invCatFilter) return;
+    if (q && !item.name.toLowerCase().includes(q) && !String(item.id).includes(q)) return;
+    
+    visible++;
+    const totalStock = item.balance + item.wip;
+    const rowClass = totalStock <= 0 ? 'zero-stock' : (totalStock < 10 && item.uom === 'kg') ? 'low-stock' : '';
+    
+    html += `<tr class="${rowClass}">
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">${item.id}</td>
+      <td><span style="font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">${item.cat}</span></td>
+      <td style="font-weight:500">${item.name}</td>
+      <td style="font-size:11px;color:var(--muted)">${item.uom}</td>
+      <td>${fmtNum(item.opening, item.uom)}</td>
+      <td style="color:${item.received > 0 ? 'var(--green)' : 'var(--muted)'}">${fmtNum(item.received, item.uom)}</td>
+      <td style="color:${item.issued > 0 ? 'var(--red)' : 'var(--muted)'}">${fmtNum(item.issued, item.uom)}</td>
+      <td style="font-weight:600;color:${item.balance <= 0 ? 'var(--red)' : 'var(--navy)'}">${fmtNum(item.balance, item.uom)}</td>
+      <td style="color:${item.wip > 0 ? 'var(--blue)' : 'var(--muted)'}">${fmtNum(item.wip, item.uom)}</td>
+    </tr>`;
+  });
+  
+  if (visible === 0) {
+    html = '<tr><td colspan="9" class="no-data">No items match your search.</td></tr>';
+  }
+  
+  tbody.innerHTML = html;
+}
+
+// ─── MRP (MATERIAL REQUIREMENT) ───
+let mrpStatusFilter = 'all';
+
+function getMRPStatusPill(status) {
+  const s = (status || '').toUpperCase();
+  if (s === 'SHORTAGE') return '<span class="status-pill shortage">SHORTAGE</span>';
+  if (s === 'LOW') return '<span class="status-pill low">LOW</span>';
+  if (s === 'OK') return '<span class="status-pill ok">OK</span>';
+  if (s === 'NOT NEEDED' || s === '') return '<span class="status-pill not-needed">Not needed</span>';
+  return `<span class="status-pill not-needed">${status}</span>`;
+}
+
+function renderMRP() {
+  const data = _mrp;
+  if (!data || !data.orders || data.orders.length === 0) {
+    document.getElementById('mrp-orders-body').innerHTML = '<tr><td colspan="7" class="no-data"><div class="big">⚖️</div>No MRP data available.</td></tr>';
+    return;
+  }
+  
+  document.getElementById('mrp-title').textContent = data.title || 'Material Requirement Plan';
+  
+  // Render Orders
+  const ordersBody = document.getElementById('mrp-orders-body');
+  if (data.orders && data.orders.length > 0) {
+    let totalReq = 0, totalProd = 0, totalRem = 0;
+    let ohtml = '';
+    data.orders.forEach(o => {
+      totalReq += o.required;
+      totalProd += o.produced;
+      totalRem += o.remaining;
+      ohtml += `<tr>
+        <td style="font-family:'DM Mono',monospace">${o.dia}</td>
+        <td style="font-weight:500">${o.product}</td>
+        <td style="font-size:11px;color:var(--muted)">${o.customer}</td>
+        <td>${o.required > 0 ? o.required.toLocaleString() : '—'}</td>
+        <td style="font-weight:600;color:var(--navy)">${o.produced > 0 ? o.produced.toLocaleString() : '—'}</td>
+        <td style="color:${o.remaining > 0 ? 'var(--orange)' : 'var(--green)'}; font-weight:600">${o.remaining > 0 ? o.remaining.toLocaleString() : '✓ Done'}</td>
+        <td style="font-size:11px;color:var(--muted);font-style:italic">${o.remarks || ''}</td>
+      </tr>`;
+    });
+    ohtml += `<tr class="total-row">
+      <td colspan="3">TOTAL</td>
+      <td>${totalReq.toLocaleString()}</td>
+      <td>${totalProd.toLocaleString()}</td>
+      <td>${totalRem.toLocaleString()}</td>
+      <td></td>
+    </tr>`;
+    ordersBody.innerHTML = ohtml;
+    document.getElementById('mrp-orders-badge').textContent = data.orders.length + ' orders · ' + totalReq.toLocaleString() + ' required';
+  }
+  
+  // Material status badge
+  if (data.materials) {
+    const shortages = data.materials.filter(m => m.status === 'SHORTAGE').length;
+    const lowCount = data.materials.filter(m => m.status === 'LOW').length;
+    document.getElementById('mrp-mat-badge').textContent = 
+      `${data.materials.length} items` + 
+      (shortages > 0 ? ` · 🔴 ${shortages} shortage${shortages > 1 ? 's' : ''}` : '') +
+      (lowCount > 0 ? ` · 🟡 ${lowCount} low` : '');
+  }
+  
+  // Render Inks
+  const inkBody = document.getElementById('mrp-ink-body');
+  if (data.inks && data.inks.length > 0) {
+    let ihtml = '';
+    data.inks.forEach(ink => {
+      ihtml += `<tr>
+        <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">${ink.id}</td>
+        <td style="font-weight:500">${ink.name}</td>
+        <td>${ink.avgUse > 0 ? fmtNum(ink.avgUse, ink.uom) + ' ' + ink.uom : '—'}</td>
+        <td style="font-weight:600;color:var(--navy)">${fmtNum(ink.stock, ink.uom)} ${ink.uom}</td>
+        <td style="color:${ink.daysLeft < 15 ? 'var(--red)' : ink.daysLeft < 30 ? 'var(--orange)' : 'var(--green)'}; font-weight:600">${ink.daysLeft} days</td>
+        <td>${getMRPStatusPill(ink.status)}</td>
+      </tr>`;
+    });
+    inkBody.innerHTML = ihtml;
+    document.getElementById('mrp-ink-badge').textContent = data.inks.length + ' inks tracked';
+  }
+  
+  filterMRP();
+}
+
+function setMRPFilter(f, btn) {
+  mrpStatusFilter = f;
+  document.querySelectorAll('.mrp-filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterMRP();
+}
+
+function filterMRP() {
+  const data = _mrp;
+  if (!data || !data.materials) return;
+  
+  const q = (document.getElementById('mrpSearch').value || '').toLowerCase();
+  const tbody = document.getElementById('mrp-mat-body');
+  
+  let html = '';
+  let visible = 0;
+  
+  data.materials.forEach(m => {
+    if (mrpStatusFilter !== 'all' && m.status !== mrpStatusFilter) return;
+    if (q && !m.name.toLowerCase().includes(q) && !String(m.id).includes(q) && !m.cat.toLowerCase().includes(q)) return;
+    
+    // Skip items with zero required and zero stock (truly irrelevant)
+    if (m.required === 0 && m.stock === 0) return;
+    
+    visible++;
+    const surplusClass = m.surplus < 0 ? 'deficit-val' : m.surplus > 0 ? 'surplus-val' : '';
+    const surplusPrefix = m.surplus < 0 ? '' : '+';
+    const surplusDisplay = m.required === 0 ? '—' : `${surplusPrefix}${fmtNum(m.surplus, m.uom)}`;
+    
+    html += `<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">${m.id}</td>
+      <td><span style="font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)">${m.cat}</span></td>
+      <td style="font-weight:500">${m.name}${m.products ? `<div style="font-size:10px;color:var(--muted);margin-top:2px">→ ${m.products}</div>` : ''}</td>
+      <td>${m.required > 0 ? fmtNum(m.required, m.uom) + ' <span style="font-size:10px;color:var(--muted)">' + m.uom + '</span>' : '—'}</td>
+      <td style="font-weight:600;color:var(--navy)">${fmtNum(m.stock, m.uom)} <span style="font-size:10px;color:var(--muted)">${m.uom}</span></td>
+      <td class="${surplusClass}">${surplusDisplay} <span style="font-size:10px;color:var(--muted)">${m.required > 0 ? m.uom : ''}</span></td>
+      <td>${getMRPStatusPill(m.status)}</td>
+    </tr>`;
+  });
+  
+  if (visible === 0) {
+    html = '<tr><td colspan="7" class="no-data">No materials match your filters.</td></tr>';
+  }
+  
+  tbody.innerHTML = html;
+}
+
 // ─── INIT ───
 renderDashboard();
 renderGrid();
 updateGrandTotal();
+renderProductionLog();
+renderFGStock();
+renderInventory();
+renderMRP();
 
 // ─── PWA INSTALL ───
 // Manifest and SW are now proper files (manifest.json + sw.js)
