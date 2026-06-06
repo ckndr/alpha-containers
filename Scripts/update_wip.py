@@ -105,7 +105,7 @@ def build_slug_map(ws):
     """
     slug_map = {}
     for r in range(INV_DATA_START, ws.max_row + 1):
-        if ws.cell(r, INV_CAT_COL).value != 'Slug':
+        if str(ws.cell(r, INV_CAT_COL).value or '').strip().upper() != 'SLUG':
             continue
         name   = ws.cell(r, INV_NAME_COL).value
         issued = ws.cell(r, INV_ISSUED_COL).value or 0

@@ -22,6 +22,16 @@ def is_numeric_item_id(val):
     return False
 
 def main():
+    print("\n" + "="*60)
+    print("  !! WARNING: This is a ONE-TIME migration script.")
+    print("  !! Running it again will INSERT DUPLICATE ROWS.")
+    print("  !! If you need to add a new MRP order, do it manually in Excel.")
+    print("="*60)
+    confirm = input("\n  Type YES to continue, anything else to abort: ").strip()
+    if confirm != "YES":
+        print("  Aborted.")
+        return
+
     # 1. Find the latest Tubex workbook (excluding backups)
     folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     ac_files = [

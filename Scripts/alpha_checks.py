@@ -137,3 +137,30 @@ def log_mismatches(source_name, unmapped_items, folder=None):
                 f.write("  " + str(item) + "\n")
 
     print("  Mismatches logged to: Logs/mismatches.log (%d item(s))" % len(unmapped_items))
+
+
+def replace_copy_export(folder, target_name):
+    """
+    Look for a '- copy' variant of target_name in folder.
+    If found, replace the target with the copy (fresh ERP export).
+    Returns True if replacement happened, False otherwise.
+    """
+    target_path = os.path.join(folder, target_name)
+    stem, ext = os.path.splitext(target_name)
+    copy_name = (stem + " - copy" + ext).lower()
+    matches = [
+        os.path.join(folder, name)
+        for name in os.listdir(folder)
+        if name.lower() == copy_name
+    ]
+
+    if not matches:
+        return False
+
+    copy_path = max(matches, key=os.path.getmtime)
+    os.replace(copy_path, target_path)
+    print("  Fresh export found: %s -> %s" % (
+        os.path.basename(copy_path),
+        os.path.basename(target_path),
+    ))
+    return True

@@ -1098,39 +1098,6 @@ function updateQty(pid, val, el) {
 
 
 
-function filterProducts() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  let visible = 0;
-  document.querySelectorAll('[data-pid]').forEach(card => {
-    const name = card.dataset.name;
-    const cust = card.dataset.customer;
-    const type = card.dataset.type;
-    const hasQty = quantities[parseInt(card.dataset.pid)] > 0;
-    let show = true;
-    if (q && !name.includes(q) && !cust.includes(q)) show = false;
-    if (activeFilter === 'tube' && type !== 'tube') show = false;
-    if (activeFilter === 'pet' && type !== 'pet') show = false;
-    if (activeFilter === 'active' && !hasQty) show = false;
-    card.style.display = show ? '' : 'none';
-    if (show) visible++;
-  });
-  const nr = document.getElementById('noResults');
-  if (nr) nr.style.display = visible ? 'none' : 'block';
-}
-
-function clearAll() {
-  Object.keys(quantities).forEach(k => delete quantities[k]);
-  renderGrid();
-  updateGrandTotal();
-}
-
-function renderGrid() {
-  const grid = document.getElementById('productGrid');
-  grid.innerHTML = PRODUCTS.map(renderCard).join('') +
-    '<div id="noResults" class="no-results" style="display:none">No products match your search.</div>';
-  filterProducts();
-}
-
 
 
 function updateGrandTotal() {

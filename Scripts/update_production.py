@@ -132,7 +132,7 @@ import warnings
 warnings.filterwarnings("ignore", message=".*Data Validation.*")
 warnings.filterwarnings("ignore", message=".*extension.*")
 from datetime import datetime
-from alpha_checks import check_freshness, check_not_locked, log_mismatches
+from alpha_checks import check_freshness, check_not_locked, log_mismatches, replace_copy_export
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -415,26 +415,6 @@ def get_val(row, col_map, key, default=None):
     return val
 
 
-def replace_copy_export(folder, target_name):
-    target_path = os.path.join(folder, target_name)
-    stem, ext = os.path.splitext(target_name)
-    copy_name = (stem + " - copy" + ext).lower()
-    matches = [
-        os.path.join(folder, name)
-        for name in os.listdir(folder)
-        if name.lower() == copy_name
-    ]
-
-    if not matches:
-        return False
-
-    copy_path = max(matches, key=os.path.getmtime)
-    os.replace(copy_path, target_path)
-    print("  Fresh export found: %s -> %s" % (
-        os.path.basename(copy_path),
-        os.path.basename(target_path),
-    ))
-    return True
 
 
 def find_files():
@@ -881,10 +861,10 @@ def write_fg_stock(ac_path, fg_rows, latest_date):
 
 def main():
     print("\n" + "="*60)
-    print("  Tubex -- Production Log Updater v20")
+    print("  Tubex -- Production Log Updater v21")
     print("="*60 + "\n")
 
-    print("[1/5] Finding files...")
+    print("[1/4] Finding files...")
     ac_path, prod_path = find_files()
     if not ac_path:
         return
@@ -893,7 +873,7 @@ def main():
     check_not_locked(ac_path)
     check_freshness(prod_path, max_hours=26, label="Production.xlsx")
 
-    print("\n[2/5] Reading production data...")
+    print("\n[2/4] Reading production data...")
     try:
         result = read_production_source(prod_path)
     except ImportError:
@@ -924,11 +904,11 @@ def main():
                 shown.add(orig)
                 print(f"    '{orig}' -> '{corr}' (PID={pid})")
 
-    print("\n[3/5] Wiping Production_Log and rewriting from scratch...")
+    print("\n[3/4] Wiping Production_Log and rewriting from scratch...")
     written = write_production_log(ac_path, source_rows)
     print(f"  Written: {written} rows")
 
-    print("\n[4/5] Reading FG Stock and updating FG Stock sheet...")
+    print("\n[4/4] Reading FG Stock and updating FG Stock sheet...")
     try:
         fg_rows, fg_date, fg_no_pid = read_fg_stock(prod_path)
     except Exception as e:
@@ -956,26 +936,6 @@ def main():
         for name, dia, cust in sorted(set(fg_no_pid)):
             print(f"    {cust}: {name}  (Dia={dia})")
         log_mismatches("fg_stock", list(set(fg_no_pid)))
-
-    # ── Sort Dashboard (active/inactive) ────────────────────────────────────
-    print("\n[5/5] Sorting Dashboard (active/inactive)...")
-    try:
-        import subprocess
-        sort_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sort_dashboard.py")
-        result = subprocess.run(
-            ["python", sort_script],
-            capture_output=True, text=True
-        )
-        if result.stdout:
-            for line in result.stdout.strip().split('\n'):
-                print("  " + line)
-        if result.returncode != 0:
-            print("  WARNING: sort_dashboard failed:")
-            if result.stderr:
-                for line in result.stderr.strip().split('\n'):
-                    print("    " + line)
-    except Exception as e:
-        print(f"  WARNING: Could not run sort_dashboard: {e}")
 
     print("\n  Press Ctrl+Shift+F9 in Excel to recalculate.")
     print("="*60)

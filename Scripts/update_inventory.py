@@ -50,33 +50,13 @@ warnings.filterwarnings("ignore", message=".*Data Validation.*")
 warnings.filterwarnings("ignore", message=".*extension.*")
 import pandas as pd
 from openpyxl import load_workbook
-from alpha_checks import check_freshness, check_not_locked, log_mismatches
+from alpha_checks import check_freshness, check_not_locked, log_mismatches, replace_copy_export
 
 # Scripts live in Tubex/Scripts/
 # Excel and ERP files live in Tubex/ (one level up)
 DATA_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-def replace_copy_export(folder, target_name):
-    target_path = os.path.join(folder, target_name)
-    stem, ext = os.path.splitext(target_name)
-    copy_name = (stem + " - copy" + ext).lower()
-    matches = [
-        os.path.join(folder, name)
-        for name in os.listdir(folder)
-        if name.lower() == copy_name
-    ]
-
-    if not matches:
-        return False
-
-    copy_path = max(matches, key=os.path.getmtime)
-    os.replace(copy_path, target_path)
-    print("  Fresh export found: %s -> %s" % (
-        os.path.basename(copy_path),
-        os.path.basename(target_path),
-    ))
-    return True
 
 
 def find_files():

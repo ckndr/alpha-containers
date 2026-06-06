@@ -6,12 +6,8 @@
 # Keep the main versioned Tubex workbook synced for home/office work.
 !Tubex_v*.xlsx
 
-# ── ERP export files ──
+# ── ERP exports & data files ──
 *.pdf
-Inventory.pdf
-dispatch*.xls
-pending*.xlsx
-Production*.xlsx
 
 # ── Python cache ──
 __pycache__/
@@ -41,5 +37,6 @@ $RECYCLE.BIN/
 *_old*
 *_copy*
 
-# ── Only the HTML app goes to GitHub ──
-# (update_html.py is also included so the script travels with the repo)
+# ── One-off debug/AI artifacts ──
+excel_for_ai.json
+mrp_dump.txt

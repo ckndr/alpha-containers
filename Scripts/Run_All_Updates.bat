@@ -43,6 +43,22 @@ echo.
 set FAIL_COUNT=0
 set FAIL_LIST=
 
+:: ── PRE-RUN BACKUP ───────────────────────────────────────────────────────────
+:: Copy the Tubex workbook to Logs/ before any script touches it.
+:: If something fails mid-run, you can restore from this backup.
+echo [Backup] Saving pre-run snapshot of Excel...
+if not exist "..\Logs" mkdir "..\Logs"
+for /f "tokens=1-3 delims=/ " %%a in ("%date%") do set "BKDATE=%%c%%a%%b"
+for %%f in ("..\Tubex_v*.xlsx") do (
+    copy /y "%%f" "..\Logs\backup_!BKDATE!_%%~nxf" >nul 2>&1
+    echo   Backed up: %%~nxf  -^>  Logs\backup_!BKDATE!_%%~nxf
+)
+:: Clean old backups — keep only the last 3
+for /f "skip=3 delims=" %%f in ('dir /b /o-d "..\Logs\backup_*.xlsx" 2^>nul') do (
+    del /f /q "..\Logs\%%f" >nul 2>&1
+)
+echo.
+
 :: ── STEP 1: Production Log + FG Stock ────────────────────────────────────────
 :: Must run first — populates Production_Log which HTML and Dashboard read.
 echo [1/5] Updating Production Log + FG Stock...
