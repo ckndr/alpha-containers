@@ -169,7 +169,7 @@ ALIASES = {
     # ── Dia 25 ──────────────────────────────────────────────────────────────
     ("s 43 25mm",                  "25"): ("S 43 25MM",                            3447),
     ("samsol 43",                  "25"): ("S 43 25MM",                            3447),
-    ("samsol 45",                  "25"): ("TUBES",                                3726),
+    ("samsol 45",                  "25"): ("S-45",                                 5389),
     ("samsol 45/43",               "25"): ("TUBES",                                3726),
     ("samsol common red",          "25"): ("TUBES COMMON RED",                     6470),
     ("tubes men blue",             "25"): ("TUBES MEN BLUE",                       6506),
@@ -248,7 +248,7 @@ FG_ALIASES = {
 
     # ── Dia 25 ──────────────────────────────────────────────────────────────
     ("tube 43",            "25", "samsol"):          ("S 43 25MM",                          3447),
-    ("tube 45",            "25", "samsol"):          ("TUBES",                              3726),
+    ("tube 45",            "25", "samsol"):          ("S-45",                               5389),
     ("common purple tube", "25", "samsol"):          ("TUBE COMMON PURPLE",                 6532),
     ("common red tube",    "25", "samsol"):          ("TUBES COMMON RED",                   6470),
     ("men blue",           "25", "samsol"):          ("TUBES MEN BLUE",                     6506),
@@ -336,6 +336,7 @@ PID_TO_CUSTOMER = {
     6530: "Adore",
     6531: "Adore",
     3726: "Samsol International Private Limited",
+    5389: "Samsol International Private Limited",
     5731: "Samsol International Private Limited",
     5732: "Samsol International Private Limited",
     6506: "Samsol International Private Limited",
