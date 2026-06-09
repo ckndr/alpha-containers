@@ -170,7 +170,7 @@ print(f"  PET MTD:  {pet_mtd:,}   |  Yesterday: {yest_pet:,}")
 def read_orders_dynamic(ws, order_type):
     orders = []
     is_pet = order_type.upper() == 'PET'
-    for r in range(11, 100):
+    for r in range(11, 200):
         type_val = ws.cell(row=r, column=2).value   # col B
         pid      = ws.cell(row=r, column=6).value   # col F
         ordered  = ws.cell(row=r, column=7).value   # col G

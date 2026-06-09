@@ -36,7 +36,7 @@ echo  ===========================================================
 echo   Tubex -- Daily Update + Deploy
 echo  ===========================================================
 echo.
-echo  Sequence: Production -^> Inventory -^> Dispatch -^> Sort Dashboard -^> HTML/GitHub
+echo  Sequence: Dispatch -^> Production -^> Inventory -^> Sort Dashboard -^> HTML/GitHub
 echo  Skipped (manual): MRP, WIP, update_from_images
 echo.
 
@@ -59,48 +59,48 @@ for /f "skip=3 delims=" %%f in ('dir /b /o-d "..\Logs\backup_*.xlsx" 2^>nul') do
 )
 echo.
 
-:: ── STEP 1: Production Log + FG Stock ────────────────────────────────────────
-:: Must run first — populates Production_Log which HTML and Dashboard read.
-echo [1/5] Updating Production Log + FG Stock...
-echo       (reads Production.xlsx ^-^> writes Production_Log + FG Stock)
-python update_production.py
+:: ── STEP 1: Dispatch ─────────────────────────────────────────────────────────
+:: Reads dispatch.xls + dispatch_pet.xls, writes Dashboard col K.
+:: Must run before Sort/HTML (HTML reads col K for dispatch totals).
+echo [1/5] Updating Dispatch...
+echo       (reads dispatch.xls + dispatch_pet.xls ^-^> writes Dashboard col K)
+python update_dispatch.py
 if errorlevel 1 (
     set /a FAIL_COUNT+=1
-    set "FAIL_LIST=!FAIL_LIST! | [1] update_production"
+    set "FAIL_LIST=!FAIL_LIST! | [1] update_dispatch"
     echo.
-    echo  !! STEP 1 FAILED — Inventory and Dispatch will still run.
-    echo  !! HTML will be generated from whatever is currently in Excel.
+    echo  !! STEP 1 FAILED — Dashboard dispatch column not updated.
 ) else (
     echo  ^^ Step 1 OK.
 )
 echo.
 
-:: ── STEP 2: Inventory ────────────────────────────────────────────────────────
-:: Independent of Production — reads inventory.xls, writes Inventory sheet.
-echo [2/5] Updating Inventory...
-echo       (reads inventory.xls ^-^> writes Inventory sheet)
-python update_inventory.py
+:: ── STEP 2: Production Log + FG Stock ────────────────────────────────────────
+:: Must run before Sort/HTML — populates Production_Log which HTML and Dashboard read.
+echo [2/5] Updating Production Log + FG Stock...
+echo       (reads Production.xlsx ^-^> writes Production_Log + FG Stock)
+python update_production.py
 if errorlevel 1 (
     set /a FAIL_COUNT+=1
-    set "FAIL_LIST=!FAIL_LIST! | [2] update_inventory"
+    set "FAIL_LIST=!FAIL_LIST! | [2] update_production"
     echo.
-    echo  !! STEP 2 FAILED — Inventory sheet not updated.
+    echo  !! STEP 2 FAILED — Inventory and Dispatch will still run.
+    echo  !! HTML will be generated from whatever is currently in Excel.
 ) else (
     echo  ^^ Step 2 OK.
 )
 echo.
 
-:: ── STEP 3: Dispatch ─────────────────────────────────────────────────────────
-:: Reads dispatch.xls + dispatch_pet.xls, writes Dashboard col K.
-:: Must run before HTML (HTML reads col K for dispatch totals).
-echo [3/5] Updating Dispatch...
-echo       (reads dispatch.xls + dispatch_pet.xls ^-^> writes Dashboard col K)
-python update_dispatch.py
+:: ── STEP 3: Inventory ────────────────────────────────────────────────────────
+:: Independent of Production — reads inventory.xls, writes Inventory sheet.
+echo [3/5] Updating Inventory...
+echo       (reads inventory.xls ^-^> writes Inventory sheet)
+python update_inventory.py
 if errorlevel 1 (
     set /a FAIL_COUNT+=1
-    set "FAIL_LIST=!FAIL_LIST! | [3] update_dispatch"
+    set "FAIL_LIST=!FAIL_LIST! | [3] update_inventory"
     echo.
-    echo  !! STEP 3 FAILED — Dashboard dispatch column not updated.
+    echo  !! STEP 3 FAILED — Inventory sheet not updated.
 ) else (
     echo  ^^ Step 3 OK.
 )

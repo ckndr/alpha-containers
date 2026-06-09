@@ -73,9 +73,9 @@ Inside the Remote Desktop session:
 - Check that all steps say "OK" (no red `!!` errors)
 - The batch file:
   1. Backs up Excel to `Logs/`
-  2. Updates Production_Log + FG Stock from Production.xlsx
-  3. Updates Inventory from inventory.xls
-  4. Updates Dispatch from dispatch.xls + dispatch_pet.xls
+  2. Updates Dispatch from dispatch.xls + dispatch_pet.xls
+  3. Updates Production_Log + FG Stock from Production.xlsx
+  4. Updates Inventory from inventory.xls
   5. Sorts Dashboard (active products to top)
   6. Generates Tubex.html + pushes to GitHub
 

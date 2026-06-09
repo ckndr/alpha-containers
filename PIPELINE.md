@@ -24,9 +24,9 @@ dispatch_pet.xls (from ERP) ────┘
 ## Script Execution Order (MUST follow this sequence)
 
 ```
-Step 1: update_production.py    ← FIRST (everything else reads Production_Log)
-Step 2: update_inventory.py     ← Independent, can run anytime after Step 1
-Step 3: update_dispatch.py      ← Independent, can run anytime after Step 1
+Step 1: update_dispatch.py      ← FIRST (writes fresh dispatch data to Dashboard)
+Step 2: update_production.py    ← Second (populates Production_Log and FG Stock)
+Step 3: update_inventory.py     ← Third (updates Inventory sheet)
 Step 4: sort_dashboard.py       ← AFTER Steps 1-3 (needs fresh production + dispatch data)
 Step 5: update_html.py          ← LAST (reads everything, generates final HTML)
 ```

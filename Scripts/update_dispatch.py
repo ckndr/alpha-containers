@@ -114,8 +114,6 @@ CATALOG_PID_COL     = 1    # col A -- Product ID
 CATALOG_NAME_COL    = 4    # col D -- Product Name
 CATALOG_DATA_START  = 3    # first data row (rows 1-2 are headers)
 
-PET_TOTAL_ROW       = 32
-
 
 
 
@@ -291,12 +289,6 @@ def update_dispatch(ac_path, dispatch_by_pid):
             continue
         ws.cell(pid_row_map[pid], DASHBOARD_DISP_COL).value = int(qty)
         updated += 1
-
-    # Fix K32 PET TOTAL formula if still on old range
-    k32 = ws.cell(PET_TOTAL_ROW, DASHBOARD_DISP_COL)
-    if isinstance(k32.value, str) and 'SUM' in k32.value and 'K26:K30' not in k32.value:
-        k32.value = '=SUM(K26:K31)'
-        print("  Fixed: K32 PET TOTAL formula corrected -> =SUM(K26:K31)")
 
     wb.save(ac_path)
     return updated, skipped
