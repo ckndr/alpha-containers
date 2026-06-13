@@ -2,12 +2,14 @@
 // Network-first: always fetches fresh data when online
 // Falls back to cache only when offline
 
-const CACHE_NAME = 'tubex-202606131207';
+const CACHE_NAME = 'tubex-202606131530';
 const ASSETS = [
   './Tubex.html',
   './manifest.json',
-  './icon-192.png',
-  './icon-512.png',
+  './icon-192-any.png',
+  './icon-512-any.png',
+  './icon-192-maskable.png',
+  './icon-512-maskable.png',
 ];
 
 // Install: pre-cache the app shell
