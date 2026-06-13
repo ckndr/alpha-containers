@@ -167,6 +167,19 @@ print(f"  PET MTD:  {pet_mtd:,}   |  Yesterday: {yest_pet:,}")
 # A row is inactive ONLY when all three are zero simultaneously.
 # Scanning rows 11–100 catches any future rows added when more orders come in.
 
+# Read MRP sheet to resolve Tube order formula lookup values (since openpyxl loads return None for formula cells)
+mrp_orders_map = {}
+if 'MRP' in wb.sheetnames:
+    ws_mrp_temp = wb['MRP']
+    for r_mrp in range(3, 100):
+        pid_val = ws_mrp_temp.cell(row=r_mrp, column=4).value
+        ord_val = ws_mrp_temp.cell(row=r_mrp, column=6).value
+        if pid_val is not None:
+            try:
+                mrp_orders_map[int(pid_val)] = int(ord_val) if ord_val else 0
+            except (TypeError, ValueError):
+                pass
+
 def read_orders_dynamic(ws, order_type):
     orders = []
     is_pet = order_type.upper() == 'PET'
@@ -190,6 +203,11 @@ def read_orders_dynamic(ws, order_type):
             ordered_int = int(ordered) if ordered else 0
         except (TypeError, ValueError):
             ordered_int = 0
+
+        # Fallback to MRP sheet for TUBE orders if it evaluates to 0 or is None/formula
+        if not is_pet and ordered_int == 0:
+            ordered_int = mrp_orders_map.get(pid_int, 0)
+
         try:
             dispatch_int = int(dispatch) if dispatch else 0
         except (TypeError, ValueError):
@@ -445,9 +463,15 @@ for r in range(2, ws_inv.max_row + 1):
     balance  = ws_inv.cell(row=r, column=8).value
     wip      = ws_inv.cell(row=r, column=9).value
     
-    # balance and wip may be formulas — data_only=True gives calculated values
-    balance = float(balance) if balance and isinstance(balance, (int, float)) else 0.0
-    wip     = float(wip) if wip and isinstance(wip, (int, float)) else 0.0
+    # balance and wip may be formulas — data_only=True gives calculated values.
+    # However, if the Excel file was modified and saved by openpyxl, cached values for
+    # formulas are lost and return None. Calculate balance as: opening + received - issued.
+    if balance is None or not isinstance(balance, (int, float)):
+        balance = opening + received - issued
+    else:
+        balance = float(balance)
+        
+    wip = float(wip) if wip and isinstance(wip, (int, float)) else 0.0
     
     if not name:
         continue
