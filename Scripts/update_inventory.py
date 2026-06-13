@@ -151,11 +151,19 @@ def update_excel(excel_path, xls_items, date_range):
 
     # Build map of item ID -> row number from Inventory sheet (col A)
     excel_ids = {}
+    slug_items = {}
     for row in range(2, ws.max_row + 1):
         val = ws.cell(row=row, column=1).value
         if val is not None:
             try:
-                excel_ids[int(float(str(val)))] = row
+                item_id = int(float(str(val)))
+                excel_ids[item_id] = row
+                
+                # Check if this item is in the Slug category (col B is Category, 1-indexed: col 2)
+                cat_val = ws.cell(row=row, column=2).value
+                if str(cat_val or '').strip().lower() == 'slug':
+                    name_val = ws.cell(row=row, column=3).value
+                    slug_items[item_id] = str(name_val or '').strip()
             except (ValueError, TypeError):
                 pass
 
@@ -182,9 +190,15 @@ def update_excel(excel_path, xls_items, date_range):
         else:
             not_in_excel.append((item_id, data['name'], data['balance'], data['unit']))
 
+    # Find missing slug items (present in Inventory sheet but missing from new inventory.xls)
+    missing_slugs = []
+    for slug_id, slug_name in sorted(slug_items.items()):
+        if slug_id not in xls_items:
+            missing_slugs.append((slug_id, slug_name))
+
     # Overwrite same file
     wb.save(excel_path)
-    return updated, not_in_excel
+    return updated, not_in_excel, missing_slugs
 
 
 def main():
@@ -212,8 +226,21 @@ def main():
 
     print("")
     print("[3/3] Updating Excel...")
-    updated, not_in_excel = update_excel(excel_path, xls_items, date_range)
+    updated, not_in_excel, missing_slugs = update_excel(excel_path, xls_items, date_range)
     print("  Saved: " + os.path.basename(excel_path))
+
+    if missing_slugs:
+        print("")
+        print("  !! WARNING: %d Slug item(s) missing from inventory.xls:" % len(missing_slugs))
+        for slug_id, slug_name in missing_slugs:
+            print("     - ID %5d: %s" % (slug_id, slug_name))
+        print("  !! Please take a look.")
+
+        # Log to mismatches.log so that Run_All_Updates.bat prints it at the end
+        mismatch_entries = []
+        for slug_id, slug_name in missing_slugs:
+            mismatch_entries.append((f"WARNING: Slug item ID {slug_id} ({slug_name}) is missing from inventory.xls",))
+        log_mismatches("inventory", mismatch_entries)
 
     print("")
     print(SEP)
@@ -232,8 +259,6 @@ def main():
     else:
         print("  No changes - inventory already matches ERP.")
 
-
-
     print("")
     print("  Open Excel and press Ctrl+Shift+F9 to recalculate.")
     print(SEP)
@@ -241,3 +266,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
