@@ -126,6 +126,7 @@ KEY BUSINESS RULES:
 """
 
 import os
+import openpyxl
 import re
 import glob
 import warnings
@@ -925,6 +926,34 @@ def main():
         print("  No FG Stock rows — sheet not updated.")
 
     print("  Saved:   " + os.path.basename(ac_path))
+
+    # ── Post-write validation ────────────────────────────────────────────
+    print("\n  Validating writes...")
+    try:
+        wb_check = openpyxl.load_workbook(ac_path, read_only=True, data_only=True)
+        
+        # Check Production_Log
+        ws_check = wb_check['Production_Log']
+        pl_count = sum(1 for r in range(3, ws_check.max_row + 1) 
+                       if ws_check.cell(r, 1).value is not None)
+        if pl_count == len(source_rows):
+            print(f"  ✓ Production_Log: {pl_count} rows written (matches source)")
+        else:
+            print(f"  !! Production_Log: expected {len(source_rows)} rows, found {pl_count}")
+        
+        # Check FG Stock
+        if 'FG Stock' in wb_check.sheetnames and fg_rows:
+            ws_fg = wb_check['FG Stock']
+            fg_count = sum(1 for r in range(4, ws_fg.max_row + 1) 
+                          if ws_fg.cell(r, 1).value is not None)
+            if fg_count == len(fg_rows):
+                print(f"  ✓ FG Stock: {fg_count} rows written (matches source)")
+            else:
+                print(f"  !! FG Stock: expected {len(fg_rows)} rows, found {fg_count}")
+        
+        wb_check.close()
+    except Exception as e:
+        print(f"  !! Validation error: {e}")
 
     if no_pid:
         print(f"\n  WARNING -- {len(set(no_pid))} Production products with NO PID (add to ALIASES):")

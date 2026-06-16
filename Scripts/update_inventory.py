@@ -229,6 +229,20 @@ def main():
     updated, not_in_excel, missing_slugs = update_excel(excel_path, xls_items, date_range)
     print("  Saved: " + os.path.basename(excel_path))
 
+    # ── Post-write validation ────────────────────────────────────────────
+    print("  Validating writes...")
+    try:
+        from openpyxl import load_workbook as _lw
+        wb_check = _lw(excel_path, read_only=True, data_only=True)
+        ws_check = wb_check['Inventory']
+        # Spot-check: count rows with non-None values in col E (Opening)
+        inv_count = sum(1 for r in range(2, ws_check.max_row + 1) 
+                       if ws_check.cell(r, 5).value is not None)
+        print(f"  ✓ Inventory: {inv_count} rows have Opening values")
+        wb_check.close()
+    except Exception as e:
+        print(f"  !! Validation error: {e}")
+
     if missing_slugs:
         print("")
         print("  !! WARNING: %d Slug item(s) missing from inventory.xls:" % len(missing_slugs))

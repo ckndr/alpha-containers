@@ -400,6 +400,22 @@ def main():
     print("")
     print("  Updated %d product row(s)" % updated_count)
     print("  Saved:  " + os.path.basename(ac_path))
+
+    # ── Post-write validation ────────────────────────────────────────────
+    print("  Validating writes...")
+    try:
+        wb_check = load_workbook(ac_path, read_only=True, data_only=True)
+        ws_check = wb_check[DASHBOARD_SHEET]
+        dispatch_cells = sum(1 for r in range(DASHBOARD_ROW_MIN, DASHBOARD_ROW_MAX + 1) 
+                            if ws_check.cell(r, DASHBOARD_DISP_COL).value is not None
+                            and isinstance(ws_check.cell(r, DASHBOARD_DISP_COL).value, (int, float)))
+        if dispatch_cells == updated_count:
+            print(f"  ✓ Dashboard col K: {dispatch_cells} dispatch values verified")
+        else:
+            print(f"  !! Dashboard col K: expected {updated_count} values, found {dispatch_cells}")
+        wb_check.close()
+    except Exception as e:
+        print(f"  !! Validation error: {e}")
     print("")
     print("  Press Ctrl+Shift+F9 in Excel to recalculate formulas.")
     print(SEP)

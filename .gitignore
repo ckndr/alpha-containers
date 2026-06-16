@@ -40,3 +40,11 @@ $RECYCLE.BIN/
 # ── One-off debug/AI artifacts ──
 excel_for_ai.json
 mrp_dump.txt
+
+
+# ── Documentation (keep in repo) ──
+# MONTH_CHECKLIST.md and PIPELINE.md are tracked intentionally
+# (they are NOT in the ignore list)
+
+# ── Pre-run backups (local only) ──
+Logs/backup_*
