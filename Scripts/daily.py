@@ -79,6 +79,47 @@ def fail(msg):
         safe_msg = msg.replace('✓', '[OK]').replace('─', '-').replace('⚠', '[WARN]').replace('✗', '[FAIL]')
         print(f"    [FAIL] {safe_msg}")
 
+def timed_input(prompt, timeout=2.0):
+    print(prompt, end='', flush=True)
+    if sys.platform != 'win32':
+        try:
+            import select
+            rlist, _, _ = select.select([sys.stdin], [], [], timeout)
+            if rlist:
+                return sys.stdin.readline().strip()
+            else:
+                print()
+                return None
+        except Exception:
+            return input().strip()
+
+    import msvcrt
+    start_time = time.time()
+    input_str = ""
+    has_started = False
+
+    while True:
+        if not has_started and (time.time() - start_time >= timeout):
+            print()
+            return None
+
+        if msvcrt.kbhit():
+            has_started = True
+            ch = msvcrt.getwch()
+            if ch == '\r' or ch == '\n':
+                print()
+                return input_str.strip()
+            elif ch == '\b':  # Backspace
+                if len(input_str) > 0:
+                    input_str = input_str[:-1]
+                    sys.stdout.write('\b \b')
+                    sys.stdout.flush()
+            elif ord(ch) >= 32:  # Printable
+                input_str += ch
+                sys.stdout.write(ch)
+                sys.stdout.flush()
+        time.sleep(0.05)
+
 def header(step, title):
     print(f"\n  {CYAN}{BOLD}[{step}/{TOTAL_STEPS}]{RESET} {BOLD}{title}{RESET}")
 
@@ -304,7 +345,7 @@ def step_wip(skip=False):
         warn("Skipped (--skip-wip)")
         return True
 
-    msg = input(f"    Paste WIP message (or Enter to skip):\n    {CYAN}>{RESET} ").strip()
+    msg = timed_input(f"    Paste WIP message (2s timeout, or Enter/timeout to skip):\n    {CYAN}>{RESET} ", timeout=2.0)
 
     if not msg:
         warn("No WIP message — skipped")
