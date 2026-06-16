@@ -37,11 +37,68 @@ HTML_PATH  = os.path.join(DIR, 'Tubex.html')
 print(f"Reading:  {os.path.basename(EXCEL_PATH)}")
 print(f"Updating: {os.path.basename(HTML_PATH)}")
 
+def recalculate_formulas_via_com(file_path):
+    import platform
+    if platform.system() != 'Windows':
+        return False
+    try:
+        import win32com.client
+        abs_path = os.path.abspath(file_path)
+        excel = win32com.client.Dispatch("Excel.Application")
+        excel.Visible = False
+        excel.DisplayAlerts = False
+        wb_com = excel.Workbooks.Open(abs_path)
+        wb_com.Save()
+        wb_com.Close(SaveChanges=True)
+        excel.Quit()
+        print(f"  Recalculated formulas in Excel via COM: {os.path.basename(file_path)}")
+        return True
+    except Exception as e:
+        print(f"  Warning: Could not recalculate formulas via Excel COM: {e}")
+        return False
+
+# Evaluate safe math formulas like "=400000-98056"
+def evaluate_math_formula(formula_str):
+    if not formula_str:
+        return 0
+    val_str = str(formula_str).strip()
+    if not val_str.startswith('='):
+        try:
+            return int(float(val_str))
+        except ValueError:
+            return 0
+    expr = val_str[1:].strip()
+    clean_expr = re.sub(r'[^0-9\+\-\*\/\.\(\)\s]', '', expr)
+    if not clean_expr.strip():
+        return 0
+    try:
+        return int(eval(clean_expr, {"__builtins__": None}, {}))
+    except Exception:
+        return 0
+
+wb_form = None # Lazy load only when needed
+
+def get_mrp_formula_value(row, col):
+    global wb_form
+    if wb_form is None:
+        try:
+            wb_form = openpyxl.load_workbook(EXCEL_PATH, data_only=False, read_only=True)
+        except Exception:
+            return None
+    try:
+        ws_mrp_form = wb_form['MRP']
+        return ws_mrp_form.cell(row=row, column=col).value
+    except Exception:
+        return None
+
 # ── LOAD EXCEL ───────────────────────────────────────────────
 try:
     import openpyxl
 except ImportError:
     raise ImportError("openpyxl not installed. Run: pip install openpyxl --break-system-packages")
+
+# Recalculate formulas via COM before reading if possible
+recalculate_formulas_via_com(EXCEL_PATH)
 
 wb     = openpyxl.load_workbook(EXCEL_PATH, data_only=True)
 ws_pl  = wb['Production_Log']
@@ -176,7 +233,13 @@ if 'MRP' in wb.sheetnames:
         ord_val = ws_mrp_temp.cell(row=r_mrp, column=6).value
         if pid_val is not None:
             try:
-                mrp_orders_map[int(pid_val)] = int(ord_val) if ord_val else 0
+                pid_int = int(pid_val)
+                ord_val_int = int(ord_val) if ord_val else 0
+                if ord_val_int == 0:
+                    formula_str = get_mrp_formula_value(r_mrp, 6)
+                    if formula_str:
+                        ord_val_int = evaluate_math_formula(formula_str)
+                mrp_orders_map[pid_int] = ord_val_int
             except (TypeError, ValueError):
                 pass
 
@@ -560,18 +623,31 @@ for r in range(3, 15):
         continue
     
     required = ws_mrp.cell(row=r, column=6).value
+    required_val = float(required) if required and isinstance(required, (int, float)) else 0.0
+    if required_val == 0.0:
+        formula_str = get_mrp_formula_value(r, 6)
+        if formula_str:
+            required_val = float(evaluate_math_formula(formula_str))
+            
     produced = ws_mrp.cell(row=r, column=7).value
+    produced_val = float(produced) if produced and isinstance(produced, (int, float)) else 0.0
+    if produced_val == 0.0:
+        produced_val = float(mtd_by_pid.get(pid, 0))
+        
     remaining = ws_mrp.cell(row=r, column=8).value
-    
+    remaining_val = float(remaining) if remaining and isinstance(remaining, (int, float)) else 0.0
+    if remaining_val == 0.0:
+        remaining_val = max(0.0, required_val - produced_val)
+        
     mrp_orders.append({
         'dia': ws_mrp.cell(row=r, column=1).value,
         'customer': str(ws_mrp.cell(row=r, column=2).value or '').strip(),
         'product': str(ws_mrp.cell(row=r, column=3).value or '').strip(),
         'pid': pid,
         'jobOrder': str(ws_mrp.cell(row=r, column=5).value or '').strip(),
-        'required': float(required) if required and isinstance(required, (int, float)) else 0,
-        'produced': float(produced) if produced and isinstance(produced, (int, float)) else 0,
-        'remaining': float(remaining) if remaining and isinstance(remaining, (int, float)) else 0,
+        'required': required_val,
+        'produced': produced_val,
+        'remaining': remaining_val,
         'remarks': str(ws_mrp.cell(row=r, column=9).value or '').strip(),
     })
 
@@ -799,6 +875,12 @@ if os.path.exists(SW_PATH):
     with open(SW_PATH, 'w', encoding='utf-8') as f:
         f.write(sw)
     print(f"  SW cache version -> {new_cache}")
+
+if wb_form:
+    try:
+        wb_form.close()
+    except Exception:
+        pass
 
 print(f"\n[OK] HTML updated successfully -> {os.path.basename(HTML_PATH)}")
 print(f"  Dashboard orders: {len(tube_orders)} tube + {len(pet_orders)} PET")
