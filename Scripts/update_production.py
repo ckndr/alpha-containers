@@ -937,9 +937,13 @@ def main():
         pl_count = sum(1 for r in range(3, ws_check.max_row + 1) 
                        if ws_check.cell(r, 1).value is not None)
         if pl_count == len(source_rows):
-            print(f"  ✓ Production_Log: {pl_count} rows written (matches source)")
+            msg = f"  ✓ Production_Log: {pl_count} rows written (matches source)"
         else:
-            print(f"  !! Production_Log: expected {len(source_rows)} rows, found {pl_count}")
+            msg = f"  !! Production_Log: expected {len(source_rows)} rows, found {pl_count}"
+        try:
+            print(msg)
+        except UnicodeEncodeError:
+            print(msg.replace('✓', 'OK'))
         
         # Check FG Stock
         if 'FG Stock' in wb_check.sheetnames and fg_rows:
@@ -947,9 +951,13 @@ def main():
             fg_count = sum(1 for r in range(4, ws_fg.max_row + 1) 
                           if ws_fg.cell(r, 1).value is not None)
             if fg_count == len(fg_rows):
-                print(f"  ✓ FG Stock: {fg_count} rows written (matches source)")
+                msg_fg = f"  ✓ FG Stock: {fg_count} rows written (matches source)"
             else:
-                print(f"  !! FG Stock: expected {len(fg_rows)} rows, found {fg_count}")
+                msg_fg = f"  !! FG Stock: expected {len(fg_rows)} rows, found {fg_count}"
+            try:
+                print(msg_fg)
+            except UnicodeEncodeError:
+                print(msg_fg.replace('✓', 'OK'))
         
         wb_check.close()
     except Exception as e:

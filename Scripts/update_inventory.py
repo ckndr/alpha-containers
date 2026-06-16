@@ -238,7 +238,11 @@ def main():
         # Spot-check: count rows with non-None values in col E (Opening)
         inv_count = sum(1 for r in range(2, ws_check.max_row + 1) 
                        if ws_check.cell(r, 5).value is not None)
-        print(f"  ✓ Inventory: {inv_count} rows have Opening values")
+        msg = f"  ✓ Inventory: {inv_count} rows have Opening values"
+        try:
+            print(msg)
+        except UnicodeEncodeError:
+            print(msg.replace('✓', 'OK'))
         wb_check.close()
     except Exception as e:
         print(f"  !! Validation error: {e}")

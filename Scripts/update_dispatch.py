@@ -410,9 +410,13 @@ def main():
                             if ws_check.cell(r, DASHBOARD_DISP_COL).value is not None
                             and isinstance(ws_check.cell(r, DASHBOARD_DISP_COL).value, (int, float)))
         if dispatch_cells == updated_count:
-            print(f"  ✓ Dashboard col K: {dispatch_cells} dispatch values verified")
+            msg = f"  ✓ Dashboard col K: {dispatch_cells} dispatch values verified"
         else:
-            print(f"  !! Dashboard col K: expected {updated_count} values, found {dispatch_cells}")
+            msg = f"  !! Dashboard col K: expected {updated_count} values, found {dispatch_cells}"
+        try:
+            print(msg)
+        except UnicodeEncodeError:
+            print(msg.replace('✓', 'OK'))
         wb_check.close()
     except Exception as e:
         print(f"  !! Validation error: {e}")
