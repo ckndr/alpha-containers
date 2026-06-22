@@ -86,12 +86,56 @@ def parse_inventory_xls(xls_path):
     """
     Parse ERP inventory.xls (Item Wise Consolidated Report).
     Returns ({item_id: {name, opening, inward, out, balance, unit}}, date_range_str).
-    Only rows where col 0 is a valid integer ID are treated as data rows.
+    Only rows where col_id is a valid integer ID are treated as data rows.
     """
     df = pd.read_excel(xls_path, sheet_name=0, engine='xlrd', header=None)
 
     items = {}
     date_range = ""
+
+    # Default column indices (old format)
+    col_id = 0
+    col_name = 2
+    col_opening = 6
+    col_inward = 7
+    col_out = 8
+    col_balance = 9
+    col_unit = 10
+
+    # Detect header row to adjust column indices dynamically
+    for idx, row in df.iterrows():
+        row_vals = [str(val).strip().lower() if pd.notna(val) else "" for val in row]
+        if 'id' in row_vals and ('item name' in row_vals or 'name' in row_vals):
+            try:
+                col_id = row_vals.index('id')
+            except ValueError:
+                pass
+            
+            for term in ['item name', 'name']:
+                if term in row_vals:
+                    col_name = row_vals.index(term)
+                    break
+            for term in ['opening', 'opening qty', 'opening quantity']:
+                if term in row_vals:
+                    col_opening = row_vals.index(term)
+                    break
+            for term in ['in', 'inward', 'received']:
+                if term in row_vals:
+                    col_inward = row_vals.index(term)
+                    break
+            for term in ['out', 'outward', 'issued']:
+                if term in row_vals:
+                    col_out = row_vals.index(term)
+                    break
+            for term in ['balance', 'bal']:
+                if term in row_vals:
+                    col_balance = row_vals.index(term)
+                    break
+            for term in ['unit', 'uom']:
+                if term in row_vals:
+                    col_unit = row_vals.index(term)
+                    break
+            break
 
     for _, row in df.iterrows():
         col0 = row[0]
@@ -103,18 +147,19 @@ def parse_inventory_xls(xls_path):
                 date_range = m.group(1) + " to " + m.group(2)
             continue
 
-        # Data row: col 0 must be a valid integer item ID
+        # Data row: col_id must be a valid integer item ID
         try:
-            item_id = int(float(col0))
+            val_to_check = row[col_id] if col_id < len(row) else None
+            item_id = int(float(val_to_check))
         except (ValueError, TypeError):
             continue
 
-        name    = str(row[2]).strip() if pd.notna(row[2]) else ""
-        opening = float(row[6]) if pd.notna(row[6]) else 0.0
-        inward  = float(row[7]) if pd.notna(row[7]) else 0.0
-        out     = float(row[8]) if pd.notna(row[8]) else 0.0
-        balance = float(row[9]) if pd.notna(row[9]) else 0.0
-        unit    = str(row[10]).strip() if pd.notna(row[10]) else ""
+        name    = str(row[col_name]).strip() if col_name < len(row) and pd.notna(row[col_name]) else ""
+        opening = float(row[col_opening]) if col_opening < len(row) and pd.notna(row[col_opening]) else 0.0
+        inward  = float(row[col_inward]) if col_inward < len(row) and pd.notna(row[col_inward]) else 0.0
+        out     = float(row[col_out]) if col_out < len(row) and pd.notna(row[col_out]) else 0.0
+        balance = float(row[col_balance]) if col_balance < len(row) and pd.notna(row[col_balance]) else 0.0
+        unit    = str(row[col_unit]).strip() if col_unit < len(row) and pd.notna(row[col_unit]) else ""
 
         items[item_id] = {
             'name':    name,
