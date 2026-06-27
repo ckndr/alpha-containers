@@ -20,7 +20,10 @@ __pycache__/
 Logs/*.log
 
 # Local tools/apps that should not upload to GitHub
-Aerosol/
+# Aerosol/ is now a project subfolder and tracked
+!Aerosol/
+!Aerosol/**/*.xlsx
+!Aerosol/**/*.pdf
 *.exe
 
 # ── Windows junk ──

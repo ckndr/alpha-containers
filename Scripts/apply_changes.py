@@ -36,7 +36,7 @@ def copy_style(src_cell, dest_cell):
         dest_cell.number_format = src_cell.number_format
 
 # Load workbook
-wb = openpyxl.load_workbook(r'd:\Alpha\Aerosol_BOM.xlsx')
+wb = openpyxl.load_workbook(r'd:\Alpha\Aerosol\Aerosol BOM.xlsx')
 
 # Sheet: BOM
 ws_bom = wb['BOM']
@@ -80,5 +80,5 @@ ws_calc.cell(row=total_row_idx, column=7, value='=SUM(G4:G13)')
 ws_calc.cell(row=total_row_idx, column=8, value='=SUM(H4:H13)')
 
 # Save the workbook
-wb.save(r'd:\Alpha\Aerosol_BOM.xlsx')
-print("Successfully updated Aerosol_BOM.xlsx!")
+wb.save(r'd:\Alpha\Aerosol\Aerosol BOM.xlsx')
+print("Successfully updated Aerosol BOM.xlsx!")

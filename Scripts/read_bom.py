@@ -4,7 +4,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='repla
 
 import openpyxl
 
-wb = openpyxl.load_workbook(r'd:\Alpha\Aerosol_BOM.xlsx')
+wb = openpyxl.load_workbook(r'd:\Alpha\Aerosol\Aerosol BOM.xlsx')
 print('Sheets:', wb.sheetnames)
 
 for sheet_name in wb.sheetnames:

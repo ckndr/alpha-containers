@@ -1,6 +1,13 @@
-# Tubex
+# Alpha Containers Project
 
-## Excel Workbook Versioning
+This repository contains project files, documentation, and automation tools for two plants:
+
+1. **Tubex Plant** (Production): A fully mature plant operating for 40+ years. Its data processing pipeline, scripts, and logs are located in the root directory.
+2. **Aerosol Plant** (Commissioning): A new plant currently in the commissioning phase. All related BOMs, calculations, and specification sheets are located in the [Aerosol](file:///d:/Alpha/Aerosol) folder.
+
+---
+
+## Tubex - Excel Workbook Versioning
 
 When editing an Excel workbook:
 - Do not overwrite the existing file. Save the edited workbook as a new version instead.

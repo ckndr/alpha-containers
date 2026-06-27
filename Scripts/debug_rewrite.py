@@ -1,6 +1,6 @@
 import openpyxl
 
-wb = openpyxl.load_workbook(r'd:\Alpha\Aerosol_BOM.xlsx')
+wb = openpyxl.load_workbook(r'd:\Alpha\Aerosol\Aerosol BOM.xlsx')
 ws = wb['Req. Calculator']
 
 # Let's inspect Row 11, Row 12, Row 13
@@ -19,4 +19,4 @@ print("After rewriting:")
 for r in [11, 12, 13]:
     print(f"Row {r}: {[cell.value for cell in ws[r]]}")
 
-wb.save(r'd:\Alpha\Aerosol_BOM.xlsx')
+wb.save(r'd:\Alpha\Aerosol\Aerosol BOM.xlsx')

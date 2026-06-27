@@ -1,7 +1,7 @@
 import openpyxl
 from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 
-wb = openpyxl.load_workbook(r'd:\Alpha\Aerosol_BOM.xlsx')
+wb = openpyxl.load_workbook(r'd:\Alpha\Aerosol\Aerosol BOM.xlsx')
 
 def copy_style(src_cell, dest_cell):
     if src_cell.has_style:

@@ -1,6 +1,6 @@
 import openpyxl
 
-wb = openpyxl.load_workbook(r'd:\Alpha\Aerosol_BOM.xlsx')
+wb = openpyxl.load_workbook(r'd:\Alpha\Aerosol\Aerosol BOM.xlsx')
 ws = wb['Req. Calculator']
 
 # Unmerge A11:F11 if it exists in merged_cells
@@ -20,5 +20,5 @@ print("Merging A14:F14...")
 ws.merge_cells('A14:F14')
 
 # Save workbook
-wb.save(r'd:\Alpha\Aerosol_BOM.xlsx')
+wb.save(r'd:\Alpha\Aerosol\Aerosol BOM.xlsx')
 print("Successfully fixed Req. Calculator sheet!")
