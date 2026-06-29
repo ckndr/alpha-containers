@@ -96,6 +96,7 @@ NAME_FIXES = {
     "PET BOTTLE (150ML)TRANSPARENT BODY MIST":                "TRANSPARENT BOTTLE 150ML",          # PID 8001 — ERP appends "Body Mist" suffix
     "PET BOTTLE SMALL (120 ML) YELLOW":                       "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — ERP has space: "120 ML" vs "120ML"
     "PET BOTTLE SMALL (130 ML) (TRANSPARENT) (WITHOUT CAP)":  "PET BOTTLE SMALL (130ML) TRANSPARENT",  # PID 8010 — ERP adds "(WITHOUT CAP)"
+    "PET BOTTLE 130 ML WHITE":                                "PET BOTTLE 130ML WHITE",              # PID 8015 — ERP space: "130 ML" vs "130ML"
 }
 
 

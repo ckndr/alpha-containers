@@ -1,6 +1,18 @@
 """
-Alpha Containers - Production Log Auto-Updater v21
+Alpha Containers - Production Log Auto-Updater v22
 ──────────────────────────────────────────────────
+CHANGE LOG v22 (vs v21):
+  JOF 343 FIX: PET BOTTLE SMALL (130ML) TRANSPARENT (PID 8010) — Mablay Beauty
+    Removed hacky Mabley transparent override (lines 541-547).
+    Fixed Product_Catalog/Dashboard customer: Alpha Labs -> Mablay Beauty.
+    FG_ALIASES: added ("trp bottle","130ml","mabley beauty") AND ("trp bottle","130ml","alpha lab")
+      — Imran uses "Alpha Lab" in FG Stock but "Mabley Beauty" in Production for same product.
+  JOF 344 NEW: PET BOTTLE 130ML WHITE (PID 8015) — Mablay Beauty
+    ALIASES: ("white bottle", "130 ml") -> PID 8015
+    FG_ALIASES: ("white bottle", "130ml", "mabley beauty") -> PID 8015
+    PID_TO_CUSTOMER: 8015 -> Mablay Beauty PVT LTD.
+    New BOM added (PET RESIN A-84 17.1kg + MASTER BATCH WHITE 0.9kg + packaging)
+
 CHANGE LOG v21 (vs v20):
   ALIAS ADD:
     ("trp bottle", "150 ml") -> TRANSPARENT BOTTLE 150ML (PID 8001)
@@ -116,9 +128,9 @@ KEY BUSINESS RULES:
   - Varnish pass rule: "(Varnish)" in product name → PID=None (no PID assigned).
     Varnish passes are tracked by name only. No BOM, no PID, no ERP product.
     Regular print pass → actual ERP PID (e.g. Vince Nurtural → 5814).
-  - PET BOMs are placeholder only (PIDs 8001–8013). No ERP BOMs yet.
+  - PET BOMs are placeholder only (PIDs 8001–8015). No ERP BOMs yet.
   - Alpha Lab = Alpha Containers' Karachi subsidiary. Maps to "Alpha Labs PVT LTD".
-  - Mabley's 130ml bottle is written "150ml" by Imran. Script fixes to PID 8010.
+  - Mabley's 130ml transparent = PID 8010. White 130ml = PID 8015 (JOF 344, Jun-2026).
   - Samsol 43 at 20.5mm = ERP "S-43 DIA 20.5" (PID 5699). Verified Apr-2026.
   - FG Stock: only latest date rows are kept. Older dates discarded every run.
   - 19mm Samsol: PID 6623 = S-43 DIA 19MM (BOM 193); PID 6624 = S-45 DIA 19MM (BOM 192).
@@ -219,6 +231,7 @@ ALIASES = {
     ("samsol black bottle",       "120 ml"): ("BLACK SMALL BOTTLE 120ML",          8011),
     ("yellow bottle",             "120 ml"): ("PET BOTTLE SMALL (120ML) YELLOW",   8005),
     ("trp bottle",                "130 ml"): ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
+    ("white bottle",              "130 ml"): ("PET BOTTLE 130ML WHITE",            8015),
     ("trp bottle",                "150 ml"): ("TRANSPARENT BOTTLE 150ML",          8001),
     ("alpha lab\ttrp bottle",      "150 ml"): ("TRANSPARENT BOTTLE 150ML",          8001),
     ("mabley beauty\tvince nutural", "30"): ("VINCE NURTURAL",                     5814),
@@ -288,6 +301,9 @@ FG_ALIASES = {
     ("yellow bottle",   "200ml", "samsol"):          ("YELLOW LARGE BOTTLE 200ML",          8006),
     ("white bottle",    "200ml", "samsol"):          ("WHITE BOTTLE 200ML",                 8007),
     ("black bottle",    "200ml", "samsol"):          ("BLACK BOTTLE 200ML",                 8008),
+    ("trp bottle",      "130ml", "mabley beauty"):   ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
+    ("trp bottle",      "130ml", "alpha lab"):       ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
+    ("white bottle",    "130ml", "mabley beauty"):   ("PET BOTTLE 130ML WHITE",               8015),
 }
 
 
@@ -368,6 +384,7 @@ PID_TO_CUSTOMER = {
     8011: "Samsol International Private Limited",
     8012: "Samsol International Private Limited",
     8013: "Mablay Beauty PVT LTD.",
+    8015: "Mablay Beauty PVT LTD.",
 }
 
 
@@ -537,14 +554,6 @@ def read_production_source(prod_path):
             pid = None
 
         cust_norm = CUSTOMER_MAP.get(cust_raw.lower().strip(), cust_raw)
-
-        if 'transparent' in name_raw.lower() and cust_raw.lower() == 'mabley beauty':
-            if '150' in dia_raw:
-                pid = 8010
-                catalog_name = 'TRANSPARENT BOTTLE 130ML'
-            elif '300' in dia_raw:
-                pid = 8009
-                catalog_name = 'TRANSPARENT BOTTLE 300ML'
 
         if pid is not None and pid in PID_TO_CUSTOMER:
             cust_norm = PID_TO_CUSTOMER[pid]

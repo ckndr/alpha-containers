@@ -371,7 +371,7 @@ def apply_product_format(ws, r):
 
 # ── CLEAR ALL DATA ROWS ─────────────────────────────────────
 # Clear from row 11 down to the old last used row (generous)
-old_last = max(last_used_row, 70)
+old_last = max(last_used_row, ws.max_row)
 for r in range(11, old_last + 1):
     for c in DATA_COLS:
         ws.cell(r, c).value = None
