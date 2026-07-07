@@ -213,6 +213,7 @@ def step_backup():
 # ═══════════════════════════════════════════════════════════════════════════
 def step_check_erp():
     header(2, "Checking ERP exports...")
+    warnings_list = []
 
     erp_files = {
         'inventory.xls':    'Inventory',
@@ -243,16 +244,18 @@ def step_check_erp():
                 ok(f"{label}: {filename} ({age_h:.1f}h old)")
             else:
                 warn(f"{label}: {filename} is {age_h:.0f}h old — stale?")
+                warnings_list.append(f"{label}: file is stale ({age_h:.0f} hours old)")
                 all_ok = False
         else:
             fail(f"{label}: {filename} NOT FOUND")
+            warnings_list.append(f"{label}: file ({filename}) not found")
             all_ok = False
 
     if not all_ok:
         print(f"\n    {DIM}Copy fresh ERP exports to {ALPHA_DIR}")
         print(f"    as 'filename - copy.xls' — pipeline auto-replaces.{RESET}")
 
-    return all_ok
+    return warnings_list
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -483,20 +486,37 @@ def step_pipeline():
 def step_crosscheck():
     header(6, "Cross-checking with Imran's data...")
 
+    errors = []
     prod_path = os.path.join(ALPHA_DIR, PROD_TARGET_NAME)
     if not os.path.exists(prod_path):
-        warn("Production.xlsx not found — skipping")
-        return True
+        warn("Production.xlsx not found — skipping machine-level and summary checks")
+        errors.append("Production.xlsx not found - skipped cross-checks")
+        return errors
 
     try:
         import pandas as pd
+        from openpyxl import load_workbook
     except ImportError:
-        warn("pandas not installed — skipping")
-        return True
+        warn("pandas or openpyxl not installed — skipping cross-check")
+        errors.append("pandas or openpyxl not installed - skipped cross-checks")
+        return errors
 
+    # --- Part A: Machine-level production totals comparison ---
     try:
-        # Read Imran's raw data
-        df_imran = pd.read_excel(prod_path, sheet_name='Production Day wise')
+        # Detect header row dynamically by scanning the first 10 rows
+        raw = pd.read_excel(prod_path, sheet_name='Production Day wise', header=None, nrows=10)
+        best_row = 0
+        best_score = 0
+        KNOWN_KEYWORDS = {'date', 'machines', 'machine', 'customer', 'product name', 'good production'}
+        for idx, r_vals in raw.iterrows():
+            vals_clean = [str(v).strip().lower() for v in r_vals if str(v).strip() not in ('', 'nan')]
+            score = sum(1 for v in vals_clean if any(k in v for k in KNOWN_KEYWORDS))
+            if score > best_score:
+                best_score = score
+                best_row = idx
+        
+        # Read Imran's raw data using the detected header row
+        df_imran = pd.read_excel(prod_path, sheet_name='Production Day wise', header=best_row)
 
         # Find the good-production and machine columns (flexible matching)
         good_col = None
@@ -519,73 +539,135 @@ def step_crosscheck():
 
         if not good_col or not machine_col:
             warn("Could not identify Machine/Good columns in Imran's file")
-            return True
+            errors.append("Could not identify Machine/Good columns in Production.xlsx")
+        else:
+            df_imran[good_col] = pd.to_numeric(df_imran[good_col], errors='coerce').fillna(0)
+            imran_totals = df_imran.groupby(machine_col)[good_col].sum()
 
-        df_imran[good_col] = pd.to_numeric(df_imran[good_col], errors='coerce').fillna(0)
-        imran_totals = df_imran.groupby(machine_col)[good_col].sum()
-
-        # Read our Production_Log
-        excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex_v*.xlsx")))
-        if not excel_files:
-            warn("No Tubex*.xlsx — skipping")
-            return True
-
-        df_dash = pd.read_excel(excel_files[-1], sheet_name='Production_Log')
-
-        good_col_d = None
-        for col in df_dash.columns:
-            if 'good' in str(col).lower():
-                good_col_d = col
-                break
-        machine_col_d = None
-        for col in df_dash.columns:
-            if 'machine' in str(col).lower():
-                machine_col_d = col
-                break
-
-        if not good_col_d or not machine_col_d:
-            warn("Could not identify columns in Production_Log")
-            return True
-
-        df_dash[good_col_d] = pd.to_numeric(df_dash[good_col_d], errors='coerce').fillna(0)
-        dash_totals = df_dash.groupby(machine_col_d)[good_col_d].sum()
-
-        # Compare machine by machine
-        all_machines = sorted(set(imran_totals.index) | set(dash_totals.index))
-        mismatches = []
-        print()
-        for m in all_machines:
-            iv = int(imran_totals.get(m, 0))
-            dv = int(dash_totals.get(m, 0))
-            if iv == dv:
-                ok(f"{str(m):14s} Imran={iv:>8,}  Dashboard={dv:>8,}")
+            # Read our Production_Log
+            excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex_v*.xlsx")))
+            if not excel_files:
+                warn("No Tubex*.xlsx — skipping machine totals check")
+                errors.append("No Tubex*.xlsx found for machine totals check")
             else:
-                diff = dv - iv
-                fail(f"{str(m):14s} Imran={iv:>8,}  Dashboard={dv:>8,}  ({diff:+,})")
-                mismatches.append(m)
+                df_dash = pd.read_excel(excel_files[-1], sheet_name='Production_Log', header=1)
 
-        it = int(imran_totals.sum())
-        dt = int(dash_totals.sum())
-        try:
-            print(f"    {'─'*52}")
-        except UnicodeEncodeError:
-            print(f"    {'-'*52}")
+                good_col_d = None
+                for col in df_dash.columns:
+                    if 'good' in str(col).lower():
+                        good_col_d = col
+                        break
+                machine_col_d = None
+                for col in df_dash.columns:
+                    if 'machine' in str(col).lower():
+                        machine_col_d = col
+                        break
 
-        if it == dt:
-            ok(f"{'TOTAL':14s} Imran={it:>8,}  Dashboard={dt:>8,}")
-        else:
-            fail(f"{'TOTAL':14s} Imran={it:>8,}  Dashboard={dt:>8,}  ({dt-it:+,})")
+                if not good_col_d or not machine_col_d:
+                    warn("Could not identify columns in Production_Log")
+                    errors.append("Could not identify columns in Production_Log")
+                else:
+                    df_dash[good_col_d] = pd.to_numeric(df_dash[good_col_d], errors='coerce').fillna(0)
+                    dash_totals = df_dash.groupby(machine_col_d)[good_col_d].sum()
 
-        if mismatches:
-            warn(f"Mismatches in: {', '.join(str(m) for m in mismatches)}")
-        else:
-            ok("All machines match!")
+                    # Compare machine by machine
+                    all_machines = sorted(set(imran_totals.index) | set(dash_totals.index))
+                    mismatches = []
+                    print()
+                    for m in all_machines:
+                        iv = int(imran_totals.get(m, 0))
+                        dv = int(dash_totals.get(m, 0))
+                        if iv == dv:
+                            ok(f"{str(m):14s} Imran={iv:>8,}  Dashboard={dv:>8,}")
+                        else:
+                            diff = dv - iv
+                            fail(f"{str(m):14s} Imran={iv:>8,}  Dashboard={dv:>8,}  ({diff:+,})")
+                            mismatches.append(m)
+                            errors.append(f"Machine total mismatch for {m}: Imran={iv:,}, Dashboard={dv:,} (diff={diff:+,})")
 
-        return len(mismatches) == 0
+                    it = int(imran_totals.sum())
+                    dt = int(dash_totals.sum())
+                    try:
+                        print(f"    {'─'*52}")
+                    except UnicodeEncodeError:
+                        print(f"    {'-'*52}")
 
+                    if it == dt:
+                        ok(f"{'TOTAL':14s} Imran={it:>8,}  Dashboard={dt:>8,}")
+                    else:
+                        fail(f"{'TOTAL':14s} Imran={it:>8,}  Dashboard={dt:>8,}  ({dt-it:+,})")
+                        errors.append(f"Grand Total production mismatch: Imran={it:,}, Dashboard={dt:,} (diff={dt-it:+,})")
+
+                    if mismatches:
+                        warn(f"Mismatches in: {', '.join(str(m) for m in mismatches)}")
+                    else:
+                        ok("All machines match!")
     except Exception as e:
-        warn(f"Cross-check error: {e}")
-        return True
+        warn(f"Machine totals cross-check error: {e}")
+        errors.append(f"Machine totals cross-check error: {e}")
+
+    # --- Part B: Summary Sheet comparison ---
+    try:
+        wb_imran = load_workbook(prod_path, data_only=True)
+        summary_sheet_name = None
+        for name in wb_imran.sheetnames:
+            if name.lower().startswith("summary"):
+                summary_sheet_name = name
+                break
+        
+        if not summary_sheet_name:
+            warn("No Summary sheet found in Production.xlsx")
+            errors.append("No Summary sheet found in Production.xlsx")
+        else:
+            ws_sum = wb_imran[summary_sheet_name]
+            excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex_v*.xlsx")))
+            if not excel_files:
+                warn("No Tubex*.xlsx found — skipping summary check")
+            else:
+                wb_dash = load_workbook(excel_files[-1], data_only=True)
+                ws_dash = wb_dash['Tubex_Dashboard']
+                
+                def _to_int(v):
+                    if v is None: return 0
+                    try: return int(float(str(v).replace(',', '').strip()))
+                    except Exception: return 0
+
+                # Define the checks: (Label, Imran Cell, Dash Cell)
+                checks = [
+                    ("Printing Production (Today)", "B14", "B6"),
+                    ("Printing Production (MTD)",   "B15", "D6"),
+                    ("PET Production (Today)",      "B3",  "B8"),
+                    ("PET Production (MTD)",        "B4",  "D8"),
+                    ("Tube Dispatch (MTD)",         "B22", "J6"),
+                    ("PET Dispatch (MTD)",          "B11", "J8"),
+                ]
+
+                print(f"\n    {DIM}── Summary Sheet ({summary_sheet_name}) vs Dashboard ──{RESET}")
+                summary_mismatches = 0
+                for label, imran_cell, dash_cell in checks:
+                    imran_val = _to_int(ws_sum[imran_cell].value)
+                    dash_val = _to_int(ws_dash[dash_cell].value)
+                    
+                    if imran_val == dash_val:
+                        ok(f"{label:28s} Imran ({imran_cell})={imran_val:>8,}  Dashboard ({dash_cell})={dash_val:>8,}")
+                    else:
+                        diff = dash_val - imran_val
+                        fail(f"{label:28s} Imran ({imran_cell})={imran_val:>8,}  Dashboard ({dash_cell})={dash_val:>8,}  ({diff:+,})")
+                        errors.append(f"Summary mismatch - {label}: Imran={imran_val:,}, Dashboard={dash_val:,} (diff={diff:+,})")
+                        summary_mismatches += 1
+                
+                if summary_mismatches == 0:
+                    ok("All Summary sheet KPIs match Dashboard!")
+                else:
+                    warn(f"{summary_mismatches} Summary sheet KPI mismatch(es) found!")
+                
+                wb_dash.close()
+        wb_imran.close()
+    except Exception as e:
+        warn(f"Summary sheet cross-check error: {e}")
+        errors.append(f"Summary sheet cross-check error: {e}")
+
+    return errors
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -717,6 +799,75 @@ def step_git_push(skip=False):
             print(f"    {DIM}{stderr}{RESET}")
 
 
+def read_mismatches_log(log_path):
+    import json
+    import re
+    from datetime import datetime
+    
+    inventory_warnings = []
+    mapping_warnings = []
+    
+    state_file = os.path.join(LOGS_DIR, "previous_missing_items.json")
+    state_data = {}
+    if os.path.exists(state_file):
+        try:
+            with open(state_file, 'r', encoding='utf-8') as f:
+                state_data = json.load(f)
+        except Exception:
+            pass
+
+    today_str = datetime.now().strftime('%Y-%m-%d')
+    last_run_date = state_data.get("last_run_date", "")
+    
+    if last_run_date != today_str:
+        prev_missing = set(state_data.get("missing_today", []))
+        state_data["missing_yesterday"] = list(prev_missing)
+        state_data["last_run_date"] = today_str
+    else:
+        prev_missing = set(state_data.get("missing_yesterday", []))
+
+    current_missing = set()
+
+    if os.path.exists(log_path):
+        with open(log_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                l = line.strip()
+                if not l or l.startswith('---') or l.startswith('==='):
+                    continue
+                if 'missing from inventory.xls' in l:
+                    clean = l.replace('WARNING:', '').strip()
+                    lower_clean = clean.lower()
+                    
+                    # 1. Ignore INKs completely in daily summary
+                    if re.search(r'\binks?\b', lower_clean):
+                        continue
+                        
+                    # Extract ID
+                    m = re.search(r'Item ID\s+(\d+)', clean)
+                    item_id = m.group(1) if m else None
+                    if item_id:
+                        current_missing.add(item_id)
+                        
+                    # 2. Hide if already missing yesterday, except exceptions
+                    is_exception = re.search(r'\b(pet resin|master batch|slugs?)\b', lower_clean)
+                    if item_id and item_id in prev_missing and not is_exception:
+                        continue
+                        
+                    inventory_warnings.append(clean)
+                else:
+                    mapping_warnings.append(l)
+
+    state_data["missing_today"] = list(current_missing)
+
+    try:
+        with open(state_file, 'w', encoding='utf-8') as f:
+            json.dump(state_data, f)
+    except Exception:
+        pass
+
+    return inventory_warnings, mapping_warnings
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # MAIN
 # ═══════════════════════════════════════════════════════════════════════════
@@ -731,15 +882,30 @@ def main():
     log_path = setup_logging()
 
     start = time.time()
+    
+    all_errors = []
 
     step_backup()              # 1. Backup Excel
-    step_check_erp()           # 2. Check ERP exports
+    
+    erp_warnings = step_check_erp()  # 2. Check ERP exports
+    all_errors.extend(erp_warnings)
+    
     step_find_production(      # 3. Find Production file
         skip=skip_prod)
     step_wip(skip=skip_wip)    # 4. WIP update
+    
     success = step_pipeline()  # 5. Run all 5 scripts
+    if not success:
+        all_errors.append("Pipeline execution had failures (one or more scripts failed)")
+
+    # Read mismatches.log (populated during step 5)
+    mismatch_log = os.path.join(LOGS_DIR, "mismatches.log")
+    inv_warns, map_warns = read_mismatches_log(mismatch_log)
+
+    crosscheck_errors = []
     if success:
-        step_crosscheck()      # 6. Cross-check
+        crosscheck_errors = step_crosscheck()  # 6. Cross-check
+        
     step_screenshot()          # 7. Screenshot
     step_onedrive_backup()     # 8. OneDrive backup
     step_git_push(             # 9. Git push
@@ -747,13 +913,63 @@ def main():
 
     elapsed = time.time() - start
 
+    # ── Unified Error Summary ──
+    has_issues = bool(all_errors or inv_warns or map_warns or crosscheck_errors)
+    error_summary_path = os.path.join(LOGS_DIR, "error_summary.txt")
+    
+    with open(error_summary_path, 'w', encoding='utf-8') as f_sum:
+        def print_both(msg=""):
+            print(msg)
+            # Remove ANSI colors from file output
+            clean_msg = msg
+            for color in [GREEN, YELLOW, RED, CYAN, BOLD, DIM, RESET]:
+                clean_msg = clean_msg.replace(color, "")
+            f_sum.write(clean_msg + "\n")
+
+        if has_issues:
+            print_both()
+            print_both(f"  {RED}{BOLD}╔══════════════════════════════════════════════════════════╗{RESET}")
+            print_both(f"  {RED}{BOLD}║  ⚠ DAILY WORKFLOW ERROR SUMMARY                          ║{RESET}")
+            print_both(f"  {RED}{BOLD}╚══════════════════════════════════════════════════════════╝{RESET}")
+            print_both()
+            
+            if all_errors:
+                print_both(f"  {YELLOW}{BOLD}[SYSTEM / FILE CHECK ISSUES]{RESET}")
+                for err in all_errors:
+                    print_both(f"    • {err}")
+                print_both()
+                
+            if inv_warns:
+                print_both(f"  {RED}{BOLD}[INVENTORY: ITEMS MISSING FROM ERP]{RESET}")
+                print_both(f"  {DIM}  (These rows are highlighted in RED in Excel and zeroed out){RESET}")
+                for err in inv_warns:
+                    print_both(f"    • {err}")
+                print_both()
+                
+            if crosscheck_errors:
+                print_both(f"  {RED}{BOLD}[CROSS-CHECK MISMATCHES]{RESET}")
+                for err in crosscheck_errors:
+                    print_both(f"    • {err}")
+                print_both()
+                
+            if map_warns:
+                print_both(f"  {YELLOW}{BOLD}[MAPPING MISMATCHES]{RESET}")
+                print_both(f"  {DIM}  (Unmapped products found during production/dispatch/FG processing){RESET}")
+                for err in map_warns:
+                    print_both(f"    • {err}")
+                print_both()
+        else:
+            print_both()
+            print_both(f"  {GREEN}{BOLD}✓ ALL CHECKS PASSED: No errors, missing items, or mismatches detected!{RESET}")
+
     # ── Final Summary ──
     print(f"\n  {'='*52}")
-    if success:
+    if not has_issues:
         print(f"  {GREEN}{BOLD}  ALL DONE{RESET} in {elapsed:.0f} seconds")
     else:
-        print(f"  {YELLOW}{BOLD}  COMPLETED WITH ISSUES{RESET} — scroll up for details")
+        print(f"  {YELLOW}{BOLD}  COMPLETED WITH ISSUES{RESET} — see summary above")
     print(f"  {DIM}  Log: {os.path.basename(log_path)}{RESET}")
+    print(f"  {DIM}  Error Summary: {os.path.basename(error_summary_path)}{RESET}")
     print(f"  {'='*52}\n")
 
     input("  Press Enter to close...")

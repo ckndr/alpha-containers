@@ -50,6 +50,7 @@ warnings.filterwarnings("ignore", message=".*Data Validation.*")
 warnings.filterwarnings("ignore", message=".*extension.*")
 import pandas as pd
 from openpyxl import load_workbook
+from openpyxl.styles import Font
 from alpha_checks import check_freshness, check_not_locked, log_mismatches, replace_copy_export
 
 # Scripts live in Tubex/Scripts/
@@ -225,6 +226,19 @@ def update_excel(excel_path, xls_items, date_range):
             ws.cell(row=row, column=6).value = new[1]
             ws.cell(row=row, column=7).value = new[2]
 
+            # Present in ERP - restore standard font color if it was red
+            for col in range(1, 11):
+                cell = ws.cell(row=row, column=col)
+                curr_font = cell.font
+                if curr_font and curr_font.color and hasattr(curr_font.color, 'rgb') and curr_font.color.rgb in ('FFFF0000', 'FF0000'):
+                    cell.font = Font(
+                        name=curr_font.name,
+                        size=curr_font.size,
+                        bold=curr_font.bold,
+                        italic=curr_font.italic,
+                        color="FF1A1A2E"
+                    )
+
             if any(_n(old[i]) != new[i] for i in range(3)):
                 updated.append((
                     item_id, data['name'],
@@ -235,15 +249,41 @@ def update_excel(excel_path, xls_items, date_range):
         else:
             not_in_excel.append((item_id, data['name'], data['balance'], data['unit']))
 
-    # Find missing slug items (present in Inventory sheet but missing from new inventory.xls)
+    # Find missing items (present in Inventory sheet but missing from new inventory.xls)
+    missing_items = []
     missing_slugs = []
-    for slug_id, slug_name in sorted(slug_items.items()):
-        if slug_id not in xls_items:
-            missing_slugs.append((slug_id, slug_name))
+    for item_id, row in sorted(excel_ids.items()):
+        if item_id not in xls_items:
+            name_val = ws.cell(row=row, column=3).value
+            cat_val = ws.cell(row=row, column=2).value
+            missing_items.append((item_id, str(name_val or '').strip(), str(cat_val or '').strip()))
+            
+            if str(cat_val or '').strip().lower() == 'slug':
+                missing_slugs.append((item_id, str(name_val or '').strip()))
+
+            # Zero out values to prevent phantom stock
+            ws.cell(row=row, column=5).value = 0.0
+            ws.cell(row=row, column=6).value = 0.0
+            ws.cell(row=row, column=7).value = 0.0
+
+            # Apply red font to columns 1 to 10
+            for col in range(1, 11):
+                cell = ws.cell(row=row, column=col)
+                curr_font = cell.font
+                if curr_font:
+                    cell.font = Font(
+                        name=curr_font.name,
+                        size=curr_font.size,
+                        bold=curr_font.bold,
+                        italic=curr_font.italic,
+                        color="FF0000"
+                    )
+                else:
+                    cell.font = Font(name="Segoe UI", size=9, color="FF0000")
 
     # Overwrite same file
     wb.save(excel_path)
-    return updated, not_in_excel, missing_slugs
+    return updated, not_in_excel, missing_slugs, missing_items
 
 
 def main():
@@ -271,7 +311,7 @@ def main():
 
     print("")
     print("[3/3] Updating Excel...")
-    updated, not_in_excel, missing_slugs = update_excel(excel_path, xls_items, date_range)
+    updated, not_in_excel, missing_slugs, missing_items = update_excel(excel_path, xls_items, date_range)
     print("  Saved: " + os.path.basename(excel_path))
 
     # ── Post-write validation ────────────────────────────────────────────
@@ -292,17 +332,17 @@ def main():
     except Exception as e:
         print(f"  !! Validation error: {e}")
 
-    if missing_slugs:
+    if missing_items:
         print("")
-        print("  !! WARNING: %d Slug item(s) missing from inventory.xls:" % len(missing_slugs))
-        for slug_id, slug_name in missing_slugs:
-            print("     - ID %5d: %s" % (slug_id, slug_name))
+        print("  !! WARNING: %d item(s) missing from inventory.xls (ZEROED OUT and highlighted RED):" % len(missing_items))
+        for item_id, name, cat in sorted(missing_items, key=lambda x: x[0]):
+            print("     - ID %5d [%s]: %s" % (item_id, cat, name))
         print("  !! Please take a look.")
 
         # Log to mismatches.log so that Run_All_Updates.bat prints it at the end
         mismatch_entries = []
-        for slug_id, slug_name in missing_slugs:
-            mismatch_entries.append((f"WARNING: Slug item ID {slug_id} ({slug_name}) is missing from inventory.xls",))
+        for item_id, name, cat in sorted(missing_items, key=lambda x: x[0]):
+            mismatch_entries.append((f"WARNING: Item ID {item_id} ({name}) [{cat}] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED",))
         log_mismatches("inventory", mismatch_entries)
 
     print("")
