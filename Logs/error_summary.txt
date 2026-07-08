@@ -3,13 +3,19 @@
   ║  ⚠ DAILY WORKFLOW ERROR SUMMARY                          ║
   ╚══════════════════════════════════════════════════════════╝
 
-  [SYSTEM / FILE CHECK ISSUES]
-    • Inventory: file is stale (74 hours old)
-    • Dispatch (Tube): file is stale (73 hours old)
-    • Dispatch (PET): file is stale (73 hours old)
-
   [INVENTORY: ITEMS MISSING FROM ERP]
     (These rows are highlighted in RED in Excel and zeroed out)
     • Item ID 4070 (MASTER BATCH ONCOLOR YELLOW NE12340208-ZN) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
     • Item ID 5816 (MASTER BATCH WHITE PRC-MC ET02340000) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+
+  [CROSS-CHECK MISMATCHES]
+    • Summary mismatch - Printing Production (Today): Imran=22,134, Dashboard=21,724 (diff=-410)
+    • Summary mismatch - Printing Production (MTD): Imran=83,482, Dashboard=61,348 (diff=-22,134)
+    • Summary mismatch - PET Production (MTD): Imran=5,400, Dashboard=0 (diff=-5,400)
+
+  [MAPPING MISMATCHES]
+    (Unmapped products found during production/dispatch/FG processing)
+    • Hello Hair | 25 | Samsol International Private Limited
+    • Trp Bottle | 200 ml | Samsol International Private Limited
+    • Trp Bottle | 200ml | Samsol
 

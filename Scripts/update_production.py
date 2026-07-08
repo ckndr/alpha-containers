@@ -233,6 +233,7 @@ ALIASES = {
     ("trp bottle",                "130 ml"): ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
     ("white bottle",              "130 ml"): ("PET BOTTLE 130ML WHITE",            8015),
     ("trp bottle",                "150 ml"): ("TRANSPARENT BOTTLE 150ML",          8001),
+    ("trp bottle",                "200 ml"): ("BT-200ML MUSTARD OIL (TRANSPARENT)", 8014),
     ("alpha lab\ttrp bottle",      "150 ml"): ("TRANSPARENT BOTTLE 150ML",          8001),
     ("mabley beauty\tvince nutural", "30"): ("VINCE NURTURAL",                     5814),
 }
@@ -301,6 +302,7 @@ FG_ALIASES = {
     ("yellow bottle",   "200ml", "samsol"):          ("YELLOW LARGE BOTTLE 200ML",          8006),
     ("white bottle",    "200ml", "samsol"):          ("WHITE BOTTLE 200ML",                 8007),
     ("black bottle",    "200ml", "samsol"):          ("BLACK BOTTLE 200ML",                 8008),
+    ("trp bottle",      "200ml", "samsol"):          ("BT-200ML MUSTARD OIL (TRANSPARENT)", 8014),
     ("trp bottle",      "130ml", "mabley beauty"):   ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
     ("trp bottle",      "130ml", "alpha lab"):       ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
     ("white bottle",    "130ml", "mabley beauty"):   ("PET BOTTLE 130ML WHITE",               8015),
@@ -344,6 +346,7 @@ PID_TO_CUSTOMER = {
     6561: "Brookes Pharma Private Limited",
     3447: "Samsol International Private Limited",
     5699: "Samsol International Private Limited",
+    8014: "Samsol International Private Limited",
     5782: "Mega Grey",
     6020: "Adore",
     6021: "Adore",
