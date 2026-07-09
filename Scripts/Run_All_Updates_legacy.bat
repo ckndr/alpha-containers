@@ -49,7 +49,7 @@ set FAIL_LIST=
 echo [Backup] Saving pre-run snapshot of Excel...
 if not exist "..\Logs" mkdir "..\Logs"
 for /f "tokens=1-3 delims=/ " %%a in ("%date%") do set "BKDATE=%%c%%a%%b"
-for %%f in ("..\Tubex_v*.xlsx") do (
+for %%f in ("..\Tubex*.xlsx") do (
     copy /y "%%f" "..\Logs\backup_!BKDATE!_%%~nxf" >nul 2>&1
     echo   Backed up: %%~nxf  -^>  Logs\backup_!BKDATE!_%%~nxf
 )

@@ -1,6 +1,6 @@
 import pandas as pd
 
-file_path = r'd:\Alpha\Tubex_v10_30.xlsx'
+file_path = r'd:\Alpha\Tubex_July26.xlsx'
 df_inv = pd.read_excel(file_path, sheet_name='Inventory', header=None)
 
 inv_map = {}

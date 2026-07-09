@@ -9,12 +9,12 @@
     • Item ID 5816 (MASTER BATCH WHITE PRC-MC ET02340000) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
 
   [CROSS-CHECK MISMATCHES]
-    • Summary mismatch - Printing Production (MTD): Imran=83,482, Dashboard=61,348 (diff=-22,134)
+    • Summary mismatch - Printing Production (MTD): Imran=107,520, Dashboard=85,386 (diff=-22,134)
     • Summary mismatch - Tube Dispatch (MTD): Imran=122,192, Dashboard=108,416 (diff=-13,776)
-    • Summary mismatch - PET Dispatch (MTD): Imran=31,820, Dashboard=26,220 (diff=-5,600)
+    • Summary mismatch - PET Dispatch (MTD): Imran=36,500, Dashboard=26,220 (diff=-10,280)
 
   [MAPPING MISMATCHES]
     (Unmapped products found during production/dispatch/FG processing)
     • Hello Hair | 25 | Golden Pearl Cosmetics (PVT) LTD
-    • PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT | PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT | 5400.0
+    • PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT | PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT | 10080.0
 

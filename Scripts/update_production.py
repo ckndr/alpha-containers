@@ -549,6 +549,10 @@ def read_production_source(prod_path):
         dia_raw  = str(get_val(r, col_map, 'Dia(mm)/Volume', '')).strip()
         cust_raw = str(get_val(r, col_map, 'Customer', '')).strip()
 
+        # Fix: Imran entered Golden Pearl hello hair as 25 instead of 30
+        if name_raw.lower().strip() == "hello hair" and dia_raw == "25":
+            dia_raw = "30"
+
         catalog_name, pid = ALIASES.get((name_raw.lower().strip(), dia_raw), (None, None))
         if catalog_name is None:
             catalog_name, pid = ALIASES.get((name_raw.lower().rstrip(), dia_raw), (None, None))
@@ -747,6 +751,10 @@ def read_fg_stock(prod_path):
         prod_key    = raw_product.lower().strip()
         cust_key    = raw_customer.lower().strip()
         dia_norm    = _norm_dia(raw_dia)
+
+        # Fix: Imran entered Golden Pearl hello hair as 25 instead of 30
+        if prod_key == "hello hair" and dia_norm == "25":
+            dia_norm = "30"
 
         result = FG_ALIASES.get((prod_key, dia_norm, cust_key))
 

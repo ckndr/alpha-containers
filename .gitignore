@@ -4,7 +4,7 @@
 *.xlsm
 
 # Keep the main versioned Tubex workbook synced for home/office work.
-!Tubex_v*.xlsx
+!Tubex*.xlsx
 
 # ── ERP exports & data files ──
 *.pdf

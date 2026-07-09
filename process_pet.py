@@ -2,7 +2,7 @@ import pandas as pd
 import openpyxl
 import re
 
-excel_path = r"D:\Alpha\Tubex_v10_30.xlsx"
+excel_path = r"D:\Alpha\Tubex_July26.xlsx"
 output_path = r"D:\Alpha\PET_SKUs.xlsx"
 
 erp_products = [
@@ -77,7 +77,7 @@ for prod in erp_products:
 
 if new_pids_added > 0:
     wb.save(excel_path)
-    print(f"Added {new_pids_added} new PET products to Tubex_v10_30.xlsx")
+    print(f"Added {new_pids_added} new PET products to Tubex_July26.xlsx")
 else:
     print("All ERP products are already present.")
 

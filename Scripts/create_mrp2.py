@@ -3,7 +3,7 @@ from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
 import pandas as pd
 
-file_path = r'd:\Alpha\Tubex_v10_30.xlsx'
+file_path = r'd:\Alpha\Tubex_July26.xlsx'
 
 # FIRST: Read inventory data BEFORE openpyxl load (to get cached formula values)
 # We need to read from the Opening/Received/Issued columns directly since cached values are gone

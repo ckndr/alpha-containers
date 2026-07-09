@@ -1,7 +1,7 @@
 import openpyxl
 import pandas as pd
 
-file_path = r'd:\Alpha\Tubex_v10_30.xlsx'
+file_path = r'd:\Alpha\Tubex_July26.xlsx'
 
 # 1. Read MRP 2 sheet raw
 wb = openpyxl.load_workbook(file_path, data_only=True)

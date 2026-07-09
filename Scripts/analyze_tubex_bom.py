@@ -1,7 +1,7 @@
 import pandas as pd
 import sys
 
-file_path = r'd:\Alpha\Tubex_v10_30.xlsx'
+file_path = r'd:\Alpha\Tubex_July26.xlsx'
 df_bom = pd.read_excel(file_path, sheet_name='BOM', skiprows=1)
 
 products = ['S-45', 'S 43 25MM', 'VINCE NURTURAL', 'HELLO HAIR COLOR']

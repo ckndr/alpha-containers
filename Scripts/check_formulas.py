@@ -1,6 +1,6 @@
 import openpyxl
 
-file_path = r'd:\Alpha\Tubex_v10_30.xlsx'
+file_path = r'd:\Alpha\Tubex_July26.xlsx'
 wb = openpyxl.load_workbook(file_path)  # Without data_only to see formulas
 ws = wb['Inventory']
 

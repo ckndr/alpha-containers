@@ -1,6 +1,6 @@
 import pandas as pd
 
-file_path = r'd:\Alpha\Tubex_v10_30.xlsx'
+file_path = r'd:\Alpha\Tubex_July26.xlsx'
 df_catalog = pd.read_excel(file_path, sheet_name='Product_Catalog', skiprows=1)
 df_mrp = pd.read_excel(file_path, sheet_name='MRP', skiprows=1)
 

@@ -1,6 +1,6 @@
 import pandas as pd
 
-file_path = r'd:\Alpha\Tubex_v10_30.xlsx'
+file_path = r'd:\Alpha\Tubex_July26.xlsx'
 df_mrp = pd.read_excel(file_path, sheet_name='MRP', skiprows=1) # First row is likely a title
 print("MRP Columns:", df_mrp.columns.tolist())
 print(df_mrp.head(10).to_string())

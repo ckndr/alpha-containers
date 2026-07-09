@@ -1,6 +1,6 @@
 import openpyxl
 
-wb = openpyxl.load_workbook('Tubex_v10_30.xlsx', data_only=False)
+wb = openpyxl.load_workbook('Tubex_July26.xlsx', data_only=False)
 mrp = wb['MRP']
 
 start_row = 14
@@ -33,5 +33,5 @@ for r in range(start_row, end_row + 1):
     # J
     mrp.cell(r, 10).value = f'=IF(B{r}<>"CAP","",SUMPRODUCT((ISNUMBER(SEARCH("Cap Not Available",\'FG Stock\'!$H$4:$H$100)))*(\'FG Stock\'!$I$4:$I$100=A{r})*\'FG Stock\'!$F$4:$F$100))'
 
-wb.save('Tubex_v10_30.xlsx')
+wb.save('Tubex_July26.xlsx')
 print('Formulas fixed for rows 14 to 95')

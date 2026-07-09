@@ -188,10 +188,10 @@ def step_backup():
     os.makedirs(LOGS_DIR, exist_ok=True)
 
     date_str = datetime.now().strftime('%Y%m%d')
-    excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex_v*.xlsx")))
+    excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
 
     if not excel_files:
-        warn("No Tubex_v*.xlsx found — nothing to back up")
+        warn("No Tubex*.xlsx found — nothing to back up")
         return
 
     for src in excel_files:
@@ -408,7 +408,7 @@ def step_pipeline():
     header(5, "Running update pipeline...")
 
     # Check Excel not open
-    excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex_v*.xlsx")))
+    excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
     if excel_files:
         try:
             with open(excel_files[-1], 'r+b'):
@@ -545,7 +545,7 @@ def step_crosscheck():
             imran_totals = df_imran.groupby(machine_col)[good_col].sum()
 
             # Read our Production_Log
-            excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex_v*.xlsx")))
+            excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
             if not excel_files:
                 warn("No Tubex*.xlsx — skipping machine totals check")
                 errors.append("No Tubex*.xlsx found for machine totals check")
@@ -620,7 +620,7 @@ def step_crosscheck():
             errors.append("No Summary sheet found in Production.xlsx")
         else:
             ws_sum = wb_imran[summary_sheet_name]
-            excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex_v*.xlsx")))
+            excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
             if not excel_files:
                 warn("No Tubex*.xlsx found — skipping summary check")
             else:

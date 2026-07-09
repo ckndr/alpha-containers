@@ -1,6 +1,6 @@
 import pandas as pd
 
-file_path = r'd:\Alpha\Tubex_v10_30.xlsx'
+file_path = r'd:\Alpha\Tubex_July26.xlsx'
 df_bom = pd.read_excel(file_path, sheet_name='BOM', skiprows=1)
 
 print("\nBOM for S 43 25MM:")

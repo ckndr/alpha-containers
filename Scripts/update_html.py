@@ -27,10 +27,10 @@ from datetime import datetime, date
 # Scripts live in Tubex/Scripts/ — Excel and HTML are one level up
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-excel_pattern = os.path.join(DIR, 'Tubex_v*.xlsx')
+excel_pattern = os.path.join(DIR, 'Tubex*.xlsx')
 excel_files   = sorted(glob.glob(excel_pattern))
 if not excel_files:
-    raise FileNotFoundError(f"No Tubex_v*.xlsx found in {DIR}")
+    raise FileNotFoundError(f"No Tubex*.xlsx found in {DIR}")
 EXCEL_PATH = excel_files[-1]
 HTML_PATH  = os.path.join(DIR, 'Tubex.html')
 

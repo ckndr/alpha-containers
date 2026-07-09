@@ -1,6 +1,6 @@
 import openpyxl
 
-wb = openpyxl.load_workbook('Tubex_v10_30.xlsx')
+wb = openpyxl.load_workbook('Tubex_July26.xlsx')
 sheet = wb['MRP']
 
 def get_formula(row_idx):
@@ -22,5 +22,5 @@ for row_idx in range(12, sheet.max_row + 1):
         cell.value = get_formula(row_idx)
         count += 1
         
-wb.save('Tubex_v10_30.xlsx')
+wb.save('Tubex_July26.xlsx')
 print(f"Formulas updated successfully for {count} rows.")
