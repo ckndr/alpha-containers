@@ -226,16 +226,18 @@ def step_check_erp():
         target = os.path.join(ALPHA_DIR, filename)
 
         # Check for "- copy" variant first (Sikander's ERP download workflow)
+        import re
         stem, ext = os.path.splitext(filename)
-        copy_name = f"{stem} - copy{ext}"
+        pattern = re.compile(rf"^{re.escape(stem)} - copy(?: \(\d+\))?{re.escape(ext)}$", re.IGNORECASE)
         copy_matches = [
             os.path.join(ALPHA_DIR, f) for f in os.listdir(ALPHA_DIR)
-            if f.lower() == copy_name.lower()
+            if pattern.match(f)
         ]
 
         if copy_matches:
-            age_min = (time.time() - os.path.getmtime(copy_matches[0])) / 60
-            ok(f"{label}: fresh copy found ({int(age_min)} min ago)")
+            latest_copy = max(copy_matches, key=os.path.getmtime)
+            age_min = (time.time() - os.path.getmtime(latest_copy)) / 60
+            ok(f"{label}: fresh copy found ({os.path.basename(latest_copy)}, {int(age_min)} min ago)")
             continue
 
         if os.path.exists(target):

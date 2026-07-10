@@ -141,26 +141,55 @@ def log_mismatches(source_name, unmapped_items, folder=None):
 
 def replace_copy_export(folder, target_name):
     """
-    Look for a '- copy' variant of target_name in folder.
-    If found, replace the target with the copy (fresh ERP export).
+    Look for a '- copy' or '- copy (N)' variant of target_name in folder.
+    If found, replace the target with the latest copy (fresh ERP export)
+    and delete all other copies.
     Returns True if replacement happened, False otherwise.
     """
+    import re
     target_path = os.path.join(folder, target_name)
     stem, ext = os.path.splitext(target_name)
-    copy_name = (stem + " - copy" + ext).lower()
+    
+    # Matches target_name - copy, target_name - copy (2), etc. case-insensitively
+    pattern = re.compile(rf"^{re.escape(stem)} - copy(?: \(\d+\))?{re.escape(ext)}$", re.IGNORECASE)
+    
     matches = [
         os.path.join(folder, name)
         for name in os.listdir(folder)
-        if name.lower() == copy_name
+        if pattern.match(name)
     ]
 
     if not matches:
         return False
 
-    copy_path = max(matches, key=os.path.getmtime)
-    os.replace(copy_path, target_path)
-    print("  Fresh export found: %s -> %s" % (
-        os.path.basename(copy_path),
-        os.path.basename(target_path),
-    ))
+    # Find the most recently modified copy file
+    latest_copy_path = max(matches, key=os.path.getmtime)
+    
+    # Overwrite the target file with the latest copy
+    try:
+        os.replace(latest_copy_path, target_path)
+        print("  Fresh export found: %s -> %s" % (
+            os.path.basename(latest_copy_path),
+            os.path.basename(target_path),
+        ))
+    except Exception as e:
+        print("  Error: Could not replace %s with latest copy %s: %s" % (
+            os.path.basename(target_path),
+            os.path.basename(latest_copy_path),
+            e
+        ))
+        return False
+
+    # Remove all other copies to keep the folder clean
+    for match_path in matches:
+        if match_path != latest_copy_path:
+            try:
+                os.remove(match_path)
+                print("  Removed older copy file: %s" % os.path.basename(match_path))
+            except Exception as e:
+                print("  Warning: could not remove older copy file %s: %s" % (
+                    os.path.basename(match_path),
+                    e
+                ))
+                
     return True

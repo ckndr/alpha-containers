@@ -3,16 +3,16 @@
   ║  ⚠ DAILY WORKFLOW ERROR SUMMARY                          ║
   ╚══════════════════════════════════════════════════════════╝
 
-  [SYSTEM / FILE CHECK ISSUES]
-    • Pipeline execution had failures (one or more scripts failed)
-
   [INVENTORY: ITEMS MISSING FROM ERP]
     (These rows are highlighted in RED in Excel and zeroed out)
     • Item ID 4070 (MASTER BATCH ONCOLOR YELLOW NE12340208-ZN) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
     • Item ID 5816 (MASTER BATCH WHITE PRC-MC ET02340000) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
 
+  [CROSS-CHECK MISMATCHES]
+    • Summary mismatch - Tube Dispatch (MTD): Imran=122,192, Dashboard=108,416 (diff=-13,776)
+    • Summary mismatch - PET Dispatch (MTD): Imran=36,500, Dashboard=26,220 (diff=-10,280)
+
   [MAPPING MISMATCHES]
     (Unmapped products found during production/dispatch/FG processing)
-    • Hello Hair | 25 | Golden Pearl Cosmetics (PVT) LTD
     • PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT | PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT | 10080.0
 
