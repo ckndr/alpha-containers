@@ -9,10 +9,19 @@
     • Item ID 5816 (MASTER BATCH WHITE PRC-MC ET02340000) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
 
   [CROSS-CHECK MISMATCHES]
-    • Summary mismatch - Tube Dispatch (MTD): Imran=122,192, Dashboard=108,416 (diff=-13,776)
-    • Summary mismatch - PET Dispatch (MTD): Imran=36,500, Dashboard=26,220 (diff=-10,280)
+    • Summary mismatch - Printing Production (Today): Imran=25,872, Dashboard=22,134 (diff=-3,738)
+    • Summary mismatch - Printing Production (MTD): Imran=595,728, Dashboard=3,220,415 (diff=+2,624,687)
+    • Summary mismatch - PET Production (Today): Imran=0, Dashboard=1,610 (diff=+1,610)
+    • Summary mismatch - PET Production (MTD): Imran=89,315, Dashboard=686,455 (diff=+597,140)
+    • Summary mismatch - Tube Dispatch (MTD): Imran=797,789, Dashboard=108,416 (diff=-689,373)
+    • Summary mismatch - PET Dispatch (MTD): Imran=28,320, Dashboard=26,220 (diff=-2,100)
 
   [MAPPING MISMATCHES]
     (Unmapped products found during production/dispatch/FG processing)
+    • |  | Samsol International Private Limited
+    • |  |
+    • S 43 25MM | 30 | Samsol International Private Limited
+    • Vince Nutural | 30 | Mablay Beauty PVT LTD.
+    • Black Bottle | 120 ml | Samsol International Private Limited
     • PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT | PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT | 10080.0
 
