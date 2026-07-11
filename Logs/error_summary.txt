@@ -1,0 +1,32 @@
+
+  ╔══════════════════════════════════════════════════════════╗
+  ║  ⚠ DAILY WORKFLOW ERROR SUMMARY                          ║
+  ╚══════════════════════════════════════════════════════════╝
+
+  [INVENTORY: ITEMS MISSING FROM ERP]
+    (These rows are highlighted in RED in Excel and zeroed out)
+    • Item ID 36 (16X200 3Ply) [Carton] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 39 (19X200 3Ply) [Carton] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 69 (M-7 S/M F/P (S) WHITE) [Cap] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 170 (WHITE 5711200001) [Base Coat] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 184 (LACQUAR IMP 49989) [Lacquer] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 200 (DIA 16 5Ply) [Carton] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 578 (M-12 S/M SPR WHITE DIA 30) [Cap] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 1065 (PIGMENTED LACQUAR 57300) [Lacquer] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 1800 (M-9 S/M SPR BLACK DIA 19) [Cap] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 3866 (M-11 S/M SPR BEIGE DIA 25) [Cap] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 4044 (M-9 S/M SPR BEIGE DIA 20.5) [Cap] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 4070 (MASTER BATCH ONCOLOR YELLOW NE12340208-ZN) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 4156 (BEIGE 5711200007) [Base Coat] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 5816 (MASTER BATCH WHITE PRC-MC ET02340000) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 6971 (M-9 S/M SPR WHITE DIA 20.5MM) [Cap] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+
+  [CROSS-CHECK MISMATCHES]
+    • Summary mismatch - Printing Production (MTD): Imran=121,352, Dashboard=134,792 (diff=+13,440)
+    • Summary mismatch - Tube Dispatch (MTD): Imran=194,306, Dashboard=180,530 (diff=-13,776)
+    • Summary mismatch - PET Dispatch (MTD): Imran=36,500, Dashboard=26,220 (diff=-10,280)
+
+  [MAPPING MISMATCHES]
+    (Unmapped products found during production/dispatch/FG processing)
+    • PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT | PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT | 10080.0
+
