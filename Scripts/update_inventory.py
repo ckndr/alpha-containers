@@ -238,6 +238,11 @@ def update_excel(excel_path, xls_items, date_range):
                         italic=curr_font.italic,
                         color="FF1A1A2E"
                     )
+            
+            # Clear the inactive note in Column K (11) if it exists
+            k_cell = ws.cell(row=row, column=11)
+            if k_cell.value == "Not active in ERP":
+                k_cell.value = ""
 
             if any(_n(old[i]) != new[i] for i in range(3)):
                 updated.append((
@@ -266,20 +271,8 @@ def update_excel(excel_path, xls_items, date_range):
             ws.cell(row=row, column=6).value = 0.0
             ws.cell(row=row, column=7).value = 0.0
 
-            # Apply red font to columns 1 to 10
-            for col in range(1, 11):
-                cell = ws.cell(row=row, column=col)
-                curr_font = cell.font
-                if curr_font:
-                    cell.font = Font(
-                        name=curr_font.name,
-                        size=curr_font.size,
-                        bold=curr_font.bold,
-                        italic=curr_font.italic,
-                        color="FF0000"
-                    )
-                else:
-                    cell.font = Font(name="Segoe UI", size=9, color="FF0000")
+            # Note in Column K that this item is inactive
+            ws.cell(row=row, column=11).value = "Not active in ERP"
 
     # Overwrite same file
     wb.save(excel_path)
