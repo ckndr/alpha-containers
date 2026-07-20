@@ -10,7 +10,8 @@
 
   [CROSS-CHECK MISMATCHES]
     • Summary mismatch - Tube Dispatch (MTD): Imran=257,138, Dashboard=243,362 (diff=-13,776)
-    • Summary mismatch - PET Dispatch (MTD): Imran=46,700, Dashboard=26,220 (diff=-20,480)
+    • Summary mismatch - PET Dispatch (MTD): Imran=53,900, Dashboard=26,220 (diff=-27,680)
+    • Pending Tube Orders mismatch: PENDING ORDER JULY 2026 (12).xlsx (18-07-2026)=558,950, MRP Sheet=258,950 (diff=+300,000)
 
   [MAPPING MISMATCHES]
     (Unmapped products found during production/dispatch/FG processing)

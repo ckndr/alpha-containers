@@ -228,7 +228,7 @@ print(f"  PET MTD:  {pet_mtd:,}   |  Yesterday: {yest_pet:,}")
 mrp_orders_map = {}
 if 'MRP' in wb.sheetnames:
     ws_mrp_temp = wb['MRP']
-    for r_mrp in range(3, 100):
+    for r_mrp in range(3, 150):
         pid_val = ws_mrp_temp.cell(row=r_mrp, column=4).value
         ord_val = ws_mrp_temp.cell(row=r_mrp, column=6).value
         if pid_val is not None:

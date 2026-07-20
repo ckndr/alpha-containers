@@ -87,7 +87,7 @@ for r in range(11, 200):
 mrp_orders = {}
 if 'MRP' in wb_val.sheetnames:
     ws_mrp = wb_val['MRP']
-    for r_mrp in range(3, 100):
+    for r_mrp in range(3, 150):
         pid_val = ws_mrp.cell(r_mrp, 4).value # col D = PID
         ord_val = ws_mrp.cell(r_mrp, 6).value # col F = Orders
         if pid_val is not None:
