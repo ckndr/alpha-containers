@@ -1,0 +1,100 @@
+=== MONTHLY BREAKDOWN ===
+
+--- Month: 2025-11 ---
+  S 43 25MM                                (Samsol International Private Limited): Produced= 82,992 | Dispatched= 71,904
+  S-43 DIA 20.5                            (Samsol International Private Limited): Produced=134,640 | Dispatched=103,530
+  S-45                                     (Samsol International Private Limited): Produced= 61,824 | Dispatched= 61,152
+  SAMSOL HAIR COLOR 45 DIA 20.5 MM         (Samsol International Private Limited): Produced= 27,030 | Dispatched= 27,030
+  TUBE COMMON PURPLE                       (Samsol International Private Limited): Produced= 25,872 | Dispatched= 26,208
+  TUBES                                    (Samsol International Private Limited): Produced= 76,272 | Dispatched=100,800
+  TUBES COMMON RED                         (Samsol International Private Limited): Produced= 60,480 | Dispatched= 59,808
+  Total                                   : Produced=469,110 | Dispatched=450,432
+
+--- Month: 2025-12 ---
+  S 43 25MM                                (Samsol International Private Limited): Produced= 96,796 | Dispatched= 80,976
+  S-43 DIA 20.5                            (Samsol International Private Limited): Produced=171,335 | Dispatched=200,940
+  S-45 DIA 20.5                            (Samsol International Private Limited): Produced=  7,650 | Dispatched=      0
+  SAMSOL HAIR COLOR 43 DIA 20.5 MM         (Samsol International Private Limited): Produced=  7,165 | Dispatched=      0
+  SAMSOL HAIR COLOR 45 DIA 20.5 MM         (Samsol International Private Limited): Produced=120,360 | Dispatched=118,830
+  TUBE COMMON PURPLE                       (Samsol International Private Limited): Produced= 28,224 | Dispatched=      0
+  TUBES                                    (Samsol International Private Limited): Produced= 58,436 | Dispatched= 32,956
+  TUBES COMMON RED                         (Samsol International Private Limited): Produced= 28,560 | Dispatched=      0
+  TUBES MEN BLUE                           (Samsol International Private Limited): Produced=  9,408 | Dispatched=  5,040
+  Total                                   : Produced=527,934 | Dispatched=438,742
+
+--- Month: 2026-01 ---
+  S 43 25MM                                (Samsol International Private Limited): Produced=  2,016 | Dispatched=      0
+  SAMSOL HAIR COLOR 39 SMALL PURPLE        (Samsol International Private Limited): Produced=  3,060 | Dispatched=  3,060
+  SAMSOL HAIR COLOR 41 SMALL PURPLE        (Samsol International Private Limited): Produced=  3,060 | Dispatched=  3,060
+  SAMSOL HAIR COLOR 45 DIA 20.5 MM         (Samsol International Private Limited): Produced= 61,200 | Dispatched= 61,710
+  TUBES                                    (Samsol International Private Limited): Produced= 50,736 | Dispatched= 66,164
+  TUBES COMMON RED                         (Samsol International Private Limited): Produced=      0 | Dispatched= 25,536
+  TUBES MEN BLUE                           (Samsol International Private Limited): Produced=  4,704 | Dispatched=  7,392
+  Total                                   : Produced=124,776 | Dispatched=166,922
+
+--- Month: 2026-02 ---
+  S-45 DIA 20.5                            (Samsol International Private Limited): Produced=189,210 | Dispatched= 88,740
+  SAMSOL HAIR COLOR 43 DIA 20.5 MM         (Samsol International Private Limited): Produced=171,360 | Dispatched=175,440
+  TUBES                                    (Samsol International Private Limited): Produced=  9,408 | Dispatched=      0
+  TUBES COMMON RED                         (Samsol International Private Limited): Produced= 48,048 | Dispatched= 49,392
+  Total                                   : Produced=418,026 | Dispatched=313,572
+
+--- Month: 2026-03 ---
+  S 43 25MM                                (Samsol International Private Limited): Produced=141,656 | Dispatched=129,360
+  S-43 DIA 20.5                            (Samsol International Private Limited): Produced= 33,660 | Dispatched= 33,150
+  S-45 DIA 20.5                            (Samsol International Private Limited): Produced=  7,650 | Dispatched= 55,080
+  TUBE COMMON PURPLE                       (Samsol International Private Limited): Produced=      0 | Dispatched= 27,208
+  TUBES                                    (Samsol International Private Limited): Produced= 61,824 | Dispatched= 83,328
+  Total                                   : Produced=244,790 | Dispatched=328,126
+
+--- Month: 2026-04 ---
+  S 43 25MM                                (Samsol International Private Limited): Produced=101,058 | Dispatched= 35,952
+  S-43 DIA 19MM                            (Samsol International Private Limited): Produced= 25,284 | Dispatched=      0
+  S-43 DIA 20.5                            (Samsol International Private Limited): Produced=102,510 | Dispatched=      0
+  S-45                                     (Samsol International Private Limited): Produced= 20,832 | Dispatched=      0
+  S-45 DIA 19MM                            (Samsol International Private Limited): Produced= 14,112 | Dispatched=      0
+  TUBE COMMON PURPLE                       (Samsol International Private Limited): Produced= 22,848 | Dispatched= 22,176
+  TUBES                                    (Samsol International Private Limited): Produced= 82,992 | Dispatched= 17,136
+  TUBES COMMON RED                         (Samsol International Private Limited): Produced= 62,160 | Dispatched= 53,760
+  TUBES MEN BLUE                           (Samsol International Private Limited): Produced= 15,792 | Dispatched= 15,792
+  Total                                   : Produced=447,588 | Dispatched=144,816
+
+--- Month: 2026-05 ---
+  S 43 25MM                                (Samsol International Private Limited): Produced= 43,176 | Dispatched= 50,064
+  S-43 DIA 19MM                            (Samsol International Private Limited): Produced=      0 | Dispatched= 24,696
+  S-43 DIA 20.5                            (Samsol International Private Limited): Produced=      0 | Dispatched= 89,250
+  S-45                                     (Samsol International Private Limited): Produced=  4,284 | Dispatched=      0
+  S-45 DIA 19MM                            (Samsol International Private Limited): Produced=  9,996 | Dispatched=  8,232
+  S-45 DIA 20.5                            (Samsol International Private Limited): Produced=      0 | Dispatched= 13,260
+  TUBES                                    (Samsol International Private Limited): Produced= 18,816 | Dispatched= 78,288
+  TUBES COMMON RED                         (Samsol International Private Limited): Produced= 21,504 | Dispatched= 28,224
+  Total                                   : Produced= 97,776 | Dispatched=292,014
+
+--- Month: 2026-06 ---
+  S 43 25MM                                (Samsol International Private Limited): Produced=      0 | Dispatched= 90,048
+  S-45                                     (Samsol International Private Limited): Produced= 22,176 | Dispatched= 44,352
+  TUBE COMMON PURPLE                       (Samsol International Private Limited): Produced= 32,592 | Dispatched= 31,248
+  TUBES                                    (Samsol International Private Limited): Produced= 77,952 | Dispatched= 55,776
+  TUBES COMMON RED                         (Samsol International Private Limited): Produced= 62,496 | Dispatched= 62,496
+  Total                                   : Produced=195,216 | Dispatched=283,920
+
+--- Month: 2026-07 ---
+  TUBES                                    (Samsol International Private Limited): Produced= 74,928 | Dispatched= 95,088
+  Total                                   : Produced= 74,928 | Dispatched= 95,088
+
+=== TOTAL BREAKDOWN (NOV TO JUL) ===
+  S 43 25MM                                (Samsol International Private Limited): Produced=  467,694 | Dispatched=  458,304
+  S-43 DIA 19MM                            (Samsol International Private Limited): Produced=   25,284 | Dispatched=   24,696
+  S-43 DIA 20.5                            (Samsol International Private Limited): Produced=  442,145 | Dispatched=  426,870
+  S-45                                     (Samsol International Private Limited): Produced=  109,116 | Dispatched=  105,504
+  S-45 DIA 19MM                            (Samsol International Private Limited): Produced=   24,108 | Dispatched=    8,232
+  S-45 DIA 20.5                            (Samsol International Private Limited): Produced=  204,510 | Dispatched=  157,080
+  SAMSOL HAIR COLOR 39 SMALL PURPLE        (Samsol International Private Limited): Produced=    3,060 | Dispatched=    3,060
+  SAMSOL HAIR COLOR 41 SMALL PURPLE        (Samsol International Private Limited): Produced=    3,060 | Dispatched=    3,060
+  SAMSOL HAIR COLOR 43 DIA 20.5 MM         (Samsol International Private Limited): Produced=  178,525 | Dispatched=  175,440
+  SAMSOL HAIR COLOR 45 DIA 20.5 MM         (Samsol International Private Limited): Produced=  208,590 | Dispatched=  207,570
+  TUBE COMMON PURPLE                       (Samsol International Private Limited): Produced=  109,536 | Dispatched=  106,840
+  TUBES                                    (Samsol International Private Limited): Produced=  511,364 | Dispatched=  529,536
+  TUBES COMMON RED                         (Samsol International Private Limited): Produced=  283,248 | Dispatched=  279,216
+  TUBES MEN BLUE                           (Samsol International Private Limited): Produced=   29,904 | Dispatched=   28,224
+  Total                                   : Produced=2,600,144 | Dispatched=2,513,632

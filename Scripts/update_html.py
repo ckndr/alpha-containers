@@ -611,49 +611,84 @@ for r in range(4, ws_fg.max_row + 1):
 ws_mrp = wb['MRP']
 mrp_title = str(ws_mrp.cell(row=1, column=1).value or 'Material Requirement Plan')
 
-# Read orders (rows 3-14)
-mrp_orders = []
-for r in range(3, 15):
-    pid = ws_mrp.cell(row=r, column=4).value
-    if not pid:
-        continue
-    try:
-        pid = int(pid)
-    except (TypeError, ValueError):
-        continue
+# Dynamically find starting rows for all sections in the MRP sheet
+sec_rows = {
+    'TUBE_ORDERS': None,
+    'TUBE_MATERIALS': None,
+    'PET_ORDERS': None,
+    'PET_MATERIALS': None,
+    'INK': None
+}
+
+for r in range(1, ws_mrp.max_row + 1):
+    val = ws_mrp.cell(row=r, column=1).value
+    val_str = str(val).strip() if val is not None else ""
     
-    required = ws_mrp.cell(row=r, column=6).value
-    required_val = float(required) if required and isinstance(required, (int, float)) else 0.0
-    if required_val == 0.0:
-        formula_str = get_mrp_formula_value(r, 6)
-        if formula_str:
-            required_val = float(evaluate_math_formula(formula_str))
+    if "tube required orders" in val_str.lower():
+        sec_rows['TUBE_ORDERS'] = r
+    elif "tubes material requirement plan" in val_str.lower():
+        sec_rows['TUBE_MATERIALS'] = r
+    elif "pet required" in val_str.lower():
+        sec_rows['PET_ORDERS'] = r
+    elif "pet material requirement plan" in val_str.lower():
+        sec_rows['PET_MATERIALS'] = r
+    elif "ink" in val_str.lower() and ("avg monthly" in val_str.lower() or "usage" in val_str.lower()):
+        sec_rows['INK'] = r
+
+# Fallback to defaults if any section is not found
+tube_orders_start = sec_rows['TUBE_ORDERS'] if sec_rows['TUBE_ORDERS'] is not None else 1
+tube_mats_start = sec_rows['TUBE_MATERIALS'] if sec_rows['TUBE_MATERIALS'] is not None else 8
+pet_orders_start = sec_rows['PET_ORDERS'] if sec_rows['PET_ORDERS'] is not None else 94
+pet_mats_start = sec_rows['PET_MATERIALS'] if sec_rows['PET_MATERIALS'] is not None else 103
+ink_start = sec_rows['INK'] if sec_rows['INK'] is not None else 113
+
+def read_orders_from_range(start_row, end_row):
+    orders = []
+    for r in range(start_row, end_row):
+        pid = ws_mrp.cell(row=r, column=4).value
+        if not pid:
+            continue
+        try:
+            pid = int(pid)
+        except (TypeError, ValueError):
+            continue
+        
+        required = ws_mrp.cell(row=r, column=6).value
+        required_val = float(required) if required and isinstance(required, (int, float)) else 0.0
+        if required_val == 0.0:
+            formula_str = get_mrp_formula_value(r, 6)
+            if formula_str:
+                required_val = float(evaluate_math_formula(formula_str))
+                
+        produced = ws_mrp.cell(row=r, column=7).value
+        produced_val = float(produced) if produced and isinstance(produced, (int, float)) else 0.0
+        if produced_val == 0.0:
+            produced_val = float(mtd_by_pid.get(pid, 0))
             
-    produced = ws_mrp.cell(row=r, column=7).value
-    produced_val = float(produced) if produced and isinstance(produced, (int, float)) else 0.0
-    if produced_val == 0.0:
-        produced_val = float(mtd_by_pid.get(pid, 0))
-        
-    remaining = ws_mrp.cell(row=r, column=8).value
-    remaining_val = float(remaining) if remaining and isinstance(remaining, (int, float)) else 0.0
-    if remaining_val == 0.0:
-        remaining_val = max(0.0, required_val - produced_val)
-        
-    mrp_orders.append({
-        'dia': ws_mrp.cell(row=r, column=1).value,
-        'customer': str(ws_mrp.cell(row=r, column=2).value or '').strip(),
-        'product': str(ws_mrp.cell(row=r, column=3).value or '').strip(),
-        'pid': pid,
-        'jobOrder': str(ws_mrp.cell(row=r, column=5).value or '').strip(),
-        'required': required_val,
-        'produced': produced_val,
-        'remaining': remaining_val,
-        'remarks': str(ws_mrp.cell(row=r, column=9).value or '').strip(),
-    })
+        remaining = ws_mrp.cell(row=r, column=8).value
+        remaining_val = float(remaining) if remaining and isinstance(remaining, (int, float)) else 0.0
+        if remaining_val == 0.0:
+            remaining_val = max(0.0, required_val - produced_val)
+            
+        orders.append({
+            'dia': ws_mrp.cell(row=r, column=1).value,
+            'customer': str(ws_mrp.cell(row=r, column=2).value or '').strip(),
+            'product': str(ws_mrp.cell(row=r, column=3).value or '').strip(),
+            'pid': pid,
+            'jobOrder': str(ws_mrp.cell(row=r, column=5).value or '').strip(),
+            'required': required_val,
+            'produced': produced_val,
+            'remaining': remaining_val,
+            'remarks': str(ws_mrp.cell(row=r, column=9).value or '').strip(),
+        })
+    return orders
+
+mrp_orders = read_orders_from_range(tube_orders_start + 2, tube_mats_start)
+mrp_pet_orders = read_orders_from_range(pet_orders_start + 2, pet_mats_start)
 
 # Read material requirements (rows 18-101 for tubes)
 mrp_materials = []
-for r in range(18, 102):
+for r in range(tube_mats_start + 2, pet_orders_start):
     item_id = ws_mrp.cell(row=r, column=1).value
     if item_id is None:
         continue
@@ -691,8 +726,8 @@ for r in range(18, 102):
         'section': 'tube',
     })
 
-# Read PET material requirements (rows 116-123)
-for r in range(116, 124):
+# Read PET material requirements
+for r in range(pet_mats_start + 2, ink_start):
     item_id = ws_mrp.cell(row=r, column=1).value
     if item_id is None:
         continue
@@ -730,9 +765,9 @@ for r in range(116, 124):
         'section': 'pet',
     })
 
-# Read INK table (rows 127-158)
+# Read INK table
 mrp_inks = []
-for r in range(127, 159):
+for r in range(ink_start + 2, ws_mrp.max_row + 1):
     item_id = ws_mrp.cell(row=r, column=1).value
     if item_id is None:
         continue
@@ -749,7 +784,7 @@ for r in range(127, 159):
     stock   = ws_mrp.cell(row=r, column=8).value   # Current Stock
     
     avg_use = round(float(avg_use), 2) if avg_use and isinstance(avg_use, (int, float)) else 0
-    days    = round(float(days), 1) if days and isinstance(days, (int, float)) else 0
+    days = round(float(days), 1) if days and isinstance(days, (int, float)) else 0
     stock   = round(float(stock), 2) if stock and isinstance(stock, (int, float)) else 0
     
     if not name:
@@ -858,7 +893,7 @@ html = inject_block(html, '/* PRODLOG_START */', '/* PRODLOG_END */',
 html = inject_block(html, '/* FGSTOCK_START */', '/* FGSTOCK_END */',
     f"const FG_STOCK_DATA = {json.dumps({'title': fg_title, 'rows': fg_data}, ensure_ascii=False)};")
 html = inject_block(html, '/* MRP_START */', '/* MRP_END */',
-    f"const MRP_DATA = {json.dumps({'title': mrp_title, 'orders': mrp_orders, 'materials': mrp_materials, 'inks': mrp_inks}, ensure_ascii=False)};")
+    f"const MRP_DATA = {json.dumps({'title': mrp_title, 'orders': mrp_orders, 'pet_orders': mrp_pet_orders, 'materials': mrp_materials, 'inks': mrp_inks}, ensure_ascii=False)};")
 
 # ── WRITE HTML ───────────────────────────────────────────────
 with open(HTML_PATH, 'w', encoding='utf-8') as f:

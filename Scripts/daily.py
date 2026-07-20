@@ -669,6 +669,107 @@ def step_crosscheck():
         warn(f"Summary sheet cross-check error: {e}")
         errors.append(f"Summary sheet cross-check error: {e}")
 
+    # --- Part C: Pending Tube Orders comparison ---
+    try:
+        print(f"\n    {DIM}── Pending Tube Orders: MRP vs PENDING ORDER file ──{RESET}")
+        pending_files = []
+        if os.path.exists(DOWNLOADS_DIR):
+            for f in os.listdir(DOWNLOADS_DIR):
+                if f.upper().startswith("PENDING ORDER ") and (f.endswith(".xlsx") or f.endswith(".xls")):
+                    path = os.path.join(DOWNLOADS_DIR, f)
+                    pending_files.append((path, os.path.getmtime(path)))
+        
+        if not pending_files:
+            warn("No PENDING ORDER file found in Downloads — skipping comparison")
+            errors.append("No PENDING ORDER file found in Downloads")
+        else:
+            pending_files.sort(key=lambda x: x[1], reverse=True)
+            most_recent_pending = pending_files[0][0]
+            pending_basename = os.path.basename(most_recent_pending)
+            
+            # Find the most recent Tubex file
+            excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
+            if not excel_files:
+                warn("No Tubex*.xlsx found — skipping Pending Order check")
+                errors.append("No Tubex*.xlsx found for Pending Order check")
+            else:
+                # 1. Read Tubex MRP sheet
+                df_mrp = pd.read_excel(excel_files[-1], sheet_name='MRP', header=None)
+                mrp_total = None
+                for idx, row in df_mrp.iterrows():
+                    val_4 = str(row[4]).strip() if pd.notna(row[4]) else ""
+                    if val_4.upper() == 'TOTAL:':
+                        mrp_total = row[7]
+                        break
+                
+                if mrp_total is None:
+                    warn(f"Could not find tube total 'TOTAL:' in MRP sheet of {os.path.basename(excel_files[-1])}")
+                    errors.append(f"Could not find tube total in MRP sheet of {os.path.basename(excel_files[-1])}")
+                else:
+                    try:
+                        mrp_total = int(float(str(mrp_total).replace(',', '').strip()))
+                    except Exception as e:
+                        warn(f"Error parsing MRP tube total: {e}")
+                        errors.append(f"Error parsing MRP tube total: {e}")
+                        mrp_total = None
+                
+                if mrp_total is not None:
+                    # 2. Read Pending Order sheet
+                    xls_pending = pd.ExcelFile(most_recent_pending)
+                    pending_sheet_names = xls_pending.sheet_names
+                    
+                    # Today's date representation in DD-MM-YYYY
+                    today_str = datetime.now().strftime("%d-%m-%Y")
+                    
+                    target_sheet = None
+                    if today_str in pending_sheet_names:
+                        target_sheet = today_str
+                    else:
+                        # Find most recent date sheet
+                        date_sheets = []
+                        for s in pending_sheet_names:
+                            try:
+                                dt = datetime.strptime(s.strip(), "%d-%m-%Y")
+                                date_sheets.append((s, dt))
+                            except ValueError:
+                                continue
+                        if date_sheets:
+                            date_sheets.sort(key=lambda x: x[1], reverse=True)
+                            target_sheet = date_sheets[0][0]
+                    
+                    if not target_sheet:
+                        warn(f"No date sheet (DD-MM-YYYY) found in {pending_basename} — skipping comparison")
+                        errors.append(f"No date sheet (DD-MM-YYYY) found in {pending_basename}")
+                    else:
+                        df_pending = pd.read_excel(most_recent_pending, sheet_name=target_sheet, header=None)
+                        pending_total = None
+                        for idx, row in df_pending.iterrows():
+                            val_0 = str(row[0]).strip().upper() if pd.notna(row[0]) else ""
+                            if val_0 == 'GRAND TOTAL':
+                                pending_total = row[7]
+                                break
+                        
+                        if pending_total is None:
+                            warn(f"Could not find 'GRAND TOTAL' in {pending_basename} sheet {target_sheet}")
+                            errors.append(f"Could not find 'GRAND TOTAL' in {pending_basename} sheet {target_sheet}")
+                        else:
+                            try:
+                                pending_total = int(float(str(pending_total).replace(',', '').strip()))
+                                
+                                # Compare values
+                                if mrp_total == pending_total:
+                                    ok(f"Pending Tube Orders Match: {pending_basename} ({target_sheet}) = {pending_total:,}  MRP Sheet = {mrp_total:,}")
+                                else:
+                                    diff = pending_total - mrp_total
+                                    fail(f"Pending Tube Orders Mismatch: {pending_basename} ({target_sheet})={pending_total:,}  MRP Sheet={mrp_total:,} (diff={diff:+,})")
+                                    errors.append(f"Pending Tube Orders mismatch: {pending_basename} ({target_sheet})={pending_total:,}, MRP Sheet={mrp_total:,} (diff={diff:+,})")
+                            except Exception as e:
+                                warn(f"Error parsing Grand Total in {pending_basename} sheet {target_sheet}: {e}")
+                                errors.append(f"Error parsing Grand Total in {pending_basename} sheet {target_sheet}: {e}")
+    except Exception as e:
+        warn(f"Pending Tube Orders cross-check error: {e}")
+        errors.append(f"Pending Tube Orders cross-check error: {e}")
+
     return errors
 
 
