@@ -1,15 +1,12 @@
-import pandas as pd
+import openpyxl
 
-file_path = "D:/Alpha/Tubex_July26.xlsx"
-
-def print_sheet_details(sheet_name):
-    print(f"\n=================== Sheet: {sheet_name} ===================")
-    # Read the full sheet first
-    df = pd.read_excel(file_path, sheet_name=sheet_name, header=None)
-    print("Full shape:", df.shape)
-    # Print the first 10 rows
-    for idx, row in df.head(15).iterrows():
-        print(f"Row {idx:2d}: {row.dropna().tolist()[:10]}")
-
-print_sheet_details("Product_Catalog")
-print_sheet_details("BOM")
+wb = openpyxl.load_workbook("d:\\Alpha\\Tubex_July26.xlsx")
+if "Product_Catalog" in wb.sheetnames:
+    ws = wb["Product_Catalog"]
+    print("=== PRODUCT CATALOG ===")
+    for r in range(1, ws.max_row + 1):
+        row_vals = [ws.cell(row=r, column=c).value for c in range(1, 10)]
+        if any(row_vals):
+            print(f"Row {r:03d}: {row_vals}")
+else:
+    print("Product_Catalog sheet not found!")
