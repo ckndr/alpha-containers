@@ -19,6 +19,14 @@ erp_products = [
     {"Customer": "ALPHA LABS PVT LTD", "Product Name": "PET BOTTLE (500ML) GREEN"},
 ]
 
+PET_NAME_MAP = {
+    "BT-200 ML YELLOW": "PET BOTTLE LARGE (200 ML) YELLOW",
+    "BT-200ML YELLOW": "PET BOTTLE LARGE (200 ML) YELLOW",
+    "PET BOTTLE SMALL (120 ML) YELLOW": "PET BOTTLE SMALL (120ML) YELLOW",
+    "BT-120 ML YELLOW": "PET BOTTLE SMALL (120ML) YELLOW",
+    "PET BOTTLE (150ML)TRANSPARENT BODY MIST": "TRANSPARENT BOTTLE 150ML",
+}
+
 wb = openpyxl.load_workbook(excel_path)
 ws_catalog = wb['Product_Catalog']
 ws_bom = wb['BOM']
@@ -57,7 +65,9 @@ for row in ws_catalog.iter_rows(min_row=catalog_header_row+1, values_only=True):
 # Check and add new products
 new_pids_added = 0
 for prod in erp_products:
-    name_upper = prod["Product Name"].strip().upper()
+    raw_name = prod["Product Name"].strip()
+    mapped_name = PET_NAME_MAP.get(raw_name, raw_name)
+    name_upper = mapped_name.upper()
     if name_upper not in existing_products:
         max_8k_pid += 1
         new_pid = max_8k_pid

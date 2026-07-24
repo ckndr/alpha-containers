@@ -87,14 +87,18 @@ NAME_FIXES = {
     "S-45 DIA 19MM":  "S-45 DIA 19MM",   # PID 6624 — identity mapping, safety anchor
 
     # PET products -- ERP uses a different naming convention than catalog
-    # NOTE: "BT-200 ML YELLOW" and "PET BOTTLE LARGE 200ML WHITE" were
-    # removed from NAME_FIXES because the catalog was renamed to match
-    # the ERP names exactly (v10.3) -- they now auto-resolve.
-    "BT-120 ML YELLOW":                                       "PET BOTTLE SMALL (120ML) YELLOW",   # old ERP name retained
+    "BT-120 ML YELLOW":                                       "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — ERP name
+    "BT-120ML YELLOW":                                        "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — ERP name without space
+    "PET BOTTLE SMALL (120 ML) YELLOW":                       "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — ERP space: "120 ML" vs "120ML"
+    "YELLOW SMALL BOTTLE 120ML":                              "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — old catalog name synonym
+    "BT-200 ML YELLOW":                                       "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — ERP name synonym
+    "BT-200ML YELLOW":                                        "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — ERP name synonym without space
+    "PET BOTTLE LARGE 200ML YELLOW":                          "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — variant name
+    "YELLOW LARGE BOTTLE 200ML":                              "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — old catalog name synonym
+    "YELLOW BOTTLE 200ML":                                    "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — variant name
     "PET BOTTLE SMALL (120ML) COMPACT BLACK":                 "BLACK SMALL BOTTLE 120ML",
     # Added v8 — ERP names confirmed from dispatch mismatch log
     "PET BOTTLE (150ML)TRANSPARENT BODY MIST":                "TRANSPARENT BOTTLE 150ML",          # PID 8001 — ERP appends "Body Mist" suffix
-    "PET BOTTLE SMALL (120 ML) YELLOW":                       "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — ERP has space: "120 ML" vs "120ML"
     "PET BOTTLE SMALL (130 ML) (TRANSPARENT) (WITHOUT CAP)":  "PET BOTTLE SMALL (130ML) TRANSPARENT",  # PID 8010 — ERP adds "(WITHOUT CAP)"
     "PET BOTTLE 130 ML WHITE":                                "PET BOTTLE 130ML WHITE",              # PID 8015 — ERP space: "130 ML" vs "130ML"
 }
