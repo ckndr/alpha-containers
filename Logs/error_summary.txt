@@ -8,12 +8,10 @@
     • Item ID 4070 (MASTER BATCH ONCOLOR YELLOW NE12340208-ZN) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
 
   [CROSS-CHECK MISMATCHES]
-    • Summary mismatch - Tube Dispatch (MTD): Imran=257,138, Dashboard=243,362 (diff=-13,776)
-    • Summary mismatch - PET Dispatch (MTD): Imran=78,380, Dashboard=26,220 (diff=-52,160)
-    • Pending Tube Orders mismatch: PENDING ORDER JULY 2026 (13).xlsx (21-07-2026)=527,114, MRP Sheet=227,114 (diff=+300,000)
+    • Summary mismatch - Tube Dispatch (MTD): Imran=304,262, Dashboard=290,486 (diff=-13,776)
+    • Summary mismatch - PET Dispatch (MTD): Imran=78,380, Dashboard=43,140 (diff=-35,240)
 
   [MAPPING MISMATCHES]
     (Unmapped products found during production/dispatch/FG processing)
-    • Samsol 43 | 25 dia | Samsol
-    • PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT | PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT | 10080.0
+    • Samsol 45 | 25 dia | Samsol
 
