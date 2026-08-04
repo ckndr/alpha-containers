@@ -8,10 +8,12 @@
     • Item ID 4070 (MASTER BATCH ONCOLOR YELLOW NE12340208-ZN) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
 
   [CROSS-CHECK MISMATCHES]
-    • Summary mismatch - Tube Dispatch (MTD): Imran=385,450, Dashboard=409,924 (diff=+24,474)
-    • Summary mismatch - PET Dispatch (MTD): Imran=119,790, Dashboard=81,070 (diff=-38,720)
+    • Summary mismatch - Tube Dispatch (MTD): Imran=423,700, Dashboard=409,924 (diff=-13,776)
+    • Summary mismatch - PET Dispatch (MTD): Imran=125,310, Dashboard=81,070 (diff=-44,240)
+    • Pending Tube Orders mismatch: PENDING ORDER JULY 2026 (20).xlsx (31-07-2026)=354,328, MRP Sheet=352,328 (diff=+2,000)
 
   [MAPPING MISMATCHES]
     (Unmapped products found during production/dispatch/FG processing)
+    • Samsol 45 | dia 25 | Samsol
     • PET BOTTLE COCONUT OIL (200ML) WHITE | PET BOTTLE COCONUT OIL (200ML) WHITE | 9000.0
 
