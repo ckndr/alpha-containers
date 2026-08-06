@@ -22,29 +22,49 @@ def apply_data_style(cell, ref_cell, num_fmt=None):
         cell.number_format = num_fmt
 
 # =====================================================================
-# Restore H100:H106 to the EXACT original formula that was working.
-# This is the same AVERAGEIF formula from the Inventory sheet J column,
-# adapted to use MRP's F column (Store + WIP stock).
+# Fix H100:H106 - Pieces Can Produce weighted by CURRENT orders only
 #
-# Original: =IFERROR(IF(AVERAGEIF(TableBOM[Item ID],A100,
-#             TableBOM[Per 1000 Units])=0,"-",
-#             ROUND(F100/(AVERAGEIF(TableBOM[Item ID],A100,
-#             TableBOM[Per 1000 Units])/1000),0)),"-")
+# The E100 formula already uses this exact pattern successfully:
+#   =SUMPRODUCT((TableBOM[Item ID]=A100)*TableBOM[Per 1000 Units]*
+#     (1+TableBOM[Scrap %])*
+#     SUMIF($D$93:$D$96,TableBOM[Product ID],$H$93:$H$96)/1000)
+#
+# So we KNOW that SUMIF($D$93:$D$96,TableBOM[Product ID],$H$93:$H$96)
+# works inside SUMPRODUCT from this sheet. Let's use the same pattern.
+#
+# Weighted avg rate = sum(rate * rem) / sum(rem)
+#   where rem = SUMIF($D$93:$D$96, TableBOM[Product ID], $H$93:$H$96)
+#   filtered to only BOM rows matching this item and rem > 0
+#
+# Pieces = F{r} / (weighted_avg_rate / 1000)
+#        = F{r} * 1000 * sum(rem) / sum(rate * rem)
 # =====================================================================
 
 for r in range(100, 107):
-    formula = (
-        '=IFERROR(IF(AVERAGEIF(TableBOM[Item ID],A{r},'
-        'TableBOM[Per 1000 Units])=0,"-",'
-        'ROUND(F{r}/(AVERAGEIF(TableBOM[Item ID],A{r},'
-        'TableBOM[Per 1000 Units])/1000),0)),"-")'
-    ).format(r=r)
+    # Common sub-expressions (same pattern as E100)
+    rem  = 'SUMIF($D$93:$D$96,TableBOM[Product ID],$H$93:$H$96)'
+    item = '(TableBOM[Item ID]=A{r})'.format(r=r)
+    pos  = '(({rem})>0)'.format(rem=rem)
+
+    # numerator for weighted avg: sum(rate * remaining)
+    num = 'SUMPRODUCT({item}*{pos}*({rem})*TableBOM[Per 1000 Units])'.format(
+              item=item, pos=pos, rem=rem)
+
+    # denominator: sum(remaining) where this item has a BOM entry
+    den = 'SUMPRODUCT({item}*{pos}*({rem}))'.format(
+              item=item, pos=pos, rem=rem)
+
+    formula = '=IFERROR(IF({num}=0,"-",ROUND(F{r}*1000*{den}/{num},0)),"-")'.format(
+        num=num, den=den, r=r)
 
     cell = ws.cell(row=r, column=8, value=formula)
     apply_data_style(cell, ws['I{}'.format(r)], num_fmt="#,##0")
 
 wb.save('Tubex_Aug26.xlsx')
-print('Restored H100:H106 to original AVERAGEIF formula.')
+print('Fixed H100:H106 using same SUMIF pattern as E100.')
 print()
-print('H100:', ws['H100'].value)
-print('H106:', ws['H106'].value)
+print('H100:')
+print(ws['H100'].value)
+print()
+print('For reference, E100 (working formula):')
+print(ws['E100'].value)
