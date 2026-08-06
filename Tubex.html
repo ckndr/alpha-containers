@@ -571,9 +571,19 @@ table.cust-tbl tr.tot td {
 }
 .type-badge.TUBE { background: #eaf2ff; color: var(--blue); }
 .type-badge.PET { background: var(--green-bg); color: var(--green); }
-@media(max-width:900px){
+.cust-two-col-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 16px;
+}
+@media(max-width:1200px){
+  .cust-two-col-grid { grid-template-columns: 1fr; }
+}
+@media(max-width:1050px){
   .cust-report-layout { grid-template-columns: 1fr; }
-  .cust-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media(max-width:900px){
+  .cust-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
   /* ── FOOTER ── */
@@ -1776,7 +1786,7 @@ function renderNativeCustMain() {
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1.2fr);gap:16px">
+    <div class="cust-two-col-grid">
       <div class="cust-tbl-card">
         <h3>Monthly Production & Dispatch Breakdown</h3>
         <table class="cust-tbl">
