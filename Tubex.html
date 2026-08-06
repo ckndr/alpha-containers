@@ -379,7 +379,7 @@ table.mrp-table tr:hover td{background:#f7f9ff}
 /* ══ NATIVE CUSTOMER REPORT STYLES ══ */
 .cust-report-layout {
   display: grid;
-  grid-template-columns: 270px 1fr;
+  grid-template-columns: 270px minmax(0, 1fr);
   gap: 16px;
   min-height: 600px;
 }
@@ -482,7 +482,7 @@ table.mrp-table tr:hover td{background:#f7f9ff}
 }
 .cust-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 .cust-kpi {
@@ -520,6 +520,7 @@ table.mrp-table tr:hover td{background:#f7f9ff}
   border-radius: 12px;
   border: 2px solid var(--border);
   padding: 16px;
+  overflow-x: auto;
 }
 .cust-tbl-card h3 {
   font-size: 12px;
@@ -1775,7 +1776,7 @@ function renderNativeCustMain() {
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:16px">
+    <div style="display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1.2fr);gap:16px">
       <div class="cust-tbl-card">
         <h3>Monthly Production & Dispatch Breakdown</h3>
         <table class="cust-tbl">
