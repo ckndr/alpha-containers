@@ -24,49 +24,44 @@ def apply_data_style(cell, ref_cell, num_fmt=None):
 # =====================================================================
 # Fix H100:H106 - August PET Pieces Can Produce
 #
-# Problem: openpyxl/Excel converted TableBOM[Product ID] to
-# TableBOM[[#This Row],[Product ID]] which doesn't work outside the BOM table.
+# Simple approach: SUMIFS returns a 4-element array when criteria is
+# a 4-cell range. SUMPRODUCT handles the weighting naturally.
 #
-# Solution: Use the actual cell range for the BOM Product ID column
-# instead of structured table references inside SUMIF.
-# BOM table = A2:M353, so Product ID (col A) = BOM!$A$3:$A$353
-# Item ID (col G) = BOM!$G$3:$G$353
-# Per 1000 Units (col J) = BOM!$J$3:$J$353
+# SUMIFS(Per1000_range, ItemID_range, A100, ProdID_range, $D$93:$D$96)
+#   => returns {rate_for_prod93, rate_for_prod94, rate_for_prod95, rate_for_prod96}
+#
+# Weighted avg rate = sum(rate_i * rem_i) / sum(rem_i)  [only where rem > 0]
+# Pieces = Stock * 1000 / weighted_avg_rate
+#        = Stock * 1000 * sum(rem_i) / sum(rate_i * rem_i)
 # =====================================================================
 
-# BOM ranges (avoiding structured refs that get mangled)
-BOM_PROD_ID   = 'BOM!$A$3:$A$353'
-BOM_ITEM_ID   = 'BOM!$G$3:$G$353'
-BOM_PER1000   = 'BOM!$J$3:$J$353'
+BOM_PER1000 = 'BOM!$J$3:$J$353'
+BOM_ITEM_ID = 'BOM!$G$3:$G$353'
+BOM_PROD_ID = 'BOM!$A$3:$A$353'
 
 for r in range(100, 107):
-    # rem = remaining qty for each BOM product in the PET orders
-    rem  = 'IFERROR(SUMIF($D$93:$D$96,{prod},$H$93:$H$96),0)'.format(prod=BOM_PROD_ID)
-    item = '({bom_item}=A{r})'.format(bom_item=BOM_ITEM_ID, r=r)
-    pos  = '({rem}>0)'.format(rem=rem)
+    # rates = 4-element array of Per1000 rate for this item in each product
+    rates = 'SUMIFS({per1000},{item_id},A{r},{prod_id},$D$93:$D$96)'.format(
+        per1000=BOM_PER1000, item_id=BOM_ITEM_ID, prod_id=BOM_PROD_ID, r=r)
 
-    num = 'SUMPRODUCT({item}*{pos}*{rem}*{per1000})'.format(
-              item=item, pos=pos, rem=rem, per1000=BOM_PER1000)
-    den = 'SUMPRODUCT({item}*{pos}*{rem})'.format(
-              item=item, pos=pos, rem=rem)
+    # rem = remaining balances, zeroed out if negative
+    rem = 'IF($H$93:$H$96>0,$H$93:$H$96,0)'
 
-    formula = (
-        '=IFERROR(IF({num}=0,"-",'
-        'ROUND(F{r}*1000*{den}/{num},0)),"-")'
-    ).format(num=num, den=den, r=r)
+    # numerator = sum(rate * remaining)
+    num = 'SUMPRODUCT({rates}*{rem})'.format(rates=rates, rem=rem)
+
+    # denominator = sum(remaining) only where rate > 0
+    den = 'SUMPRODUCT(IF({rates}>0,{rem},0))'.format(rates=rates, rem=rem)
+
+    # pieces = stock * 1000 * den / num
+    formula = '=IFERROR(IF({num}=0,"-",ROUND(F{r}*1000*{den}/{num},0)),"-")'.format(
+        num=num, den=den, r=r)
 
     cell = ws.cell(row=r, column=8, value=formula)
     apply_data_style(cell, ws['I{}'.format(r)], num_fmt="#,##0")
 
 wb.save('Tubex_Aug26.xlsx')
-print('Fixed H100:H106 - using direct cell ranges instead of structured table refs.')
+print('Fixed H100:H106 with SUMIFS-based approach.')
 print()
-
-# Verify
-wb2 = openpyxl.load_workbook('Tubex_Aug26.xlsx')
-ws2 = wb2['MRP']
-print('=== H100 formula ===')
-print(ws2['H100'].value)
-print()
-print('=== H101 formula ===')
-print(ws2['H101'].value)
+print('Sample H100:')
+print(ws.cell(row=100, column=8).value)
