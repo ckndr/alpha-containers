@@ -1,45 +1,26 @@
-"""Scan all production data for unique customers and their volumes."""
-import openpyxl, datetime
+"""
+Inspect Production report Jan-2026 till Date.xlsx and Samsol_Production_and_Dispatch.xlsx
+"""
+import openpyxl
 
-sources = [
-    ("Archive",   r"d:\Alpha\Tubex Records\Production_Archive.xlsx", "July 2026",   3),
-    ("Active",    r"d:\Alpha\Tubex_Aug26.xlsx",                       "August 2026", 3),
+files = [
+    r"d:\Alpha\Tubex Records\Production report Jan-2026 till Date.xlsx",
+    r"d:\Alpha\Tubex Records\Samsol_Production_and_Dispatch.xlsx"
 ]
 
-customers = {}   # customer -> {month -> {tube, pet}}
-
-for src_label, path, month_label, start_row in sources:
+for fpath in files:
+    print(f"\n==================================================")
+    print(f" File: {fpath}")
+    print(f"==================================================")
     try:
-        wb = openpyxl.load_workbook(path, data_only=True)
-        sheet_name = "July 2026" if "Archive" in src_label else "Production_Log"
-        if sheet_name not in wb.sheetnames:
-            print(f"[SKIP] {sheet_name} not in {path}")
-            wb.close()
-            continue
-        ws = wb[sheet_name]
-        for row in ws.iter_rows(min_row=start_row, values_only=True):
-            if not row[0]:
-                continue
-            date_val, machine, customer, product, dia, pid, target, good, reject, waste = (list(row) + [None]*10)[:10]
-            if not customer or not good:
-                continue
-            # Determine type from product/machine/dia
-            prod_type = "PET" if (dia and "ml" in str(dia).lower()) else "TUBE"
-            key = str(customer).strip()
-            if key not in customers:
-                customers[key] = {}
-            if month_label not in customers[key]:
-                customers[key][month_label] = {"TUBE": 0, "PET": 0}
-            try:
-                customers[key][month_label][prod_type] += int(good or 0)
-            except:
-                pass
+        wb = openpyxl.load_workbook(fpath, data_only=True)
+        for sname in wb.sheetnames:
+            ws = wb[sname]
+            print(f"\n  --- Sheet: {sname} ({ws.max_row} rows, {ws.max_column} cols) ---")
+            for r in range(1, min(10, ws.max_row+1)):
+                vals = [ws.cell(r, c).value for c in range(1, min(12, ws.max_column+1))]
+                if any(vals):
+                    print(f"    R{r:2d}: {vals}")
         wb.close()
     except Exception as e:
-        print(f"ERROR {path}: {e}")
-
-print(f"\nFound {len(customers)} unique customers:\n")
-for cust in sorted(customers.keys()):
-    total = sum(v.get("TUBE",0)+v.get("PET",0) for v in customers[cust].values())
-    months = list(customers[cust].keys())
-    print(f"  {cust[:50]:52s}  total={total:>10,}  months={months}")
+        print(f"  ERROR: {e}")

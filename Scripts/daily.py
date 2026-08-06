@@ -436,6 +436,7 @@ def step_pipeline():
         ("update_inventory.py",   "Inventory"),
         ("update_dispatch.py",    "Dispatch"),
         ("sort_dashboard.py",     "Sort Dashboard"),
+        ("build_archives.py",     "Build Archives"),
         ("update_html.py",        "HTML Dashboard"),
     ]
 

@@ -23,7 +23,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 button,input{-webkit-tap-highlight-color:transparent}
-body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:20px}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:20px;overflow-x:hidden}
 
 /* ── HEADER ── */
 .header{
@@ -62,7 +62,7 @@ body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min
 }
 
 /* ── MAIN ── */
-.main{padding:20px 20px;max-width:1400px;margin:0 auto}
+.main{padding:20px 20px;max-width:1800px;margin:0 auto}
 .tab-panel{display:none}.tab-panel.active{display:block}
 
 /* ══ DASHBOARD ══ */
@@ -376,6 +376,205 @@ table.mrp-table tr:hover td{background:#f7f9ff}
   .mrp-section-title{font-size:14px}
 }
 
+/* ══ NATIVE CUSTOMER REPORT STYLES ══ */
+.cust-report-layout {
+  display: grid;
+  grid-template-columns: 270px 1fr;
+  gap: 16px;
+  min-height: 600px;
+}
+.cust-sidebar {
+  background: var(--card);
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  max-height: 750px;
+}
+.cust-sidebar-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.cust-search-wrap {
+  margin-bottom: 10px;
+}
+.cust-search-wrap input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 12.5px;
+  font-family: inherit;
+  outline: none;
+}
+.cust-search-wrap input:focus {
+  border-color: var(--blue);
+}
+.cust-sidebar-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cust-btn {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: var(--light);
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: .15s;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cust-btn:hover {
+  background: #e4e9f5;
+  border-color: var(--border);
+}
+.cust-btn.active {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+.cust-btn .sub {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.cust-btn.active .sub {
+  color: var(--accent2);
+}
+.cust-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cust-hdr-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+}
+.cust-title-text {
+  font-family: "DM Serif Display", serif;
+  font-size: 18px;
+  color: var(--navy);
+}
+.cust-badge-pill {
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--light);
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 600;
+}
+.cust-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.cust-kpi {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.cust-kpi .lbl {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.cust-kpi .val {
+  font-family: "DM Mono", monospace;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--navy);
+  margin: 4px 0;
+}
+.cust-kpi .sub {
+  font-size: 11px;
+  color: var(--muted);
+}
+.cust-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cust-tbl-card {
+  background: var(--card);
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  padding: 16px;
+}
+.cust-tbl-card h3 {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+table.cust-tbl {
+  width: 100%;
+  border-collapse: collapse;
+}
+table.cust-tbl th {
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 8px 10px;
+  background: var(--light);
+  border-bottom: 1px solid var(--border);
+}
+table.cust-tbl th.num, table.cust-tbl td.num {
+  text-align: right;
+  font-family: "DM Mono", monospace;
+}
+table.cust-tbl td {
+  padding: 8px 10px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+}
+table.cust-tbl tr:hover td {
+  background: #f7f9ff;
+}
+table.cust-tbl tr.tot td {
+  font-weight: 700;
+  background: var(--light);
+  border-top: 2px solid var(--navy);
+}
+.type-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.type-badge.TUBE { background: #eaf2ff; color: var(--blue); }
+.type-badge.PET { background: var(--green-bg); color: var(--green); }
+@media(max-width:900px){
+  .cust-report-layout { grid-template-columns: 1fr; }
+  .cust-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
   /* ── FOOTER ── */
   .app-footer{
     background:var(--navy);
@@ -407,11 +606,11 @@ table.mrp-table tr:hover td{background:#f7f9ff}
   </div>
   <div class="tabs">
     <button class="tab active" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
+    <button class="tab" onclick="switchTab('customer_report',this)">👥 Customer Report</button>
+    <button class="tab" onclick="switchTab('calc',this)">🧮 Material Calc</button>
     <button class="tab" onclick="switchTab('prodlog',this)">🏭 Production</button>
     <button class="tab" onclick="switchTab('fgstock',this)">📋 FG Stock</button>
     <button class="tab" onclick="switchTab('inventory',this)">📦 Inventory</button>
-    <button class="tab" onclick="switchTab('mrp',this)">⚖️ MRP</button>
-    <button class="tab" onclick="switchTab('calc',this)">🧮 Material Calc</button>
   </div>
 </div>
 
@@ -585,82 +784,28 @@ table.mrp-table tr:hover td{background:#f7f9ff}
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
-  <!-- MATERIAL REQUIREMENT TAB                    -->
+  <!-- CUSTOMER REPORT TAB                         -->
   <!-- ═══════════════════════════════════════════ -->
-  <div class="tab-panel" id="panel-mrp">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;margin-top:4px">
-      <div class="month-badge">⚖️ <span id="mrp-title">Material Requirement</span></div>
+  <div class="tab-panel" id="panel-customer_report">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;margin-top:4px">
+      <div class="month-badge">👥 Customer Production & History Report</div>
+      <div style="font-size:11.5px;color:var(--navy);font-weight:600;background:var(--light);padding:4px 12px;border-radius:20px;border:1px solid var(--border)">📅 Records since November 2025</div>
     </div>
 
-    <!-- Required Orders (Tubes) Section -->
-    <div class="mrp-section">
-      <div class="sec-hdr"><h2>Required Orders (Tubes)</h2><span class="sec-badge" id="mrp-orders-badge">—</span></div>
-      <div class="tbl-wrap">
-        <table class="orders" id="mrp-orders-table">
-          <thead><tr>
-            <th>Dia</th><th>Product</th><th>Customer</th>
-            <th style="text-align:right">Required</th><th style="text-align:right">Produced</th>
-            <th style="text-align:right">Remaining</th><th>Remarks</th>
-          </tr></thead>
-          <tbody id="mrp-orders-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Required Orders (PET) Section -->
-    <div class="mrp-section">
-      <div class="sec-hdr"><h2>Required Orders (PET)</h2><span class="sec-badge" id="mrp-pet-orders-badge">—</span></div>
-      <div class="tbl-wrap">
-        <table class="orders" id="mrp-pet-orders-table">
-          <thead><tr>
-            <th>Dia</th><th>Product</th><th>Customer</th>
-            <th style="text-align:right">Required</th><th style="text-align:right">Produced</th>
-            <th style="text-align:right">Remaining</th><th>Remarks/Priority</th>
-          </tr></thead>
-          <tbody id="mrp-pet-orders-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Material Status Section -->
-    <div class="mrp-section">
-      <div class="sec-hdr"><h2>Raw Material Status</h2><span class="sec-badge" id="mrp-mat-badge">—</span></div>
-      
-      <div class="mrp-filter-bar">
-        <div class="search-wrap" style="flex:1;min-width:200px">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input class="search-input" type="text" id="mrpSearch" placeholder="Search material…" oninput="filterMRP()">
+    <div class="cust-report-layout">
+      <div class="cust-sidebar">
+        <div class="cust-sidebar-title">Select Customer</div>
+        <div class="cust-search-wrap">
+          <input type="text" id="nativeCustSearch" placeholder="Search customer…" oninput="filterNativeCustSidebar()">
         </div>
-        <button class="filter-btn active" id="mrp-f-all" onclick="setMRPFilter('all',this)">All</button>
-        <button class="filter-btn" id="mrp-f-shortage" onclick="setMRPFilter('SHORTAGE',this)">🔴 Shortage</button>
-        <button class="filter-btn" id="mrp-f-low" onclick="setMRPFilter('LOW',this)">🟡 Low</button>
-        <button class="filter-btn" id="mrp-f-ok" onclick="setMRPFilter('OK',this)">🟢 OK</button>
+        <div id="nativeCustList" class="cust-sidebar-list"></div>
       </div>
-      
-      <div class="tbl-wrap">
-        <table class="mrp-table" id="mrp-mat-table">
-          <thead><tr>
-            <th>ID</th><th>Category</th><th>Item Name</th>
-            <th style="text-align:right">Required</th><th style="text-align:right">Stock</th>
-            <th style="text-align:right">Surplus / Deficit</th><th>Status</th>
-          </tr></thead>
-          <tbody id="mrp-mat-body"></tbody>
-        </table>
-      </div>
-    </div>
 
-    <!-- INK Status Section -->
-    <div class="mrp-section">
-      <div class="sec-hdr"><h2>Ink Stock Status</h2><span class="sec-badge" id="mrp-ink-badge">—</span></div>
-      <div class="tbl-wrap">
-        <table class="mrp-table" id="mrp-ink-table">
-          <thead><tr>
-            <th>ID</th><th>Ink Name</th>
-            <th style="text-align:right">Avg Monthly Use</th><th style="text-align:right">Current Stock</th>
-            <th style="text-align:right">Days Left</th><th>Status</th>
-          </tr></thead>
-          <tbody id="mrp-ink-body"></tbody>
-        </table>
+      <div class="cust-main-content" id="nativeCustMainContent">
+        <div class="no-data" style="padding:60px 20px;text-align:center;background:var(--card);border-radius:12px;border:2px solid var(--border)">
+          <div class="big">👥</div>
+          Select a customer from the left list to view complete historical production metrics.
+        </div>
       </div>
     </div>
   </div>
@@ -734,12 +879,12 @@ table.mrp-table tr:hover td{background:#f7f9ff}
 <script>
 /* ═══════════════════════════════════════════════════════
    LIVE DATA — auto-generated by update_html.py
-   Last generated: 05-Aug-2026 11:49
+   Last generated: 05-Aug-2026 16:43
    ════════════════════════════════════════════════════ */
 /*/* DATA_START */
 const DASH_DATA = {
   "month": "August 2026",
-  "lastUpdated": "Updated 05-Aug-2026 11:49 from Tubex_Aug26.xlsx",
+  "lastUpdated": "Updated 05-Aug-2026 16:43 from Tubex_Aug26.xlsx",
   "kpi": {
     "tubeYest": 15239,
     "tubeMTD": 48797,
@@ -972,8 +1117,11 @@ const PRODUCTION_LOG_DATA = {"month": "August 2026", "rows": [{"date": "01-Aug",
 const FG_STOCK_DATA = {"title": "FG STOCK IN HAND — Last Updated: 05-Aug-2026", "rows": [{"sr": 1, "pid": null, "customer": "Horizon", "product": "Trp Bottle", "dia": "150ml", "qty": 2760, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 2, "pid": null, "customer": "Samsol International Private Limited", "product": "Samsol 45", "dia": "dia 25", "qty": 23520, "status": "OK", "remarks": "No Order"}, {"sr": 3, "pid": 6515, "customer": "Samsol International Private Limited", "product": "H.H 100GM", "dia": "32", "qty": 36192, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 4, "pid": 4050, "customer": "Professional Beauty Solution (PVT) LTD.Pakistan", "product": "EAZICOLOR PREMIUM HAIR COLOUR 60ML", "dia": "30", "qty": 9450, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 5, "pid": 6337, "customer": "Al-Rehman Group", "product": "ACTIVE PRO HAIR COLOR CREAM 60ML", "dia": "30", "qty": 15680, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 6, "pid": 6416, "customer": "Al-Rehman Group", "product": "SIGNATURE HAIR COLOR CREAM 60ML", "dia": "30", "qty": 15435, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 7, "pid": 5782, "customer": "Mega Grey", "product": "M.G", "dia": "32", "qty": 74464, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 8, "pid": 6531, "customer": "Adore", "product": "V-HC BLACK", "dia": "35", "qty": 4320, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 9, "pid": 6530, "customer": "Adore", "product": "V- HC BROWN", "dia": "35", "qty": 4500, "status": "OK", "remarks": "Ready for dispatch"}, {"sr": 10, "pid": 8001, "customer": "Alpha Labs PVT LTD", "product": "TRANSPARENT BOTTLE 150ML", "dia": "150ml", "qty": 10120, "status": "OK", "remarks": "Inprogress On Packing"}, {"sr": 11, "pid": null, "customer": "Samsol International Private Limited", "product": "Samsol 45", "dia": "dia 25", "qty": 1344, "status": "Not Ready", "remarks": "Inprogress On Packing"}, {"sr": 12, "pid": 6530, "customer": "Adore", "product": "V- HC BROWN", "dia": "35", "qty": 11340, "status": "Not Ready", "remarks": "Cap Not Available"}, {"sr": 13, "pid": 5699, "customer": "Samsol International Private Limited", "product": "S-43 DIA 20.5", "dia": "20.5", "qty": 14790, "status": "OK", "remarks": "Order Cancel"}, {"sr": 14, "pid": 5731, "customer": "Samsol International Private Limited", "product": "SAMSOL HAIR COLOR 45 DIA 20.5 MM", "dia": "20.5", "qty": 13770, "status": "OK", "remarks": "Order Cancel"}, {"sr": 15, "pid": 6624, "customer": "Samsol International Private Limited", "product": "S-45 DIA 19MM", "dia": "19", "qty": 15876, "status": "Not Ready", "remarks": "Order Cancel"}, {"sr": 16, "pid": 5731, "customer": "Samsol International Private Limited", "product": "SAMSOL HAIR COLOR 45 DIA 20.5 MM", "dia": "20.5", "qty": 33660, "status": "Not Ready", "remarks": "Order Cancel"}]};
 /* FGSTOCK_END */
 /* MRP_START */
-const MRP_DATA = {"title": "AUGUST 2026 Tube Required Orders", "orders": [{"dia": 30, "customer": "Golden Pearl Cosmetics (PVT) LTD", "product": "HELLO HAIR COLOR", "pid": 6206, "jobOrder": "6900", "required": 262534.0, "produced": 30602.0, "remaining": 231932.0, "remarks": ""}], "pet_orders": [{"dia": "120 ml", "customer": "Samsol International Private Limited", "product": "PET BOTTLE SMALL (120ML) YELLOW", "pid": 8005, "jobOrder": "337 & 345", "required": 37160.0, "produced": 0.0, "remaining": 37160.0, "remarks": ""}, {"dia": "130 ml", "customer": "Mablay Beauty PVT LTD.", "product": "PET BOTTLE 130ML WHITE", "pid": 8015, "jobOrder": "344", "required": 15000.0, "produced": 0.0, "remaining": 15000.0, "remarks": ""}, {"dia": "150 ml", "customer": "Alpha Labs PVT LTD", "product": "PET BOTTLE (150ML)TRANSPARENT BODY MIST", "pid": 8001, "jobOrder": "341 & 347", "required": 201257.0, "produced": 19550.0, "remaining": 181707.0, "remarks": "Top Priority"}, {"dia": "150 ml", "customer": "Horizon Chem", "product": "PET BOTTLE (150ML)TRANSPARENT BODY MIST", "pid": 8017, "jobOrder": "346", "required": 13960.0, "produced": 0.0, "remaining": 13960.0, "remarks": ""}], "materials": [{"id": 33, "cat": "SLUG", "name": "12.5X4.5X4.8", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 31, "cat": "SLUG", "name": "13.5X4.2", "uom": "kg", "required": 0, "stock": 71.5, "surplus": 71.5, "products": "", "status": "Not needed", "section": "tube"}, {"id": 2799, "cat": "SLUG", "name": "16x4.5", "uom": "kg", "required": 0, "stock": 88.0, "surplus": 88.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 25, "cat": "SLUG", "name": "16X4.8 S/M", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 22, "cat": "SLUG", "name": "19X4.2", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 19, "cat": "SLUG", "name": "19X4.5 S/M", "uom": "kg", "required": 0, "stock": 425.0, "surplus": 425.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4179, "cat": "SLUG", "name": "20.5x4.5", "uom": "kg", "required": 0, "stock": 132.0, "surplus": 132.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6, "cat": "SLUG", "name": "25X4.5 S/M", "uom": "kg", "required": 0, "stock": 253.0, "surplus": 253.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 10, "cat": "SLUG", "name": "25X4.8 S/M", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 2, "cat": "SLUG", "name": "30X4.3", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 406, "cat": "SLUG", "name": "30X4.5 S/M", "uom": "kg", "required": 2041.0, "stock": 0, "surplus": -2041.0, "products": "HELLO HAIR COLOR", "status": "SHORTAGE", "section": "tube"}, {"id": 6961, "cat": "SLUG", "name": "32X5.2", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3935, "cat": "SLUG", "name": "32x5.0", "uom": "kg", "required": 0, "stock": 444.0, "surplus": 444.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3503, "cat": "SLUG", "name": "35X5.0", "uom": "kg", "required": 0, "stock": 328.0, "surplus": 328.0, "products": "", "status": "HOLD", "section": "tube"}, {"id": 184, "cat": "LACQUER", "name": "LACQUER IMP 49989", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 185, "cat": "LACQUER", "name": "EPOXY LACQUER (1500)", "uom": "L", "required": 0, "stock": 100.0, "surplus": 100.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 188, "cat": "LACQUER", "name": "LACQUER RHENANIA (ACTEGA COLL 299)", "uom": "kg", "required": 0, "stock": 91.0, "surplus": 91.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 1065, "cat": "LACQUER", "name": "PIGMENTED LACQUER 57300", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4155, "cat": "LACQUER", "name": "E/P LACQUER 4000 A/R", "uom": "kg", "required": 71.44, "stock": 75.0, "surplus": 3.56, "products": "HELLO HAIR COLOR", "status": "LOW", "section": "tube"}, {"id": 170, "cat": "BASE COAT", "name": "WHITE 5711200001", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 175, "cat": "BASE COAT", "name": "GOLD 5725100018", "uom": "kg", "required": 0, "stock": 30.0, "surplus": 30.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 192, "cat": "BASE COAT", "name": "TRANSPARENT 234-786", "uom": "kg", "required": 0, "stock": 50.0, "surplus": 50.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3595, "cat": "BASE COAT", "name": "POLYSTER BASE COAT WHITE 23410", "uom": "kg", "required": 170.93, "stock": 90.0, "surplus": -80.93, "products": "HELLO HAIR COLOR", "status": "SHORTAGE", "section": "tube"}, {"id": 3869, "cat": "BASE COAT", "name": "POLYESTER BASE COAT BEIGE 234-999", "uom": "kg", "required": 0, "stock": 60.0, "surplus": 60.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4156, "cat": "BASE COAT", "name": "BEIGE 5711200007", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4157, "cat": "BASE COAT", "name": "SILVER METALLIC 5725100011", "uom": "kg", "required": 0, "stock": 240.0, "surplus": 240.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5895, "cat": "BASE COAT", "name": "GOLD METALLIC ALM-550-234", "uom": "kg", "required": 0, "stock": 50.0, "surplus": 50.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5974, "cat": "BASE COAT", "name": "P11 TBX HT VARNISH (PC 176)", "uom": "L", "required": 0, "stock": 50.0, "surplus": 50.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 177, "cat": "BASE COAT", "name": "YELLOW IMP 5711200008", "uom": "kg", "required": 0, "stock": 450.0, "surplus": 450.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6132, "cat": "BASE COAT", "name": "VR SCHEKOLIN 57251", "uom": "kg", "required": 0, "stock": 60.0, "surplus": 60.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 186, "cat": "LATEX", "name": "LATEX IMP 574010002", "uom": "kg", "required": 71.44, "stock": 45.0, "surplus": -26.44, "products": "HELLO HAIR COLOR", "status": "SHORTAGE", "section": "tube"}, {"id": 69, "cat": "CAP", "name": "M-7 S/M F/P (S) WHITE", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Hold. Caps not approved", "section": "tube"}, {"id": 99, "cat": "CAP", "name": "M-7 OPHTHALMIC  PINK", "uom": "PCS", "required": 0, "stock": 10000.0, "surplus": 10000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 72, "cat": "CAP", "name": "M-9 S/M SPR BLACK DIA 16MM", "uom": "PCS", "required": 0, "stock": 23741.0, "surplus": 23741.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 79, "cat": "CAP", "name": "M-9 S/M SPR WHITE LORINE", "uom": "PCS", "required": 0, "stock": 83600.0, "surplus": 83600.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 80, "cat": "CAP", "name": "M-9 S/M SPR WHITE DIA 19", "uom": "PCS", "required": 0, "stock": 100000.0, "surplus": 100000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 81, "cat": "CAP", "name": "M-9 S/M F/P WHITE (S)", "uom": "PCS", "required": 0, "stock": 553124.0, "surplus": 553124.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 1800, "cat": "CAP", "name": "M-9 S/M SPR BLACK DIA 19", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3211, "cat": "CAP", "name": "M-9 S/M SPR WHITE DIA 22 AUTO", "uom": "PCS", "required": 0, "stock": 4000.0, "surplus": 4000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4015, "cat": "CAP", "name": "M-9 S/M F/P ORANGE (NORMAL)", "uom": "PCS", "required": 0, "stock": 475000.0, "surplus": 475000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4044, "cat": "CAP", "name": "M-9 S/M SPR BEIGE DIA 20.5", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4088, "cat": "CAP", "name": "M-9 S/M SPR WHITE DIA 16MM", "uom": "PCS", "required": 0, "stock": 60000.0, "surplus": 60000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4143, "cat": "CAP", "name": "M-9 S/M F/P Normal White", "uom": "PCS", "required": 0, "stock": 65000.0, "surplus": 65000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6971, "cat": "CAP", "name": "M-9 S/M SPR WHITE DIA 20.5MM", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 7370, "cat": "CAP", "name": "M-9 S/M SPR BLACK DIA 20.5MM", "uom": "PCS", "required": 0, "stock": 47000.0, "surplus": 47000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 68, "cat": "CAP", "name": "M-11 S/M SPR WHITE DIA 25MM", "uom": "PCS", "required": 236570.64, "stock": 208000.0, "surplus": -28570.64, "products": "HELLO HAIR COLOR", "status": "SHORTAGE", "section": "tube"}, {"id": 102, "cat": "CAP", "name": "M-11 S/M SPR ORANGE DIA 25", "uom": "PCS", "required": 0, "stock": 30000.0, "surplus": 30000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 1073, "cat": "CAP", "name": "M-11 S/M F/P BLACK", "uom": "PCS", "required": 0, "stock": 120000.0, "surplus": 120000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 1285, "cat": "CAP", "name": "M-11 S/M F/P WHITE (LARGE)", "uom": "PCS", "required": 0, "stock": 208000.0, "surplus": 208000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3522, "cat": "CAP", "name": "M-11 S/M SPR DARK BLUE DIA 25MM", "uom": "PCS", "required": 0, "stock": 75000.0, "surplus": 75000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3866, "cat": "CAP", "name": "M-11 S/M SPR BEIGE DIA 25", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 578, "cat": "CAP", "name": "M-12 S/M SPR WHITE DIA 30", "uom": "PCS", "required": 0, "stock": 5000.0, "surplus": 5000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 9902, "cat": "CAP", "name": "CAP 12.5MM (est)", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 9903, "cat": "CARTON", "name": "CARTON 12.5MM (est)", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 36, "cat": "CARTON", "name": "16X200 3Ply", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Hold. Caps not approved", "section": "tube"}, {"id": 200, "cat": "CARTON", "name": "DIA 16 5Ply", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Hold. Caps not approved", "section": "tube"}, {"id": 39, "cat": "CARTON", "name": "19X200 3Ply", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3619, "cat": "CARTON", "name": "20.5x510 5ply", "uom": "PCS", "required": 0, "stock": 280.0, "surplus": 280.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3598, "cat": "CARTON", "name": "25x336 5Ply", "uom": "PCS", "required": 1071.93, "stock": 500.0, "surplus": -571.93, "products": "HELLO HAIR COLOR", "status": "SHORTAGE", "section": "tube"}, {"id": 45, "cat": "CARTON", "name": "30X150 3Ply", "uom": "PCS", "required": 0, "stock": 460.0, "surplus": 460.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3988, "cat": "CARTON", "name": "35x165 5ply", "uom": "PCS", "required": 0, "stock": 349.0, "surplus": 349.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5977, "cat": "CARTON", "name": "MASTER CARTON 38\"X24\"X15.5\"", "uom": "PCS", "required": 0, "stock": 61.0, "surplus": 61.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 194, "cat": "ZINC POWDER", "name": "ZINC STEARATE", "uom": "kg", "required": 2.12, "stock": 20.0, "surplus": 17.88, "products": "HELLO HAIR COLOR", "status": "OK", "section": "tube"}, {"id": 4165, "cat": "ZINC POWDER", "name": "ZINC ARCHIMATE", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3635, "cat": "TAPE", "name": "PACKING TAPE 2\" OF 60 YARDS", "uom": "PCS", "required": 39.8, "stock": 463.0, "surplus": 423.2, "products": "HELLO HAIR COLOR", "status": "OK", "section": "tube"}, {"id": 190, "cat": "THINNER", "name": "THINNER FOR LACQUER SOL R/C", "uom": "L", "required": 0, "stock": 175.0, "surplus": 175.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 191, "cat": "THINNER", "name": "THINNER LACQUER SOL EPOXY", "uom": "L", "required": 0, "stock": 50.0, "surplus": 50.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 2680, "cat": "PET RESIN", "name": "PET RESIN A-84", "uom": "kg", "required": 0, "stock": 825.0, "surplus": 825.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3492, "cat": "MASTER BATCH", "name": "MASTER BATCH (PA M27) GREEN", "uom": "kg", "required": 0, "stock": 75.0, "surplus": 75.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4002, "cat": "MASTER BATCH", "name": "MASTER BATCH YELLOW CMN# 3087", "uom": "kg", "required": 0, "stock": 125.0, "surplus": 125.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4070, "cat": "MASTER BATCH", "name": "MASTER BATCH ONCOLOR YELLOW NE12340208-ZN", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4310, "cat": "MASTER BATCH", "name": "MASTER BATCH BEIGE (RCW-25)", "uom": "kg", "required": 0, "stock": 36.23, "surplus": 36.23, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5625, "cat": "MASTER BATCH", "name": "MASTER BATCH AMBAR BR-535n", "uom": "kg", "required": 0, "stock": 48.5, "surplus": 48.5, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5816, "cat": "MASTER BATCH", "name": "MASTER BATCH WHITE PRC-MC ET02340000", "uom": "kg", "required": 0, "stock": 25.0, "surplus": 25.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6135, "cat": "MASTER BATCH", "name": "MASTER BATCH RENOL-GREEN NE60340193-MN", "uom": "kg", "required": 0, "stock": 200.0, "surplus": 200.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 7133, "cat": "MASTER BATCH", "name": "MASTER BATCH GREEN PE63340532-ZN FA", "uom": "kg", "required": 0, "stock": 20.0, "surplus": 20.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 7412, "cat": "MASTER BATCH", "name": "MASTER BATCH BLACK DP# 6411", "uom": "kg", "required": 0, "stock": 25.0, "surplus": 25.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3752, "cat": "GRANULES", "name": "HIGH DENSITY POLY ETHYLINE (HDPE) 200050", "uom": "kg", "required": 0, "stock": 56.0, "surplus": 56.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4248, "cat": "GRANULES", "name": "LOW DENSITY POLY ETHYLENE ( LDPE 4025AS AB247Y01)", "uom": "kg", "required": 0, "stock": 250.0, "surplus": 250.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6042, "cat": "GRANULES", "name": "HDPE BLOW NATURAL ( MARLEX )", "uom": "kg", "required": 0, "stock": 25.0, "surplus": 25.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 2267, "cat": "POLY BAG", "name": "POLY BAG 20X30 (LDPE)", "uom": "PCS", "required": 0, "stock": 50.0, "surplus": 50.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3043, "cat": "PACKING", "name": "PLASTIC DOORI", "uom": "ROLL", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 2680, "cat": "PET RESIN", "name": "PET RESIN A-84", "uom": "kg", "required": 5976.1, "stock": 825.0, "surplus": -5151.1, "products": "PET BOTTLE SMALL (120ML) YELLOW, PET BOTTLE 130ML WHITE, PET BOTTLE (150ML)TRANSPARENT BODY MIST, PET BOTTLE (150ML)TRANSPARENT BODY MIST", "status": "SHORTAGE", "section": "pet"}, {"id": 4070, "cat": "MASTER BATCH", "name": "MASTER BATCH ONCOLOR YELLOW NE12340208-ZN", "uom": "kg", "required": 38.46, "stock": 0, "surplus": -38.46, "products": "PET BOTTLE SMALL (120ML) YELLOW", "status": "SHORTAGE", "section": "pet"}, {"id": 5816, "cat": "MASTER BATCH", "name": "MASTER BATCH WHITE PRC-MC ET02340000", "uom": "kg", "required": 15.52, "stock": 25.0, "surplus": 9.48, "products": "PET BOTTLE 130ML WHITE", "status": "OK", "section": "pet"}, {"id": 5977, "cat": "Carton", "name": "MASTER CARTON 38\"X24\"X15.5\"", "uom": "PCS", "required": 273.35, "stock": 61.0, "surplus": -212.35, "products": "PET BOTTLE 130ML WHITE, PET BOTTLE (150ML)TRANSPARENT BODY MIST, PET BOTTLE (150ML)TRANSPARENT BODY MIST", "status": "SHORTAGE", "section": "pet"}, {"id": 2267, "cat": "Poly Bag", "name": "POLY BAG 20X30 (LDPE)", "uom": "PCS", "required": 2485.35, "stock": 50.0, "surplus": -2435.35, "products": "PET BOTTLE SMALL (120ML) YELLOW, PET BOTTLE 130ML WHITE, PET BOTTLE (150ML)TRANSPARENT BODY MIST, PET BOTTLE (150ML)TRANSPARENT BODY MIST", "status": "SHORTAGE", "section": "pet"}, {"id": 3006, "cat": "Poly Bag", "name": "POLY BAG 24X36 (LDPE)", "uom": "PCS", "required": 0, "stock": 150.0, "surplus": 150.0, "products": "", "status": "Not needed", "section": "pet"}, {"id": 3043, "cat": "PACKING", "name": "PLASTIC DOORI", "uom": "ROLL", "required": 1.43, "stock": 0, "surplus": -1.43, "products": "PET BOTTLE SMALL (120ML) YELLOW, PET BOTTLE 130ML WHITE, PET BOTTLE (150ML)TRANSPARENT BODY MIST, PET BOTTLE (150ML)TRANSPARENT BODY MIST", "status": "SHORTAGE", "section": "pet"}], "inks": []};
+const MRP_DATA = {"title": "AUGUST 2026 Tube Required Orders", "orders": [{"dia": 30, "customer": "Golden Pearl Cosmetics (PVT) LTD", "product": "HELLO HAIR COLOR", "pid": 6206, "jobOrder": "6900", "required": 262534.0, "produced": 30602.0, "remaining": 231932.0, "remarks": ""}], "pet_orders": [{"dia": "120 ml", "customer": "Samsol International Private Limited", "product": "PET BOTTLE SMALL (120ML) YELLOW", "pid": 8005, "jobOrder": "337 & 345", "required": 37160.0, "produced": 0.0, "remaining": 37160.0, "remarks": ""}, {"dia": "130 ml", "customer": "Mablay Beauty PVT LTD.", "product": "PET BOTTLE 130ML WHITE", "pid": 8015, "jobOrder": "344", "required": 15000.0, "produced": 0.0, "remaining": 15000.0, "remarks": ""}, {"dia": "150 ml", "customer": "Alpha Labs PVT LTD", "product": "PET BOTTLE (150ML)TRANSPARENT BODY MIST", "pid": 8001, "jobOrder": "341 & 347", "required": 201257.0, "produced": 19550.0, "remaining": 181707.0, "remarks": ""}, {"dia": "150 ml", "customer": "Horizon Chem", "product": "PET BOTTLE (150ML)TRANSPARENT BODY MIST", "pid": 8017, "jobOrder": "346", "required": 13960.0, "produced": 0.0, "remaining": 13960.0, "remarks": ""}], "materials": [{"id": 33, "cat": "SLUG", "name": "12.5X4.5X4.8", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 31, "cat": "SLUG", "name": "13.5X4.2", "uom": "kg", "required": 0, "stock": 71.5, "surplus": 71.5, "products": "", "status": "Not needed", "section": "tube"}, {"id": 2799, "cat": "SLUG", "name": "16x4.5", "uom": "kg", "required": 0, "stock": 88.0, "surplus": 88.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 25, "cat": "SLUG", "name": "16X4.8 S/M", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 22, "cat": "SLUG", "name": "19X4.2", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 19, "cat": "SLUG", "name": "19X4.5 S/M", "uom": "kg", "required": 0, "stock": 425.0, "surplus": 425.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4179, "cat": "SLUG", "name": "20.5x4.5", "uom": "kg", "required": 0, "stock": 132.0, "surplus": 132.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6, "cat": "SLUG", "name": "25X4.5 S/M", "uom": "kg", "required": 0, "stock": 253.0, "surplus": 253.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 10, "cat": "SLUG", "name": "25X4.8 S/M", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 2, "cat": "SLUG", "name": "30X4.3", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 406, "cat": "SLUG", "name": "30X4.5 S/M", "uom": "kg", "required": 2041.0, "stock": 0, "surplus": -2041.0, "products": "HELLO HAIR COLOR", "status": "SHORTAGE", "section": "tube"}, {"id": 6961, "cat": "SLUG", "name": "32X5.2", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3935, "cat": "SLUG", "name": "32x5.0", "uom": "kg", "required": 0, "stock": 444.0, "surplus": 444.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3503, "cat": "SLUG", "name": "35X5.0", "uom": "kg", "required": 0, "stock": 328.0, "surplus": 328.0, "products": "", "status": "HOLD", "section": "tube"}, {"id": 184, "cat": "LACQUER", "name": "LACQUER IMP 49989", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 185, "cat": "LACQUER", "name": "EPOXY LACQUER (1500)", "uom": "L", "required": 0, "stock": 100.0, "surplus": 100.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 188, "cat": "LACQUER", "name": "LACQUER RHENANIA (ACTEGA COLL 299)", "uom": "kg", "required": 0, "stock": 91.0, "surplus": 91.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 1065, "cat": "LACQUER", "name": "PIGMENTED LACQUER 57300", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4155, "cat": "LACQUER", "name": "E/P LACQUER 4000 A/R", "uom": "kg", "required": 71.44, "stock": 75.0, "surplus": 3.56, "products": "HELLO HAIR COLOR", "status": "LOW", "section": "tube"}, {"id": 170, "cat": "BASE COAT", "name": "WHITE 5711200001", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 175, "cat": "BASE COAT", "name": "GOLD 5725100018", "uom": "kg", "required": 0, "stock": 30.0, "surplus": 30.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 192, "cat": "BASE COAT", "name": "TRANSPARENT 234-786", "uom": "kg", "required": 0, "stock": 50.0, "surplus": 50.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3595, "cat": "BASE COAT", "name": "POLYSTER BASE COAT WHITE 23410", "uom": "kg", "required": 170.93, "stock": 90.0, "surplus": -80.93, "products": "HELLO HAIR COLOR", "status": "SHORTAGE", "section": "tube"}, {"id": 3869, "cat": "BASE COAT", "name": "POLYESTER BASE COAT BEIGE 234-999", "uom": "kg", "required": 0, "stock": 60.0, "surplus": 60.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4156, "cat": "BASE COAT", "name": "BEIGE 5711200007", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4157, "cat": "BASE COAT", "name": "SILVER METALLIC 5725100011", "uom": "kg", "required": 0, "stock": 240.0, "surplus": 240.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5895, "cat": "BASE COAT", "name": "GOLD METALLIC ALM-550-234", "uom": "kg", "required": 0, "stock": 50.0, "surplus": 50.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5974, "cat": "BASE COAT", "name": "P11 TBX HT VARNISH (PC 176)", "uom": "L", "required": 0, "stock": 50.0, "surplus": 50.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 177, "cat": "BASE COAT", "name": "YELLOW IMP 5711200008", "uom": "kg", "required": 0, "stock": 450.0, "surplus": 450.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6132, "cat": "BASE COAT", "name": "VR SCHEKOLIN 57251", "uom": "kg", "required": 0, "stock": 60.0, "surplus": 60.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 186, "cat": "LATEX", "name": "LATEX IMP 574010002", "uom": "kg", "required": 71.44, "stock": 45.0, "surplus": -26.44, "products": "HELLO HAIR COLOR", "status": "SHORTAGE", "section": "tube"}, {"id": 69, "cat": "CAP", "name": "M-7 S/M F/P (S) WHITE", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Hold. Caps not approved", "section": "tube"}, {"id": 99, "cat": "CAP", "name": "M-7 OPHTHALMIC  PINK", "uom": "PCS", "required": 0, "stock": 10000.0, "surplus": 10000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 72, "cat": "CAP", "name": "M-9 S/M SPR BLACK DIA 16MM", "uom": "PCS", "required": 0, "stock": 23741.0, "surplus": 23741.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 79, "cat": "CAP", "name": "M-9 S/M SPR WHITE LORINE", "uom": "PCS", "required": 0, "stock": 83600.0, "surplus": 83600.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 80, "cat": "CAP", "name": "M-9 S/M SPR WHITE DIA 19", "uom": "PCS", "required": 0, "stock": 100000.0, "surplus": 100000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 81, "cat": "CAP", "name": "M-9 S/M F/P WHITE (S)", "uom": "PCS", "required": 0, "stock": 553124.0, "surplus": 553124.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 1800, "cat": "CAP", "name": "M-9 S/M SPR BLACK DIA 19", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3211, "cat": "CAP", "name": "M-9 S/M SPR WHITE DIA 22 AUTO", "uom": "PCS", "required": 0, "stock": 4000.0, "surplus": 4000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4015, "cat": "CAP", "name": "M-9 S/M F/P ORANGE (NORMAL)", "uom": "PCS", "required": 0, "stock": 475000.0, "surplus": 475000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4044, "cat": "CAP", "name": "M-9 S/M SPR BEIGE DIA 20.5", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4088, "cat": "CAP", "name": "M-9 S/M SPR WHITE DIA 16MM", "uom": "PCS", "required": 0, "stock": 60000.0, "surplus": 60000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4143, "cat": "CAP", "name": "M-9 S/M F/P Normal White", "uom": "PCS", "required": 0, "stock": 65000.0, "surplus": 65000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6971, "cat": "CAP", "name": "M-9 S/M SPR WHITE DIA 20.5MM", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 7370, "cat": "CAP", "name": "M-9 S/M SPR BLACK DIA 20.5MM", "uom": "PCS", "required": 0, "stock": 47000.0, "surplus": 47000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 68, "cat": "CAP", "name": "M-11 S/M SPR WHITE DIA 25MM", "uom": "PCS", "required": 236570.64, "stock": 208000.0, "surplus": -28570.64, "products": "HELLO HAIR COLOR", "status": "SHORTAGE", "section": "tube"}, {"id": 102, "cat": "CAP", "name": "M-11 S/M SPR ORANGE DIA 25", "uom": "PCS", "required": 0, "stock": 30000.0, "surplus": 30000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 1073, "cat": "CAP", "name": "M-11 S/M F/P BLACK", "uom": "PCS", "required": 0, "stock": 120000.0, "surplus": 120000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 1285, "cat": "CAP", "name": "M-11 S/M F/P WHITE (LARGE)", "uom": "PCS", "required": 0, "stock": 208000.0, "surplus": 208000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3522, "cat": "CAP", "name": "M-11 S/M SPR DARK BLUE DIA 25MM", "uom": "PCS", "required": 0, "stock": 75000.0, "surplus": 75000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3866, "cat": "CAP", "name": "M-11 S/M SPR BEIGE DIA 25", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 578, "cat": "CAP", "name": "M-12 S/M SPR WHITE DIA 30", "uom": "PCS", "required": 0, "stock": 5000.0, "surplus": 5000.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 9902, "cat": "CAP", "name": "CAP 12.5MM (est)", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 9903, "cat": "CARTON", "name": "CARTON 12.5MM (est)", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 36, "cat": "CARTON", "name": "16X200 3Ply", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Hold. Caps not approved", "section": "tube"}, {"id": 200, "cat": "CARTON", "name": "DIA 16 5Ply", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Hold. Caps not approved", "section": "tube"}, {"id": 39, "cat": "CARTON", "name": "19X200 3Ply", "uom": "PCS", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3619, "cat": "CARTON", "name": "20.5x510 5ply", "uom": "PCS", "required": 0, "stock": 280.0, "surplus": 280.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3598, "cat": "CARTON", "name": "25x336 5Ply", "uom": "PCS", "required": 1071.93, "stock": 500.0, "surplus": -571.93, "products": "HELLO HAIR COLOR", "status": "SHORTAGE", "section": "tube"}, {"id": 45, "cat": "CARTON", "name": "30X150 3Ply", "uom": "PCS", "required": 0, "stock": 460.0, "surplus": 460.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3988, "cat": "CARTON", "name": "35x165 5ply", "uom": "PCS", "required": 0, "stock": 349.0, "surplus": 349.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5977, "cat": "CARTON", "name": "MASTER CARTON 38\"X24\"X15.5\"", "uom": "PCS", "required": 0, "stock": 61.0, "surplus": 61.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 194, "cat": "ZINC POWDER", "name": "ZINC STEARATE", "uom": "kg", "required": 2.12, "stock": 20.0, "surplus": 17.88, "products": "HELLO HAIR COLOR", "status": "OK", "section": "tube"}, {"id": 4165, "cat": "ZINC POWDER", "name": "ZINC ARCHIMATE", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3635, "cat": "TAPE", "name": "PACKING TAPE 2\" OF 60 YARDS", "uom": "PCS", "required": 39.8, "stock": 463.0, "surplus": 423.2, "products": "HELLO HAIR COLOR", "status": "OK", "section": "tube"}, {"id": 190, "cat": "THINNER", "name": "THINNER FOR LACQUER SOL R/C", "uom": "L", "required": 0, "stock": 175.0, "surplus": 175.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 191, "cat": "THINNER", "name": "THINNER LACQUER SOL EPOXY", "uom": "L", "required": 0, "stock": 50.0, "surplus": 50.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 2680, "cat": "PET RESIN", "name": "PET RESIN A-84", "uom": "kg", "required": 0, "stock": 825.0, "surplus": 825.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3492, "cat": "MASTER BATCH", "name": "MASTER BATCH (PA M27) GREEN", "uom": "kg", "required": 0, "stock": 75.0, "surplus": 75.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4002, "cat": "MASTER BATCH", "name": "MASTER BATCH YELLOW CMN# 3087", "uom": "kg", "required": 0, "stock": 125.0, "surplus": 125.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4070, "cat": "MASTER BATCH", "name": "MASTER BATCH ONCOLOR YELLOW NE12340208-ZN", "uom": "kg", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4310, "cat": "MASTER BATCH", "name": "MASTER BATCH BEIGE (RCW-25)", "uom": "kg", "required": 0, "stock": 36.23, "surplus": 36.23, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5625, "cat": "MASTER BATCH", "name": "MASTER BATCH AMBAR BR-535n", "uom": "kg", "required": 0, "stock": 48.5, "surplus": 48.5, "products": "", "status": "Not needed", "section": "tube"}, {"id": 5816, "cat": "MASTER BATCH", "name": "MASTER BATCH WHITE PRC-MC ET02340000", "uom": "kg", "required": 0, "stock": 25.0, "surplus": 25.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6135, "cat": "MASTER BATCH", "name": "MASTER BATCH RENOL-GREEN NE60340193-MN", "uom": "kg", "required": 0, "stock": 200.0, "surplus": 200.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 7133, "cat": "MASTER BATCH", "name": "MASTER BATCH GREEN PE63340532-ZN FA", "uom": "kg", "required": 0, "stock": 20.0, "surplus": 20.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 7412, "cat": "MASTER BATCH", "name": "MASTER BATCH BLACK DP# 6411", "uom": "kg", "required": 0, "stock": 25.0, "surplus": 25.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3752, "cat": "GRANULES", "name": "HIGH DENSITY POLY ETHYLINE (HDPE) 200050", "uom": "kg", "required": 0, "stock": 56.0, "surplus": 56.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 4248, "cat": "GRANULES", "name": "LOW DENSITY POLY ETHYLENE ( LDPE 4025AS AB247Y01)", "uom": "kg", "required": 0, "stock": 250.0, "surplus": 250.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 6042, "cat": "GRANULES", "name": "HDPE BLOW NATURAL ( MARLEX )", "uom": "kg", "required": 0, "stock": 25.0, "surplus": 25.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 2267, "cat": "POLY BAG", "name": "POLY BAG 20X30 (LDPE)", "uom": "PCS", "required": 0, "stock": 50.0, "surplus": 50.0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 3043, "cat": "PACKING", "name": "PLASTIC DOORI", "uom": "ROLL", "required": 0, "stock": 0, "surplus": 0, "products": "", "status": "Not needed", "section": "tube"}, {"id": 2680, "cat": "PET RESIN", "name": "PET RESIN A-84", "uom": "kg", "required": 5976.1, "stock": 825.0, "surplus": -5151.1, "products": "PET BOTTLE SMALL (120ML) YELLOW, PET BOTTLE 130ML WHITE, PET BOTTLE (150ML)TRANSPARENT BODY MIST, PET BOTTLE (150ML)TRANSPARENT BODY MIST", "status": "SHORTAGE", "section": "pet"}, {"id": 4070, "cat": "MASTER BATCH", "name": "MASTER BATCH ONCOLOR YELLOW NE12340208-ZN", "uom": "kg", "required": 38.46, "stock": 0, "surplus": -38.46, "products": "PET BOTTLE SMALL (120ML) YELLOW", "status": "SHORTAGE", "section": "pet"}, {"id": 5816, "cat": "MASTER BATCH", "name": "MASTER BATCH WHITE PRC-MC ET02340000", "uom": "kg", "required": 15.52, "stock": 25.0, "surplus": 9.48, "products": "PET BOTTLE 130ML WHITE", "status": "OK", "section": "pet"}, {"id": 5977, "cat": "Carton", "name": "MASTER CARTON 38\"X24\"X15.5\"", "uom": "PCS", "required": 273.35, "stock": 61.0, "surplus": -212.35, "products": "PET BOTTLE 130ML WHITE, PET BOTTLE (150ML)TRANSPARENT BODY MIST, PET BOTTLE (150ML)TRANSPARENT BODY MIST", "status": "SHORTAGE", "section": "pet"}, {"id": 2267, "cat": "Poly Bag", "name": "POLY BAG 20X30 (LDPE)", "uom": "PCS", "required": 2485.35, "stock": 50.0, "surplus": -2435.35, "products": "PET BOTTLE SMALL (120ML) YELLOW, PET BOTTLE 130ML WHITE, PET BOTTLE (150ML)TRANSPARENT BODY MIST, PET BOTTLE (150ML)TRANSPARENT BODY MIST", "status": "SHORTAGE", "section": "pet"}, {"id": 3006, "cat": "Poly Bag", "name": "POLY BAG 24X36 (LDPE)", "uom": "PCS", "required": 0, "stock": 150.0, "surplus": 150.0, "products": "", "status": "Not needed", "section": "pet"}, {"id": 3043, "cat": "PACKING", "name": "PLASTIC DOORI", "uom": "ROLL", "required": 1.43, "stock": 0, "surplus": -1.43, "products": "PET BOTTLE SMALL (120ML) YELLOW, PET BOTTLE 130ML WHITE, PET BOTTLE (150ML)TRANSPARENT BODY MIST, PET BOTTLE (150ML)TRANSPARENT BODY MIST", "status": "SHORTAGE", "section": "pet"}], "inks": []};
 /* MRP_END */
+/* CUSTOMER_REPORT_START */
+const CUSTOMER_REPORT_DATA = [{"customer": "Samsol International Private Limited", "month": "November 2025", "product": "TUBES COMMON RED", "type": "TUBE", "dia": "25", "produced": 60480, "dispatched": 59808, "balance": 672, "reject": 1110, "good": 60480}, {"customer": "Samsol International Private Limited", "month": "November 2025", "product": "TUBES", "type": "TUBE", "dia": "25", "produced": 76272, "dispatched": 100800, "balance": -24528, "reject": 2085, "good": 76272}, {"customer": "Hola Hair", "month": "November 2025", "product": "H.H 100GM", "type": "TUBE", "dia": "32", "produced": 59688, "dispatched": 50128, "balance": 9560, "reject": 1340, "good": 59688}, {"customer": "Samsol International Private Limited", "month": "November 2025", "product": "S-43 DIA 20.5", "type": "TUBE", "dia": "20.5", "produced": 134640, "dispatched": 103530, "balance": 31110, "reject": 3295, "good": 134640}, {"customer": "Mablay Beauty PVT LTD.", "month": "November 2025", "product": "HIS ONLY HAIR COLOR CREAM 40GM", "type": "TUBE", "dia": "25", "produced": 20496, "dispatched": 19738, "balance": 758, "reject": 510, "good": 20496}, {"customer": "Samsol International Private Limited", "month": "November 2025", "product": "SAMSOL HAIR COLOR 45 DIA 20.5 MM", "type": "TUBE", "dia": "20.5", "produced": 27030, "dispatched": 27030, "balance": 0, "reject": 810, "good": 27030}, {"customer": "Samsol International Private Limited", "month": "November 2025", "product": "TUBE COMMON PURPLE", "type": "TUBE", "dia": "25", "produced": 25872, "dispatched": 26208, "balance": -336, "reject": 575, "good": 25872}, {"customer": "Samsol International Private Limited", "month": "November 2025", "product": "S 43 25MM", "type": "TUBE", "dia": "25", "produced": 82992, "dispatched": 71904, "balance": 11088, "reject": 2370, "good": 82992}, {"customer": "Samsol International Private Limited", "month": "November 2025", "product": "S-45", "type": "TUBE", "dia": "25", "produced": 61824, "dispatched": 61152, "balance": 672, "reject": 1750, "good": 61824}, {"customer": "Mega Grey", "month": "November 2025", "product": "M.G", "type": "TUBE", "dia": "32", "produced": 25792, "dispatched": 0, "balance": 25792, "reject": 460, "good": 25792}, {"customer": "Other Customers", "month": "November 2025", "product": "DARI MOOCH HC DARK BROWN 50ML", "type": "TUBE", "dia": "25", "produced": 15456, "dispatched": 20160, "balance": -4704, "reject": 630, "good": 15456}, {"customer": "Adore", "month": "November 2025", "product": "V-HC BLACK", "type": "TUBE", "dia": "35", "produced": 4860, "dispatched": 0, "balance": 4860, "reject": 165, "good": 4860}, {"customer": "Golden Pearl Cosmetics (PVT) LTD", "month": "November 2025", "product": "HELLO HAIR COLOR", "type": "TUBE", "dia": "30", "produced": 38955, "dispatched": 200165, "balance": -161210, "reject": 800, "good": 38955}, {"customer": "Adore", "month": "November 2025", "product": "V- HC BROWN", "type": "TUBE", "dia": "35", "produced": 9075, "dispatched": 0, "balance": 9075, "reject": 550, "good": 9075}, {"customer": "Hola Hair", "month": "December 2025", "product": "H.H 100GM", "type": "TUBE", "dia": "32", "produced": 12272, "dispatched": 0, "balance": 12272, "reject": 680, "good": 12272}, {"customer": "Samsol International Private Limited", "month": "December 2025", "product": "S 43 25MM", "type": "TUBE", "dia": "25", "produced": 90412, "dispatched": 80976, "balance": 9436, "reject": 1330, "good": 90412}, {"customer": "Samsol International Private Limited", "month": "December 2025", "product": "TUBES MEN BLUE", "type": "TUBE", "dia": "25", "produced": 9408, "dispatched": 5040, "balance": 4368, "reject": 230, "good": 9408}, {"customer": "DTM", "month": "December 2025", "product": "DTM DIA 25MM", "type": "TUBE", "dia": "25", "produced": 4032, "dispatched": 0, "balance": 4032, "reject": 350, "good": 4032}, {"customer": "Samsol International Private Limited", "month": "December 2025", "product": "TUBES", "type": "TUBE", "dia": "25", "produced": 58436, "dispatched": 32956, "balance": 25480, "reject": 1560, "good": 58436}, {"customer": "Golden Pearl Cosmetics (PVT) LTD", "month": "December 2025", "product": "HELLO HAIR COLOR", "type": "TUBE", "dia": "30", "produced": 200777, "dispatched": 0, "balance": 200777, "reject": 6381, "good": 200777}, {"customer": "Samsol International Private Limited", "month": "December 2025", "product": "TUBES COMMON RED", "type": "TUBE", "dia": "25", "produced": 28560, "dispatched": 0, "balance": 28560, "reject": 805, "good": 28560}, {"customer": "Samsol International Private Limited", "month": "December 2025", "product": "TUBE COMMON PURPLE", "type": "TUBE", "dia": "25", "produced": 28224, "dispatched": 0, "balance": 28224, "reject": 225, "good": 28224}, {"customer": "Samsol International Private Limited", "month": "December 2025", "product": "S-43 DIA 20.5", "type": "TUBE", "dia": "20.5", "produced": 161135, "dispatched": 200940, "balance": -39805, "reject": 3770, "good": 161135}, {"customer": "Samsol International Private Limited", "month": "December 2025", "product": "SAMSOL HAIR COLOR 45 DIA 20.5 MM", "type": "TUBE", "dia": "20.5", "produced": 114750, "dispatched": 118830, "balance": -4080, "reject": 2015, "good": 114750}, {"customer": "Mablay Beauty PVT LTD.", "month": "December 2025", "product": "VINCE HIS ONLY BEARD & MUSTACHE COLOR CREAM", "type": "TUBE", "dia": "20.5", "produced": 31110, "dispatched": 30600, "balance": 510, "reject": 460, "good": 31110}, {"customer": "Samsol International Private Limited", "month": "December 2025", "product": "S-45 DIA 20.5", "type": "TUBE", "dia": "20.5", "produced": 7650, "dispatched": 0, "balance": 7650, "reject": 100, "good": 7650}, {"customer": "Samsol International Private Limited", "month": "December 2025", "product": "SAMSOL HAIR COLOR 43 DIA 20.5 MM", "type": "TUBE", "dia": "20.5", "produced": 7165, "dispatched": 0, "balance": 7165, "reject": 128, "good": 7165}, {"customer": "Professional Beauty Solution (Pvt) Ltd", "month": "December 2025", "product": "HIBA S HAIR COLOR 60ML", "type": "TUBE", "dia": "30", "produced": 5448, "dispatched": 0, "balance": 5448, "reject": 150, "good": 5448}, {"customer": "Samsol International Private Limited", "month": "January 2026", "product": "TUBES", "type": "TUBE", "dia": "25", "produced": 50736, "dispatched": 66164, "balance": -15428, "reject": 420, "good": 50736}, {"customer": "Al-Rehman Group", "month": "January 2026", "product": "ACTIVE PRO HAIR COLOR CREAM 60ML", "type": "TUBE", "dia": "30", "produced": 25970, "dispatched": 10045, "balance": 15925, "reject": 400, "good": 25970}, {"customer": "Samsol International Private Limited", "month": "January 2026", "product": "SAMSOL HAIR COLOR 39 SMALL PURPLE", "type": "TUBE", "dia": "20.5", "produced": 3060, "dispatched": 3060, "balance": 0, "reject": 85, "good": 3060}, {"customer": "Samsol International Private Limited", "month": "January 2026", "product": "SAMSOL HAIR COLOR 41 SMALL PURPLE", "type": "TUBE", "dia": "20.5", "produced": 3060, "dispatched": 3060, "balance": 0, "reject": 70, "good": 3060}, {"customer": "Samsol International Private Limited", "month": "January 2026", "product": "S 43 25MM", "type": "TUBE", "dia": "25", "produced": 2016, "dispatched": 0, "balance": 2016, "reject": 70, "good": 2016}, {"customer": "Al-Rehman Group", "month": "January 2026", "product": "SIGNATURE HAIR COLOR CREAM 60ML", "type": "TUBE", "dia": "30", "produced": 25480, "dispatched": 0, "balance": 25480, "reject": 625, "good": 25480}, {"customer": "Professional Beauty Solution (Pvt) Ltd", "month": "January 2026", "product": "HIBA S HAIR COLOR 60ML", "type": "TUBE", "dia": "30", "produced": 93785, "dispatched": 60000, "balance": 33785, "reject": 1500, "good": 93785}, {"customer": "Golden Pearl Cosmetics (PVT) LTD", "month": "January 2026", "product": "HELLO HAIR COLOR", "type": "TUBE", "dia": "30", "produced": 51205, "dispatched": 130585, "balance": -79380, "reject": 1490, "good": 51205}, {"customer": "Samsol International Private Limited", "month": "January 2026", "product": "SAMSOL HAIR COLOR 45 DIA 20.5 MM", "type": "TUBE", "dia": "20.5", "produced": 61200, "dispatched": 61710, "balance": -510, "reject": 545, "good": 61200}, {"customer": "Mablay Beauty PVT LTD.", "month": "January 2026", "product": "HIS ONLY HAIR COLOR CREAM 40GM", "type": "TUBE", "dia": "25", "produced": 24864, "dispatched": 24402, "balance": 462, "reject": 560, "good": 24864}, {"customer": "Hola Hair", "month": "January 2026", "product": "H.H 100GM", "type": "TUBE", "dia": "32", "produced": 34736, "dispatched": 0, "balance": 34736, "reject": 650, "good": 34736}, {"customer": "Samsol International Private Limited", "month": "January 2026", "product": "TUBES MEN BLUE", "type": "TUBE", "dia": "25", "produced": 4704, "dispatched": 7392, "balance": -2688, "reject": 45, "good": 4704}, {"customer": "Samsol International Private Limited", "month": "January 2026", "product": "Yellow small bottle", "type": "PET", "dia": "120 ml", "produced": 60960, "dispatched": 0, "balance": 60960, "reject": 1620, "good": 60960}, {"customer": "Samsol International Private Limited", "month": "January 2026", "product": "Yellow large bottle", "type": "PET", "dia": "200 ml", "produced": 45240, "dispatched": 0, "balance": 45240, "reject": 1300, "good": 45240}, {"customer": "Samsol International Private Limited", "month": "February 2026", "product": "SAMSOL HAIR COLOR 43 DIA 20.5 MM", "type": "TUBE", "dia": "20.5", "produced": 166260, "dispatched": 175440, "balance": -9180, "reject": 2900, "good": 166260}, {"customer": "Brookes Pharma Private Limited", "month": "February 2026", "product": "PYODINE GEL 20GM", "type": "TUBE", "dia": "19", "produced": 50568, "dispatched": 50568, "balance": 0, "reject": 1555, "good": 50568}, {"customer": "Hola Hair", "month": "February 2026", "product": "H.H 100GM", "type": "TUBE", "dia": "32", "produced": 33696, "dispatched": 51584, "balance": -17888, "reject": 1163, "good": 33696}, {"customer": "Brookes Pharma Private Limited", "month": "February 2026", "product": "CONTRATUBEX GEL 20G", "type": "TUBE", "dia": "19", "produced": 19992, "dispatched": 25740, "balance": -5748, "reject": 900, "good": 19992}, {"customer": "Mablay Beauty PVT LTD.", "month": "February 2026", "product": "VINCE NURTURAL", "type": "TUBE", "dia": "30", "produced": 24010, "dispatched": 10045, "balance": 13965, "reject": 345, "good": 24010}, {"customer": "Brookes Pharma Private Limited", "month": "February 2026", "product": "PHLOGIN GEL 20G", "type": "TUBE", "dia": "19", "produced": 15288, "dispatched": 14112, "balance": 1176, "reject": 305, "good": 15288}, {"customer": "Professional Beauty Solution (Pvt) Ltd", "month": "February 2026", "product": "EAZICOLOR PREMIUM HAIR COLOUR 60ML", "type": "TUBE", "dia": "30", "produced": 25137, "dispatched": 11100, "balance": 14037, "reject": 260, "good": 25137}, {"customer": "Samsol International Private Limited", "month": "February 2026", "product": "TUBES COMMON RED", "type": "TUBE", "dia": "25", "produced": 48048, "dispatched": 49392, "balance": -1344, "reject": 560, "good": 48048}, {"customer": "Golden Pearl Cosmetics (PVT) LTD", "month": "February 2026", "product": "HELLO HAIR COLOR", "type": "TUBE", "dia": "30", "produced": 92120, "dispatched": 90895, "balance": 1225, "reject": 1900, "good": 92120}, {"customer": "Samsol International Private Limited", "month": "February 2026", "product": "S-45 DIA 20.5", "type": "TUBE", "dia": "20.5", "produced": 179010, "dispatched": 88740, "balance": 90270, "reject": 3435, "good": 179010}, {"customer": "Samsol International Private Limited", "month": "February 2026", "product": "TUBES", "type": "TUBE", "dia": "25", "produced": 9408, "dispatched": 0, "balance": 9408, "reject": 320, "good": 9408}, {"customer": "Mega Grey", "month": "February 2026", "product": "M.G", "type": "TUBE", "dia": "32", "produced": 67808, "dispatched": 68432, "balance": -624, "reject": 1190, "good": 67808}, {"customer": "Alpha Labs PVT LTD", "month": "February 2026", "product": "Transparent bottle", "type": "PET", "dia": "150 ml", "produced": 65205, "dispatched": 0, "balance": 65205, "reject": 3805, "good": 65205}, {"customer": "Mablay Beauty PVT LTD.", "month": "February 2026", "product": "Transparent bottle", "type": "PET", "dia": "300 ml", "produced": 55850, "dispatched": 0, "balance": 55850, "reject": 4605, "good": 55850}, {"customer": "Samsol International Private Limited", "month": "March 2026", "product": "S-45 DIA 20.5", "type": "TUBE", "dia": "20.5", "produced": 7650, "dispatched": 55080, "balance": -47430, "reject": 120, "good": 7650}, {"customer": "Samsol International Private Limited", "month": "March 2026", "product": "S-43 DIA 20.5", "type": "TUBE", "dia": "20.5", "produced": 33660, "dispatched": 33150, "balance": 510, "reject": 460, "good": 33660}, {"customer": "Golden Pearl Cosmetics (PVT) LTD", "month": "March 2026", "product": "HELLO HAIR COLOR", "type": "TUBE", "dia": "30", "produced": 192570, "dispatched": 221480, "balance": -28910, "reject": 2840, "good": 192570}, {"customer": "Mega Grey", "month": "March 2026", "product": "M.G", "type": "TUBE", "dia": "32", "produced": 22256, "dispatched": 34112, "balance": -11856, "reject": 850, "good": 22256}, {"customer": "Professional Beauty Solution (Pvt) Ltd", "month": "March 2026", "product": "EAZICOLOR PREMIUM HAIR COLOUR 60ML", "type": "TUBE", "dia": "30", "produced": 23712, "dispatched": 30000, "balance": -6288, "reject": 755, "good": 23712}, {"customer": "Mablay Beauty PVT LTD.", "month": "March 2026", "product": "VINCE NURTURAL", "type": "TUBE", "dia": "30", "produced": 22540, "dispatched": 33603, "balance": -11063, "reject": 400, "good": 22540}, {"customer": "Adore", "month": "March 2026", "product": "ANVIL 43", "type": "TUBE", "dia": "35", "produced": 56520, "dispatched": 54000, "balance": 2520, "reject": 1485, "good": 56520}, {"customer": "Samsol International Private Limited", "month": "March 2026", "product": "S 43 25MM", "type": "TUBE", "dia": "25", "produced": 141656, "dispatched": 129360, "balance": 12296, "reject": 2415, "good": 141656}, {"customer": "Samsol International Private Limited", "month": "March 2026", "product": "TUBES", "type": "TUBE", "dia": "25", "produced": 56784, "dispatched": 83328, "balance": -26544, "reject": 830, "good": 56784}, {"customer": "Adore", "month": "March 2026", "product": "ANVIL 45", "type": "TUBE", "dia": "35", "produced": 30420, "dispatched": 29700, "balance": 720, "reject": 580, "good": 30420}, {"customer": "Alpha Labs PVT LTD", "month": "March 2026", "product": "Transparent bottle", "type": "PET", "dia": "150 ml", "produced": 51635, "dispatched": 0, "balance": 51635, "reject": 3685, "good": 51635}, {"customer": "Samsol International Private Limited", "month": "March 2026", "product": "White bottle", "type": "PET", "dia": "200 ml", "produced": 17400, "dispatched": 0, "balance": 17400, "reject": 540, "good": 17400}, {"customer": "Samsol International Private Limited", "month": "March 2026", "product": "Black Bottle", "type": "PET", "dia": "200 ml", "produced": 20280, "dispatched": 0, "balance": 20280, "reject": 760, "good": 20280}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "S 43 25MM", "type": "TUBE", "dia": "25", "produced": 101058, "dispatched": 35952, "balance": 65106, "reject": 2360, "good": 101058}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "TUBES", "type": "TUBE", "dia": "25", "produced": 77952, "dispatched": 17136, "balance": 60816, "reject": 1890, "good": 77952}, {"customer": "Adore", "month": "April 2026", "product": "ANVIL 43", "type": "TUBE", "dia": "35", "produced": 20520, "dispatched": 20700, "balance": -180, "reject": 495, "good": 20520}, {"customer": "Golden Pearl Cosmetics (PVT) LTD", "month": "April 2026", "product": "HELLO HAIR COLOR", "type": "TUBE", "dia": "30", "produced": 272160, "dispatched": 195307, "balance": 76853, "reject": 5335, "good": 272160}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "TUBE COMMON PURPLE", "type": "TUBE", "dia": "25", "produced": 22848, "dispatched": 22176, "balance": 672, "reject": 445, "good": 22848}, {"customer": "Brookes Pharma Private Limited", "month": "April 2026", "product": "PHLOGIN GEL 20G", "type": "TUBE", "dia": "19", "produced": 35280, "dispatched": 0, "balance": 35280, "reject": 820, "good": 35280}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "S-43 DIA 20.5", "type": "TUBE", "dia": "20.5", "produced": 102510, "dispatched": 0, "balance": 102510, "reject": 2380, "good": 102510}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "S-45", "type": "TUBE", "dia": "25", "produced": 20832, "dispatched": 0, "balance": 20832, "reject": 330, "good": 20832}, {"customer": "Hola Hair", "month": "April 2026", "product": "H.H 100GM", "type": "TUBE", "dia": "32", "produced": 71784, "dispatched": 0, "balance": 71784, "reject": 2130, "good": 71784}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "TUBES COMMON RED", "type": "TUBE", "dia": "25", "produced": 62160, "dispatched": 53760, "balance": 8400, "reject": 1395, "good": 62160}, {"customer": "Mega Grey", "month": "April 2026", "product": "M.G", "type": "TUBE", "dia": "32", "produced": 74880, "dispatched": 26000, "balance": 48880, "reject": 1565, "good": 74880}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "TUBES MEN BLUE", "type": "TUBE", "dia": "25", "produced": 15792, "dispatched": 15792, "balance": 0, "reject": 295, "good": 15792}, {"customer": "Seatle (Private) Limited", "month": "April 2026", "product": "DOWFEN GEL 50G", "type": "TUBE", "dia": "30", "produced": 25704, "dispatched": 0, "balance": 25704, "reject": 540, "good": 25704}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "S-43 DIA 19MM", "type": "TUBE", "dia": "19", "produced": 25284, "dispatched": 0, "balance": 25284, "reject": 390, "good": 25284}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "S-45 DIA 19MM", "type": "TUBE", "dia": "19", "produced": 11760, "dispatched": 0, "balance": 11760, "reject": 240, "good": 11760}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "Samsol Black Bottle", "type": "PET", "dia": "120 ml", "produced": 12240, "dispatched": 0, "balance": 12240, "reject": 150, "good": 12240}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "Yellow bottle", "type": "PET", "dia": "200 ml", "produced": 145680, "dispatched": 0, "balance": 145680, "reject": 5530, "good": 145680}, {"customer": "Samsol International Private Limited", "month": "May 2026", "product": "S 43 25MM", "type": "TUBE", "dia": "25", "produced": 43176, "dispatched": 50064, "balance": -6888, "reject": 965, "good": 43176}, {"customer": "Golden Pearl Cosmetics (PVT) LTD", "month": "May 2026", "product": "HELLO HAIR COLOR", "type": "TUBE", "dia": "30", "produced": 197164, "dispatched": 177072, "balance": 20092, "reject": 3315, "good": 197164}, {"customer": "Samsol International Private Limited", "month": "May 2026", "product": "TUBES", "type": "TUBE", "dia": "25", "produced": 18816, "dispatched": 78288, "balance": -59472, "reject": 525, "good": 18816}, {"customer": "Adore", "month": "May 2026", "product": "V- HC BROWN", "type": "TUBE", "dia": "35", "produced": 20700, "dispatched": 5040, "balance": 15660, "reject": 760, "good": 20700}, {"customer": "Mablay Beauty PVT LTD.", "month": "May 2026", "product": "VINCE HIS ONLY BEARD & MUSTACHE COLOR CREAM", "type": "TUBE", "dia": "20.5", "produced": 23910, "dispatched": 23185, "balance": 725, "reject": 645, "good": 23910}, {"customer": "Mablay Beauty PVT LTD.", "month": "May 2026", "product": "VINCE NURTURAL", "type": "TUBE", "dia": "30", "produced": 23562, "dispatched": 21750, "balance": 1812, "reject": 765, "good": 23562}, {"customer": "Hola Hair", "month": "May 2026", "product": "H.H 100GM", "type": "TUBE", "dia": "32", "produced": 13104, "dispatched": 52416, "balance": -39312, "reject": 290, "good": 13104}, {"customer": "Mablay Beauty PVT LTD.", "month": "May 2026", "product": "HIS ONLY HAIR COLOR CREAM 40GM", "type": "TUBE", "dia": "25", "produced": 21840, "dispatched": 21336, "balance": 504, "reject": 460, "good": 21840}, {"customer": "Adore", "month": "May 2026", "product": "V-HC BLACK", "type": "TUBE", "dia": "35", "produced": 10620, "dispatched": 6120, "balance": 4500, "reject": 220, "good": 10620}, {"customer": "Samsol International Private Limited", "month": "May 2026", "product": "TUBES COMMON RED", "type": "TUBE", "dia": "25", "produced": 21504, "dispatched": 28224, "balance": -6720, "reject": 415, "good": 21504}, {"customer": "Samsol International Private Limited", "month": "May 2026", "product": "S-45 DIA 19MM", "type": "TUBE", "dia": "19", "produced": 9996, "dispatched": 8232, "balance": 1764, "reject": 260, "good": 9996}, {"customer": "Samsol International Private Limited", "month": "May 2026", "product": "S-45", "type": "TUBE", "dia": "25", "produced": 4284, "dispatched": 0, "balance": 4284, "reject": 120, "good": 4284}, {"customer": "Alpha Labs PVT LTD", "month": "May 2026", "product": "Trp bottle", "type": "PET", "dia": "130 ml", "produced": 38985, "dispatched": 0, "balance": 38985, "reject": 3800, "good": 38985}, {"customer": "Samsol International Private Limited", "month": "May 2026", "product": "Yellow bottle", "type": "PET", "dia": "120 ml", "produced": 39120, "dispatched": 0, "balance": 39120, "reject": 1860, "good": 39120}, {"customer": "Samsol International Private Limited", "month": "June 2026", "product": "S-45", "type": "TUBE", "dia": "25", "produced": 22176, "dispatched": 44352, "balance": -22176, "reject": 310, "good": 22176}, {"customer": "Golden Pearl Cosmetics (PVT) LTD", "month": "June 2026", "product": "HELLO HAIR COLOR", "type": "TUBE", "dia": "30", "produced": 127806, "dispatched": 173264, "balance": -45458, "reject": 2975, "good": 127806}, {"customer": "Samsol International Private Limited", "month": "June 2026", "product": "TUBES COMMON RED", "type": "TUBE", "dia": "25", "produced": 62496, "dispatched": 62496, "balance": 0, "reject": 1185, "good": 62496}, {"customer": "Samsol International Private Limited", "month": "June 2026", "product": "TUBE COMMON PURPLE", "type": "TUBE", "dia": "25", "produced": 32592, "dispatched": 31248, "balance": 1344, "reject": 825, "good": 32592}, {"customer": "Samsol International Private Limited", "month": "June 2026", "product": "TUBES", "type": "TUBE", "dia": "25", "produced": 77952, "dispatched": 55776, "balance": 22176, "reject": 2405, "good": 77952}, {"customer": "Alpha Labs PVT LTD", "month": "June 2026", "product": "Trp Bottle", "type": "PET", "dia": "150 ml", "produced": 108790, "dispatched": 0, "balance": 108790, "reject": 8020, "good": 108790}, {"customer": "Mablay Beauty PVT LTD.", "month": "June 2026", "product": "Trp Bottle", "type": "PET", "dia": "130 ml", "produced": 25070, "dispatched": 0, "balance": 25070, "reject": 1720, "good": 25070}, {"customer": "Alpha Labs PVT LTD", "month": "July 2026", "product": "TRANSPARENT BOTTLE 150ML", "type": "PET", "dia": "150 ml", "produced": 17020, "dispatched": 35650, "balance": -18630, "reject": 2050, "good": 17020}, {"customer": "Golden Pearl Cosmetics (PVT) LTD", "month": "July 2026", "product": "HELLO HAIR COLOR", "type": "TUBE", "dia": "30", "produced": 232232, "dispatched": 236572, "balance": -4340, "reject": 5315, "good": 232232}, {"customer": "Samsol International Private Limited", "month": "July 2026", "product": "S 43 25MM", "type": "TUBE", "dia": "25", "produced": 74928, "dispatched": 0, "balance": 74928, "reject": 2245, "good": 74928}, {"customer": "Samsol International Private Limited", "month": "July 2026", "product": "PET BOTTLE LARGE (200 ML) YELLOW", "type": "PET", "dia": "200 ml", "produced": 42240, "dispatched": 41880, "balance": 360, "reject": 3150, "good": 42240}, {"customer": "Samsol International Private Limited", "month": "July 2026", "product": "PET BOTTLE SMALL (120ML) YELLOW", "type": "PET", "dia": "120 ml", "produced": 16080, "dispatched": 16080, "balance": 0, "reject": 1000, "good": 16080}, {"customer": "Samsol International Private Limited", "month": "July 2026", "product": "S-45", "type": "TUBE", "dia": "25", "produced": 45850, "dispatched": 0, "balance": 45850, "reject": 1330, "good": 45850}, {"customer": "Samsol International Private Limited", "month": "July 2026", "product": "WHITE BOTTLE 200ML", "type": "PET", "dia": "200 ml", "produced": 9000, "dispatched": 0, "balance": 9000, "reject": 600, "good": 9000}, {"customer": "Mablay Beauty PVT LTD.", "month": "July 2026", "product": "VINCE NURTURAL", "type": "TUBE", "dia": "30", "produced": 48314, "dispatched": 45000, "balance": 3314, "reject": 680, "good": 48314}, {"customer": "Alpha Labs PVT LTD", "month": "August 2026", "product": "TRANSPARENT BOTTLE 150ML", "type": "PET", "dia": "150 ml", "produced": 19550, "dispatched": 12880, "balance": 6670, "reject": 1130, "good": 19550}, {"customer": "Golden Pearl Cosmetics (PVT) LTD", "month": "August 2026", "product": "HELLO HAIR COLOR", "type": "TUBE", "dia": "30", "produced": 30602, "dispatched": 68068, "balance": -37466, "reject": 695, "good": 30602}, {"customer": "Samsol International Private Limited", "month": "August 2026", "product": "S-45", "type": "TUBE", "dia": "25", "produced": 18195, "dispatched": 0, "balance": 18195, "reject": 445, "good": 18195}, {"customer": "Seatle (Private) Limited", "month": "May 2026", "product": "DOWFEN GEL 50G", "type": "TUBE", "dia": "30", "produced": 0, "dispatched": 24990, "balance": -24990, "reject": 0, "good": 0}, {"customer": "DTM", "month": "January 2026", "product": "DTM DIA 25MM", "type": "TUBE", "dia": "25", "produced": 0, "dispatched": 7056, "balance": -7056, "reject": 0, "good": 0}, {"customer": "Hola Hair", "month": "March 2026", "product": "H.H 100GM", "type": "TUBE", "dia": "32", "produced": 0, "dispatched": 66768, "balance": -66768, "reject": 0, "good": 0}, {"customer": "Professional Beauty Solution (Pvt) Ltd", "month": "February 2026", "product": "HIBA S HAIR COLOR 60ML", "type": "TUBE", "dia": "30", "produced": 0, "dispatched": 40350, "balance": -40350, "reject": 0, "good": 0}, {"customer": "Brookes Pharma Private Limited", "month": "May 2026", "product": "PHLOGIN GEL 20G", "type": "TUBE", "dia": "19", "produced": 0, "dispatched": 35280, "balance": -35280, "reject": 0, "good": 0}, {"customer": "Other Customers", "month": "November 2025", "product": "PLAIN DIA 16MM", "type": "TUBE", "dia": "16", "produced": 0, "dispatched": 0, "balance": 0, "reject": 0, "good": 0}, {"customer": "Other Customers", "month": "November 2025", "product": "PLAIN DIA 19MM", "type": "TUBE", "dia": "19", "produced": 0, "dispatched": 0, "balance": 0, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "June 2026", "product": "S 43 25MM", "type": "TUBE", "dia": "25", "produced": 0, "dispatched": 90048, "balance": -90048, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "May 2026", "product": "S-43 DIA 19MM", "type": "TUBE", "dia": "19", "produced": 0, "dispatched": 24696, "balance": -24696, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "May 2026", "product": "S-43 DIA 20.5", "type": "TUBE", "dia": "20.5", "produced": 0, "dispatched": 89250, "balance": -89250, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "May 2026", "product": "S-45 DIA 20.5", "type": "TUBE", "dia": "20.5", "produced": 0, "dispatched": 13260, "balance": -13260, "reject": 0, "good": 0}, {"customer": "Al-Rehman Group", "month": "November 2025", "product": "SIGNATURE HAIR COLOR CREAM 60ML", "type": "TUBE", "dia": "30", "produced": 0, "dispatched": 8803, "balance": -8803, "reject": 0, "good": 0}, {"customer": "Al-Rehman Group", "month": "May 2026", "product": "SIGNATURE HAIR COLOR CREAM 60ML", "type": "TUBE", "dia": "30", "produced": 0, "dispatched": 10045, "balance": -10045, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "March 2026", "product": "TUBE COMMON PURPLE", "type": "TUBE", "dia": "25", "produced": 0, "dispatched": 27208, "balance": -27208, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "July 2026", "product": "TUBES", "type": "TUBE", "dia": "25", "produced": 0, "dispatched": 142128, "balance": -142128, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "January 2026", "product": "TUBES COMMON RED", "type": "TUBE", "dia": "25", "produced": 0, "dispatched": 25536, "balance": -25536, "reject": 0, "good": 0}, {"customer": "Adore", "month": "December 2025", "product": "V- HC BROWN", "type": "TUBE", "dia": "35", "produced": 0, "dispatched": 9000, "balance": -9000, "reject": 0, "good": 0}, {"customer": "Adore", "month": "December 2025", "product": "V-HC BLACK", "type": "TUBE", "dia": "35", "produced": 0, "dispatched": 4860, "balance": -4860, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "November 2025", "product": "BT-120 ML YELLOW", "type": "PET", "dia": "", "produced": 0, "dispatched": 0, "balance": 0, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "December 2025", "product": "BT-120 ML YELLOW", "type": "PET", "dia": "", "produced": 0, "dispatched": 0, "balance": 0, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "BT-120 ML YELLOW", "type": "PET", "dia": "", "produced": 0, "dispatched": 28440, "balance": -28440, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "May 2026", "product": "BT-120 ML YELLOW", "type": "PET", "dia": "", "produced": 0, "dispatched": 26760, "balance": -26760, "reject": 0, "good": 0}, {"customer": "Other Customers", "month": "December 2025", "product": "BT-130 ML TRANSPARENT", "type": "PET", "dia": "", "produced": 0, "dispatched": 20010, "balance": -20010, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "November 2025", "product": "BT-200 ML YELLOW", "type": "PET", "dia": "", "produced": 0, "dispatched": 0, "balance": 0, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "December 2025", "product": "BT-200 ML YELLOW", "type": "PET", "dia": "", "produced": 0, "dispatched": 25200, "balance": -25200, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "BT-200 ML YELLOW", "type": "PET", "dia": "", "produced": 0, "dispatched": 104640, "balance": -104640, "reject": 0, "good": 0}, {"customer": "Other Customers", "month": "February 2026", "product": "BT-300 ML TRANSPARENT", "type": "PET", "dia": "", "produced": 0, "dispatched": 10080, "balance": -10080, "reject": 0, "good": 0}, {"customer": "Alpha Labs PVT LTD", "month": "November 2025", "product": "PET BOTTLE (150ML)TRANSPARENT BODY MIST", "type": "PET", "dia": "150 ml", "produced": 0, "dispatched": 44160, "balance": -44160, "reject": 0, "good": 0}, {"customer": "Alpha Labs PVT LTD", "month": "December 2025", "product": "PET BOTTLE (150ML)TRANSPARENT BODY MIST", "type": "PET", "dia": "150 ml", "produced": 0, "dispatched": 175720, "balance": -175720, "reject": 0, "good": 0}, {"customer": "Alpha Labs PVT LTD", "month": "February 2026", "product": "PET BOTTLE (150ML)TRANSPARENT BODY MIST", "type": "PET", "dia": "150 ml", "produced": 0, "dispatched": 106720, "balance": -106720, "reject": 0, "good": 0}, {"customer": "Alpha Labs PVT LTD", "month": "May 2026", "product": "PET BOTTLE (150ML)TRANSPARENT BODY MIST", "type": "PET", "dia": "150 ml", "produced": 0, "dispatched": 50600, "balance": -50600, "reject": 0, "good": 0}, {"customer": "Alpha Labs PVT LTD", "month": "June 2026", "product": "PET BOTTLE (150ML)TRANSPARENT BODY MIST", "type": "PET", "dia": "150 ml", "produced": 0, "dispatched": 127880, "balance": -127880, "reject": 0, "good": 0}, {"customer": "Alpha Labs PVT LTD", "month": "July 2026", "product": "PET BOTTLE (150ML)TRANSPARENT BODY MIST", "type": "PET", "dia": "150 ml", "produced": 0, "dispatched": 0, "balance": 0, "reject": 0, "good": 0}, {"customer": "Other Customers", "month": "December 2025", "product": "PET BOTTLE (500ML) GREEN", "type": "PET", "dia": "", "produced": 0, "dispatched": 1824, "balance": -1824, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "November 2025", "product": "PET BOTTLE COCONUT OIL (200ML) WHITE", "type": "PET", "dia": "200 ml", "produced": 0, "dispatched": 2760, "balance": -2760, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "November 2025", "product": "PET BOTTLE LARGE (200 ML) YELLOW", "type": "PET", "dia": "200 ml", "produced": 0, "dispatched": 20640, "balance": -20640, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "December 2025", "product": "PET BOTTLE LARGE (200 ML) YELLOW", "type": "PET", "dia": "200 ml", "produced": 0, "dispatched": 47400, "balance": -47400, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "January 2026", "product": "PET BOTTLE LARGE (200 ML) YELLOW", "type": "PET", "dia": "200 ml", "produced": 0, "dispatched": 27480, "balance": -27480, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "February 2026", "product": "PET BOTTLE LARGE (200 ML) YELLOW", "type": "PET", "dia": "200 ml", "produced": 0, "dispatched": 17760, "balance": -17760, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "June 2026", "product": "PET BOTTLE LARGE (200 ML) YELLOW", "type": "PET", "dia": "200 ml", "produced": 0, "dispatched": 35040, "balance": -35040, "reject": 0, "good": 0}, {"customer": "Other Customers", "month": "March 2026", "product": "PET BOTTLE LARGE (200ML) COMPACT BLACK", "type": "PET", "dia": "", "produced": 0, "dispatched": 20280, "balance": -20280, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "March 2026", "product": "PET BOTTLE LARGE 200ML WHITE", "type": "PET", "dia": "200 ml", "produced": 0, "dispatched": 8040, "balance": -8040, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "April 2026", "product": "PET BOTTLE LARGE 200ML WHITE", "type": "PET", "dia": "200 ml", "produced": 0, "dispatched": 9240, "balance": -9240, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "July 2026", "product": "PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT", "type": "PET", "dia": "200 ml", "produced": 0, "dispatched": 10080, "balance": -10080, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "November 2025", "product": "PET BOTTLE SMALL (120 ML) YELLOW", "type": "PET", "dia": "", "produced": 0, "dispatched": 7080, "balance": -7080, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "December 2025", "product": "PET BOTTLE SMALL (120 ML) YELLOW", "type": "PET", "dia": "", "produced": 0, "dispatched": 51840, "balance": -51840, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "January 2026", "product": "PET BOTTLE SMALL (120 ML) YELLOW", "type": "PET", "dia": "", "produced": 0, "dispatched": 60960, "balance": -60960, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "May 2026", "product": "PET BOTTLE SMALL (120 ML) YELLOW", "type": "PET", "dia": "", "produced": 0, "dispatched": 24960, "balance": -24960, "reject": 0, "good": 0}, {"customer": "Other Customers", "month": "April 2026", "product": "PET BOTTLE SMALL (120ML) COMPACT BLACK", "type": "PET", "dia": "", "produced": 0, "dispatched": 12240, "balance": -12240, "reject": 0, "good": 0}, {"customer": "Other Customers", "month": "December 2025", "product": "PET BOTTLE SMALL (130 ML) (TRANSPARENT) (WITHOUT CAP)", "type": "PET", "dia": "", "produced": 0, "dispatched": 3105, "balance": -3105, "reject": 0, "good": 0}, {"customer": "Other Customers", "month": "May 2026", "product": "PET BOTTLE SMALL (130 ML) (TRANSPARENT) (WITHOUT CAP)", "type": "PET", "dia": "", "produced": 0, "dispatched": 5520, "balance": -5520, "reject": 0, "good": 0}, {"customer": "Other Customers", "month": "June 2026", "product": "PET BOTTLE SMALL (130 ML) (TRANSPARENT) (WITHOUT CAP)", "type": "PET", "dia": "", "produced": 0, "dispatched": 12928, "balance": -12928, "reject": 0, "good": 0}, {"customer": "Other Customers", "month": "July 2026", "product": "PET BOTTLE SMALL (130 ML) (TRANSPARENT) (WITHOUT CAP)", "type": "PET", "dia": "", "produced": 0, "dispatched": 0, "balance": 0, "reject": 0, "good": 0}, {"customer": "Mablay Beauty PVT LTD.", "month": "July 2026", "product": "PET BOTTLE SMALL (130ML) TRANSPARENT", "type": "PET", "dia": "", "produced": 0, "dispatched": 12420, "balance": -12420, "reject": 0, "good": 0}, {"customer": "Samsol International Private Limited", "month": "July 2026", "product": "PET BOTTLE COCONUT OIL (200ML) WHITE", "type": "PET", "dia": "", "produced": 0, "dispatched": 9000, "balance": -9000, "reject": 0, "good": 0}];
+/* CUSTOMER_REPORT_END */
 const CAT_ICON = {
   'SLUG':'⚙️','BASE COAT':'🎨','LACQUER':'✨','LATEX':'💧','ZINC POWDER':'🔬',
   'CAP':'🔵','CARTON':'📦','TAPE':'🗂️','THINNER':'🧪','INK':'🖊️',
@@ -1359,7 +1507,326 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('panel-'+name).classList.add('active');
+  if (name === 'customer_report') {
+    renderCustomerReportNative();
+  }
   updateJumpButton();
+}
+
+// ─── NATIVE CUSTOMER REPORT ───
+let _nativeSelectedCust = "ALL CUSTOMERS (Factory Total)";
+let _nativeSelectedMonths = null; // null = all months; Set() = custom selected months
+let _nativeTypeFilter = 'all';
+
+function renderCustomerReportNative() {
+  const data = (typeof CUSTOMER_REPORT_DATA !== 'undefined') ? CUSTOMER_REPORT_DATA : [];
+  if (!data || data.length === 0) return;
+  
+  buildNativeCustSidebar();
+  if (!_nativeSelectedCust) {
+    _nativeSelectedCust = "ALL CUSTOMERS (Factory Total)";
+  }
+  renderNativeCustMain();
+}
+
+function getNativeCustomers() {
+  const data = (typeof CUSTOMER_REPORT_DATA !== 'undefined') ? CUSTOMER_REPORT_DATA : [];
+  const totals = {};
+  let totalFactory = 0;
+  data.forEach(r => {
+    const qty = (r.produced || r.good || 0);
+    totalFactory += qty;
+    if (!totals[r.customer]) totals[r.customer] = 0;
+    totals[r.customer] += qty;
+  });
+  const sortedCusts = Object.entries(totals).sort((a,b) => b[1] - a[1]);
+  return [["ALL CUSTOMERS (Factory Total)", totalFactory], ...sortedCusts];
+}
+
+function buildNativeCustSidebar() {
+  const list = document.getElementById('nativeCustList');
+  if (!list) return;
+  const q = (document.getElementById('nativeCustSearch')?.value || '').toLowerCase();
+  list.innerHTML = '';
+  
+  getNativeCustomers().forEach(([name, total]) => {
+    if (q && !name.toLowerCase().includes(q) && name !== "ALL CUSTOMERS (Factory Total)") return;
+    const btn = document.createElement('button');
+    const isAll = (name === "ALL CUSTOMERS (Factory Total)");
+    btn.className = 'cust-btn' + (name === _nativeSelectedCust ? ' active' : '') + (isAll ? ' all-cust-btn' : '');
+    const displayName = isAll ? '🌐 ALL CUSTOMERS' : name;
+    const short = displayName.length > 28 ? displayName.substring(0, 26) + '...' : displayName;
+    btn.innerHTML = `<div style="${isAll?'font-weight:700;color:var(--navy)':''}">${short}</div><div class="sub">${total.toLocaleString()} units total</div>`;
+    btn.onclick = () => {
+      _nativeSelectedCust = name;
+      _nativeSelectedMonths = null;
+      _nativeTypeFilter = 'all';
+      buildNativeCustSidebar();
+      renderNativeCustMain();
+    };
+    list.appendChild(btn);
+  });
+}
+
+function filterNativeCustSidebar() {
+  buildNativeCustSidebar();
+}
+
+function getNativeCustMonths(cust) {
+  const data = (typeof CUSTOMER_REPORT_DATA !== 'undefined') ? CUSTOMER_REPORT_DATA : [];
+  const s = new Set();
+  data.forEach(r => {
+    if (cust === "ALL CUSTOMERS (Factory Total)" || r.customer === cust) {
+      s.add(r.month);
+    }
+  });
+  const monthOrder = ["November 2025", "December 2025", "January 2026", "February 2026", "March 2026", "April 2026", "May 2026", "June 2026", "July 2026", "August 2026", "September 2026", "October 2026", "November 2026", "December 2026"];
+  return [...s].sort((a,b) => {
+    let ia = monthOrder.indexOf(a), ib = monthOrder.indexOf(b);
+    if (ia !== -1 && ib !== -1) return ia - ib;
+    return a.localeCompare(b);
+  });
+}
+
+function resetNativeMonths() {
+  _nativeSelectedMonths = null;
+  renderNativeCustMain();
+}
+
+function selectL3NativeMonths() {
+  const months = getNativeCustMonths(_nativeSelectedCust);
+  const l3 = months.slice(-3);
+  _nativeSelectedMonths = new Set(l3);
+  renderNativeCustMain();
+}
+
+function toggleNativeMonth(m) {
+  if (!_nativeSelectedMonths) {
+    _nativeSelectedMonths = new Set([m]);
+  } else {
+    if (_nativeSelectedMonths.has(m)) {
+      _nativeSelectedMonths.delete(m);
+      if (_nativeSelectedMonths.size === 0) {
+        _nativeSelectedMonths = null;
+      }
+    } else {
+      _nativeSelectedMonths.add(m);
+    }
+  }
+  renderNativeCustMain();
+}
+
+function renderNativeCustMain() {
+  const container = document.getElementById('nativeCustMainContent');
+  if (!container || !_nativeSelectedCust) return;
+  
+  const data = (typeof CUSTOMER_REPORT_DATA !== 'undefined') ? CUSTOMER_REPORT_DATA : [];
+  const isAllCust = (_nativeSelectedCust === "ALL CUSTOMERS (Factory Total)");
+  const months = getNativeCustMonths(_nativeSelectedCust);
+  const l3 = months.slice(-3);
+  
+  const isAll = (!_nativeSelectedMonths || _nativeSelectedMonths.size === 0);
+  const isL3  = (!isAll && l3.length > 0 && l3.every(m => _nativeSelectedMonths.has(m)) && _nativeSelectedMonths.size === l3.length);
+  
+  const filteredRecs = data.filter(r => {
+    if (!isAllCust && r.customer !== _nativeSelectedCust) return false;
+    if (_nativeTypeFilter !== 'all' && r.type !== _nativeTypeFilter) return false;
+    if (!isAll && !_nativeSelectedMonths.has(r.month)) return false;
+    return true;
+  });
+  
+  const tubeProdTotal = filteredRecs.filter(r => r.type === 'TUBE').reduce((s,r) => s + (r.produced || r.good || 0), 0);
+  const tubeDispTotal = filteredRecs.filter(r => r.type === 'TUBE').reduce((s,r) => s + (r.dispatched || 0), 0);
+  
+  const petProdTotal  = filteredRecs.filter(r => r.type === 'PET').reduce((s,r) => s + (r.produced || r.good || 0), 0);
+  const petDispTotal  = filteredRecs.filter(r => r.type === 'PET').reduce((s,r) => s + (r.dispatched || 0), 0);
+  
+  const rejectTotal   = filteredRecs.reduce((s,r) => s + (r.reject || 0), 0);
+  
+  const grandProdTotal = tubeProdTotal + petProdTotal;
+  const grandDispTotal = tubeDispTotal + petDispTotal;
+  
+  let selectionSubtext = `All ${months.length} months`;
+  if (isL3) {
+    selectionSubtext = "Last 3 months (L3)";
+  } else if (!isAll) {
+    selectionSubtext = `Custom (${_nativeSelectedMonths.size} months selected)`;
+  }
+
+  let periodBtns = `<button class="filter-btn ${isAll ? 'active' : ''}" onclick="resetNativeMonths()">All Months</button>`;
+  periodBtns += `<button class="filter-btn ${isL3 ? 'active' : ''}" onclick="selectL3NativeMonths()">Last 3 Months</button>`;
+  
+  months.forEach(m => {
+    const active = _nativeSelectedMonths && _nativeSelectedMonths.has(m);
+    periodBtns += `<button class="filter-btn ${active ? 'active' : ''}" onclick="toggleNativeMonth('${m}')">${m}</button>`;
+  });
+  
+  const typeBtns = ['all','TUBE','PET'].map(t =>
+    `<button class="filter-btn ${_nativeTypeFilter===t?'active':''}" onclick="setNativeTypeFilter('${t}')">${t==='all'?'All Types':t}</button>`
+  ).join('');
+
+  const monthSummary = {};
+  data.filter(r => isAllCust || r.customer === _nativeSelectedCust).forEach(r => {
+    if (!monthSummary[r.month]) monthSummary[r.month] = {TUBE_P:0, TUBE_D:0, PET_P:0, PET_D:0, reject:0};
+    if (r.type === 'TUBE') {
+      monthSummary[r.month].TUBE_P += (r.produced || r.good || 0);
+      monthSummary[r.month].TUBE_D += (r.dispatched || 0);
+    } else {
+      monthSummary[r.month].PET_P  += (r.produced || r.good || 0);
+      monthSummary[r.month].PET_D  += (r.dispatched || 0);
+    }
+    monthSummary[r.month].reject += (r.reject || 0);
+  });
+  
+  const monthRows = months.map(m => {
+    const d = monthSummary[m] || {TUBE_P:0, TUBE_D:0, PET_P:0, PET_D:0, reject:0};
+    const totP = d.TUBE_P + d.PET_P;
+    const totD = d.TUBE_D + d.PET_D;
+    const rejPct = totP > 0 ? ((d.reject / totP) * 100).toFixed(1) : '0.0';
+    const isSelected = isAll || (_nativeSelectedMonths && _nativeSelectedMonths.has(m));
+    const bgStyle = isSelected ? (isAll ? '' : 'background:rgba(35,85,160,0.08);font-weight:600') : 'opacity:0.4';
+    return `<tr style="${bgStyle}">
+      <td style="font-weight:600">${m} ${isSelected && !isAll ? '✓' : ''}</td>
+      <td class="num" style="color:var(--blue-light)">${d.TUBE_P.toLocaleString()}</td>
+      <td class="num" style="color:var(--blue-light);font-size:11px">${d.TUBE_D.toLocaleString()}</td>
+      <td class="num" style="color:var(--green)">${d.PET_P.toLocaleString()}</td>
+      <td class="num" style="color:var(--green);font-size:11px">${d.PET_D.toLocaleString()}</td>
+      <td class="num" style="font-weight:700;color:var(--navy)">${totP.toLocaleString()}</td>
+      <td class="num" style="font-weight:600;color:var(--accent)">${totD.toLocaleString()}</td>
+      <td class="num" style="color:var(--red)">${rejPct}%</td>
+    </tr>`;
+  }).join('');
+  
+  const allM = Object.values(monthSummary);
+  const sumTUBEP   = allM.reduce((s,d)=>s+d.TUBE_P,0);
+  const sumTUBED   = allM.reduce((s,d)=>s+d.TUBE_D,0);
+  const sumPETP    = allM.reduce((s,d)=>s+d.PET_P,0);
+  const sumPETD    = allM.reduce((s,d)=>s+d.PET_D,0);
+  const sumReject  = allM.reduce((s,d)=>s+d.reject,0);
+  const sumTotalP  = sumTUBEP + sumPETP;
+  const sumTotalD  = sumTUBED + sumPETD;
+  const sumRejPct  = sumTotalP > 0 ? ((sumReject/sumTotalP)*100).toFixed(1) : '0.0';
+
+  const products = {};
+  filteredRecs.forEach(r => {
+    const k = r.product + '||' + r.type + (isAllCust ? '||' + r.customer : '');
+    if (!products[k]) products[k] = {product:r.product, type:r.type, customer:r.customer, produced:0, dispatched:0};
+    products[k].produced   += (r.produced || r.good || 0);
+    products[k].dispatched += (r.dispatched || 0);
+  });
+  const prodMax = Math.max(...Object.values(products).map(p=>p.produced), 1);
+  const prodRows = Object.values(products)
+    .sort((a,b)=>b.produced-a.produced)
+    .map(p => {
+      const pct = ((p.produced/prodMax)*100).toFixed(0);
+      const custTag = isAllCust ? `<div style="font-size:10px;color:var(--muted)">${p.customer}</div>` : '';
+      return `<tr>
+        <td><span class="type-badge ${p.type}">${p.type}</span></td>
+        <td style="font-weight:500">${p.product}${custTag}</td>
+        <td class="num" style="font-weight:600;color:var(--navy)">${p.produced.toLocaleString()}</td>
+        <td class="num" style="color:var(--accent)">${p.dispatched.toLocaleString()}</td>
+        <td style="width:120px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="flex:1;height:6px;background:var(--light);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:${pct}%;background:${p.type==='TUBE'?'var(--blue)':'var(--green)'};border-radius:3px"></div>
+            </div>
+            <span style="font-size:11px;color:var(--muted);width:28px;text-align:right">${pct}%</span>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+  const displayCustTitle = isAllCust ? '🌐 ALL CUSTOMERS (Factory Total)' : _nativeSelectedCust;
+
+  container.innerHTML = `
+    <div class="cust-hdr-bar">
+      <div>
+        <div class="cust-title-text">${displayCustTitle}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Historical Production & Dispatch Log (Records since November 2025)</div>
+      </div>
+      <span class="cust-badge-pill">${selectionSubtext}</span>
+    </div>
+
+    <div class="cust-kpi-grid">
+      <div class="cust-kpi">
+        <div class="lbl">TUBE Produced</div>
+        <div class="val" style="color:var(--blue)">${tubeProdTotal.toLocaleString()}</div>
+      </div>
+      <div class="cust-kpi">
+        <div class="lbl">TUBE Dispatched</div>
+        <div class="val" style="color:var(--blue)">${tubeDispTotal.toLocaleString()}</div>
+      </div>
+      <div class="cust-kpi">
+        <div class="lbl">PET Produced</div>
+        <div class="val" style="color:var(--green)">${petProdTotal.toLocaleString()}</div>
+      </div>
+      <div class="cust-kpi">
+        <div class="lbl">PET Dispatched</div>
+        <div class="val" style="color:var(--green)">${petDispTotal.toLocaleString()}</div>
+      </div>
+    </div>
+
+    <div class="cust-filter-bar">
+      <span style="font-size:11px;font-weight:600;color:var(--muted)">PERIOD (MULTI-SELECT):</span>
+      ${periodBtns}
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+        <span style="font-size:11px;font-weight:600;color:var(--muted)">TYPE:</span>
+        ${typeBtns}
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:16px">
+      <div class="cust-tbl-card">
+        <h3>Monthly Production & Dispatch Breakdown</h3>
+        <table class="cust-tbl">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th class="num">TUBE Prod</th>
+              <th class="num">TUBE Disp</th>
+              <th class="num">PET Prod</th>
+              <th class="num">PET Disp</th>
+              <th class="num">Tot Prod</th>
+              <th class="num">Tot Disp</th>
+              <th class="num">Rej%</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${monthRows}
+            <tr class="tot">
+              <td>ALL MONTHS TOTAL</td>
+              <td class="num">${sumTUBEP.toLocaleString()}</td>
+              <td class="num">${sumTUBED.toLocaleString()}</td>
+              <td class="num">${sumPETP.toLocaleString()}</td>
+              <td class="num">${sumPETD.toLocaleString()}</td>
+              <td class="num">${sumTotalP.toLocaleString()}</td>
+              <td class="num">${sumTotalD.toLocaleString()}</td>
+              <td class="num" style="color:var(--red)">${sumRejPct}%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cust-tbl-card">
+        <h3>Product SKU Breakdown (${selectionSubtext})</h3>
+        <table class="cust-tbl">
+          <thead><tr><th>Type</th><th>Product</th><th class="num">Produced</th><th class="num">Dispatched</th><th>Share</th></tr></thead>
+          <tbody>${prodRows || '<tr><td colspan="5" class="no-data">No records match filter</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function setNativeMonthFilter(k) {
+  if (k === 'all') resetNativeMonths();
+  else if (k === 'l3') selectL3NativeMonths();
+  else toggleNativeMonth(k);
+}
+
+function setNativeTypeFilter(t) {
+  _nativeTypeFilter = t;
+  renderNativeCustMain();
 }
 
 // ─── MATERIAL CALCULATOR ───

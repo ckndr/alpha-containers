@@ -1,0 +1,30 @@
+
+  ╔══════════════════════════════════════════════════════════╗
+  ║  ⚠ DAILY WORKFLOW ERROR SUMMARY                          ║
+  ╚══════════════════════════════════════════════════════════╝
+
+  [INVENTORY: ITEMS MISSING FROM ERP]
+    (These rows are highlighted in RED in Excel and zeroed out)
+    • Item ID 36 (16X200 3Ply) [Carton] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 39 (19X200 3Ply) [Carton] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 69 (M-7 S/M F/P (S) WHITE) [Cap] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 170 (WHITE 5711200001) [Base Coat] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 184 (LACQUAR IMP 49989) [Lacquer] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 200 (DIA 16 5Ply) [Carton] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 1065 (PIGMENTED LACQUAR 57300) [Lacquer] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 1800 (M-9 S/M SPR BLACK DIA 19) [Cap] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 3043 (PLASTIC DOORI) [Packing] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 3866 (M-11 S/M SPR BEIGE DIA 25) [Cap] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 4044 (M-9 S/M SPR BEIGE DIA 20.5) [Cap] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 4070 (MASTER BATCH ONCOLOR YELLOW NE12340208-ZN) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 4156 (BEIGE 5711200007) [Base Coat] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • Item ID 6971 (M-9 S/M SPR WHITE DIA 20.5MM) [Cap] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+
+  [CROSS-CHECK MISMATCHES]
+    • Pending Tube Orders mismatch: PENDING ORDER AUGUST 2026 (1).xlsx (04-08-2026)=228,458, MRP Sheet=231,932 (diff=-3,474)
+
+  [MAPPING MISMATCHES]
+    (Unmapped products found during production/dispatch/FG processing)
+    • Trp Bottle | 150 ml | Horizon
+    • Samsol 45 | dia 25 | Samsol
+

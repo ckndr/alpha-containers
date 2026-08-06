@@ -879,10 +879,12 @@ new_catalog_block = (
 html = html[:pos_cs] + new_catalog_block + html[pos_ce + len(cat_end):]
 
 # ── INJECT NEW DATA CONSTANTS ────────────────────────────────
-def inject_block(html, start_marker, end_marker, js_content):
+def inject_block(html, start_marker, end_marker, js_content, optional=False):
     ps = html.find(start_marker)
     pe = html.find(end_marker)
     if ps == -1 or pe == -1:
+        if optional:
+            return html
         raise RuntimeError(f"{start_marker} / {end_marker} markers not found.")
     return html[:ps] + f"{start_marker}\n{js_content}\n{end_marker}" + html[pe + len(end_marker):]
 
@@ -893,7 +895,17 @@ html = inject_block(html, '/* PRODLOG_START */', '/* PRODLOG_END */',
 html = inject_block(html, '/* FGSTOCK_START */', '/* FGSTOCK_END */',
     f"const FG_STOCK_DATA = {json.dumps({'title': fg_title, 'rows': fg_data}, ensure_ascii=False)};")
 html = inject_block(html, '/* MRP_START */', '/* MRP_END */',
-    f"const MRP_DATA = {json.dumps({'title': mrp_title, 'orders': mrp_orders, 'pet_orders': mrp_pet_orders, 'materials': mrp_materials, 'inks': mrp_inks}, ensure_ascii=False)};")
+    f"const MRP_DATA = {json.dumps({'title': mrp_title, 'orders': mrp_orders, 'pet_orders': mrp_pet_orders, 'materials': mrp_materials, 'inks': mrp_inks}, ensure_ascii=False)};", optional=True)
+
+# ── INJECT CUSTOMER REPORT DATA ──────────────────────────────
+try:
+    from generate_customer_report import extract_all_customer_records
+    cust_recs = extract_all_customer_records()
+    html = inject_block(html, '/* CUSTOMER_REPORT_START */', '/* CUSTOMER_REPORT_END */',
+        f"const CUSTOMER_REPORT_DATA = {json.dumps(cust_recs, ensure_ascii=False)};", optional=True)
+    print(f"  Customer Report records injected into Tubex.html: {len(cust_recs):,}")
+except Exception as e:
+    print(f"  Warning: Could not inject customer report data: {e}")
 
 # ── WRITE HTML ───────────────────────────────────────────────
 with open(HTML_PATH, 'w', encoding='utf-8') as f:
@@ -921,3 +933,4 @@ print(f"\n[OK] HTML updated successfully -> {os.path.basename(HTML_PATH)}")
 print(f"  Dashboard orders: {len(tube_orders)} tube + {len(pet_orders)} PET")
 print(f"  Products in catalog: {len(products_list)}  |  BOM products: {len(bom_dict)}")
 print(f"  Open in Chrome on PC or Android to view dashboard.")
+
