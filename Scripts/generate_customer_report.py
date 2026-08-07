@@ -117,6 +117,9 @@ def extract_all_customer_records():
             "good": d["produced"] # backwards compatible
         })
 
+    # Filter out ghost records with all-zero values
+    flat_list = [r for r in flat_list if r['produced'] != 0 or r['dispatched'] != 0 or r['reject'] != 0]
+
     return flat_list
 
 if __name__ == "__main__":
