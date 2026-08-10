@@ -8,10 +8,10 @@
     • Item ID 4070 (MASTER BATCH ONCOLOR YELLOW NE12340208-ZN) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
 
   [CROSS-CHECK MISMATCHES]
-    • Pending Tube Orders mismatch: PENDING ORDER AUGUST 2026 (3).xlsx (06-08-2026)=204,420, MRP Sheet=231,932 (diff=-27,512)
+    • Pending Tube Orders mismatch: PENDING ORDER AUGUST 2026 (4).xlsx (07-08-2026)=184,904, MRP Sheet=231,932 (diff=-47,028)
 
   [MAPPING MISMATCHES]
     (Unmapped products found during production/dispatch/FG processing)
-    • Trp Bottle | 150 ml | Horizon
     • Samsol 45 | dia 25 | Samsol
+    • Trp Bottle | 150 ml | Horizon
 
