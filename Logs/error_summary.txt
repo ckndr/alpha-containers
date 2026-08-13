@@ -8,8 +8,7 @@
     • Item ID 4070 (MASTER BATCH ONCOLOR YELLOW NE12340208-ZN) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
 
   [CROSS-CHECK MISMATCHES]
-    • Summary mismatch - Tube Dispatch (MTD): Imran=68,068, Dashboard=128,282 (diff=+60,214)
-    • Pending Tube Orders mismatch: PENDING ORDER AUGUST 2026 (5).xlsx (08-08-2026)=166,816, MRP Sheet=167,434 (diff=-618)
+    • Pending Tube Orders mismatch: PENDING ORDER AUGUST 2026 (6).xlsx (11-08-2026)=144,682, MRP Sheet=145,300 (diff=-618)
 
   [MAPPING MISMATCHES]
     (Unmapped products found during production/dispatch/FG processing)
