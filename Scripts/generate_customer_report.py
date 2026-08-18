@@ -5,6 +5,14 @@ ALPHA_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RECORDS_DIR = os.path.join(ALPHA_DIR, "Tubex Records")
 PRODUCTION_ARCHIVE = os.path.join(RECORDS_DIR, "Production_Archive.xlsx")
 
+def normalize_product_name(prod_str):
+    if not prod_str:
+        return ""
+    p_up = prod_str.upper().strip()
+    if "MUSTARD" in p_up:
+        return "PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT"
+    return prod_str.strip()
+
 def get_key(cust, month, prod, ptype):
     return (cust, month, prod, ptype)
 
@@ -38,24 +46,22 @@ def extract_all_customer_records():
             good = ws_p.cell(r, 9).value or 0
             reject = ws_p.cell(r, 10).value or 0
             
-            prod_str = str(product).strip()
+            prod_str = normalize_product_name(str(product))
             cust_str = str(customer).strip()
             month_str = str(month_val).strip()
             dia_str = str(dia).strip()
-            
-            ptype = "PET" if "PET" in prod_str.upper() or "BOTTLE" in prod_str.upper() else "TUBE"
-            
-            # Since the archive was built using proper business logic, we CAN just take all records.
-            # But just to be extremely safe, we apply the filters again.
             mach_str = str(machine).strip()
-            count_production = False
             
-            if ptype == "PET":
-                if mach_str.startswith("PF"):
-                    count_production = True
-            elif ptype == "TUBE":
-                if mach_str.startswith("Print") and "(Varnish)" not in prod_str:
-                    count_production = True
+            # Determine machine/product type
+            count_production = False
+            if mach_str.startswith("PF"):
+                ptype = "PET"
+                count_production = True
+            elif mach_str.startswith("Print") and "(Varnish)" not in prod_str:
+                ptype = "TUBE"
+                count_production = True
+            else:
+                ptype = "PET" if ("PET" in prod_str.upper() or "BOTTLE" in prod_str.upper() or prod_str.upper().startswith("BT-")) else "TUBE"
             
             if count_production:
                 try: good = int(good)
@@ -85,7 +91,7 @@ def extract_all_customer_records():
             dia = ws_d.cell(r, 6).value or ""
             disp = ws_d.cell(r, 8).value or 0
             
-            prod_str = str(product).strip()
+            prod_str = normalize_product_name(str(product))
             cust_str = str(customer).strip()
             month_str = str(month_val).strip()
             dia_str = str(dia).strip()
@@ -126,8 +132,7 @@ if __name__ == "__main__":
     recs = extract_all_customer_records()
     print(f"Total Customer-Month-Product Records: {len(recs)}")
     
-    # Simple test for July and August 2026
-    july_disp = sum(r["dispatched"] for r in recs if r["month"] == "July 2026")
-    aug_disp = sum(r["dispatched"] for r in recs if r["month"] == "August 2026")
-    print(f"July 2026 Total Dispatched: {july_disp:,}")
-    print(f"August 2026 Total Dispatched: {aug_disp:,}")
+    july_pet = sum(r["produced"] for r in recs if r["month"] == "July 2026" and r["type"] == "PET")
+    july_tube = sum(r["produced"] for r in recs if r["month"] == "July 2026" and r["type"] == "TUBE")
+    print(f"July 2026 Total PET Produced: {july_pet:,}")
+    print(f"July 2026 Total TUBE Produced: {july_tube:,}")

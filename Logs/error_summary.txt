@@ -3,11 +3,6 @@
   ║  ⚠ DAILY WORKFLOW ERROR SUMMARY                          ║
   ╚══════════════════════════════════════════════════════════╝
 
-  [SYSTEM / FILE CHECK ISSUES]
-    • Inventory: file is stale (50 hours old)
-    • Dispatch (Tube): file is stale (50 hours old)
-    • Dispatch (PET): file is stale (50 hours old)
-
   [INVENTORY: ITEMS MISSING FROM ERP]
     (These rows are highlighted in RED in Excel and zeroed out)
     • Item ID 4070 (MASTER BATCH ONCOLOR YELLOW NE12340208-ZN) [Master Batch] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED

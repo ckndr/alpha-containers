@@ -497,7 +497,7 @@ def extract_mtd_dispatch(file_path, month_label, month_num):
                 disp_val = int(dispatch)
                 if disp_val > 0:
                     prod_str = str(product).strip()
-                    ptype = "PET" if "PET" in prod_str.upper() or "BOTTLE" in prod_str.upper() else "TUBE"
+                    ptype = "PET" if "PET" in prod_str.upper() or "BOTTLE" in prod_str.upper() or "MUSTARD" in prod_str.upper() or prod_str.upper().startswith("BT-") else "TUBE"
                     
                     from customer_normalization import normalize_customer_name, correct_customer_by_product
                     import os
