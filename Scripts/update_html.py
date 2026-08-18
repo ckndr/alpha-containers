@@ -147,7 +147,8 @@ downtime_cols = {
     'Gas Shutdown':      17,
     'Workers Shortage':  18,
 }
-dt_totals = {k: 0.0 for k in downtime_cols}
+tube_dt_totals = {k: 0.0 for k in downtime_cols}
+pet_dt_totals  = {k: 0.0 for k in downtime_cols}
 
 for row in ws_pl.iter_rows(min_row=3, values_only=True):
     row_date  = row[0]
@@ -167,11 +168,18 @@ for row in ws_pl.iter_rows(min_row=3, values_only=True):
 
     mach_up = str(machine).upper()
     is_press_print = mach_up.startswith('PRESS') or mach_up.startswith('PRINT') or mach_up.startswith('PLINE')
+    is_pf_pet      = mach_up.startswith('PF') or mach_up.startswith('PET')
+
     if is_press_print:
         for cat, col_idx in downtime_cols.items():
             val = row[col_idx - 1]
             if val and isinstance(val, (int, float)):
-                dt_totals[cat] += float(val)
+                tube_dt_totals[cat] += float(val)
+    elif is_pf_pet:
+        for cat, col_idx in downtime_cols.items():
+            val = row[col_idx - 1]
+            if val and isinstance(val, (int, float)):
+                pet_dt_totals[cat] += float(val)
 
     if not pid or not good_qty: continue
     good_qty = int(good_qty)
@@ -498,7 +506,11 @@ dash_data = {
         'petMTDDispatch':   pet_mtd_dispatch,
     },
     'downtime': [
-        {'cat': cat, 'icon': DOWNTIME_ICONS.get(cat, '⏱'), 'hrs': round(dt_totals[cat] / 60, 2)}
+        {'cat': cat, 'icon': DOWNTIME_ICONS.get(cat, '⏱'), 'hrs': round(tube_dt_totals[cat] / 60, 2)}
+        for cat in downtime_cols
+    ],
+    'downtimePet': [
+        {'cat': cat, 'icon': DOWNTIME_ICONS.get(cat, '⏱'), 'hrs': round(pet_dt_totals[cat] / 60, 2)}
         for cat in downtime_cols
     ],
     'tubeOrders': tube_orders,

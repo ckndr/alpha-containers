@@ -272,6 +272,9 @@ FG_ALIASES = {
     # ── Dia 25 ──────────────────────────────────────────────────────────────
     ("tube 43",            "25", "samsol"):          ("S 43 25MM",                          3447),
     ("tube 45",            "25", "samsol"):          ("S-45",                               5389),
+    ("samsol 45",          "25", "samsol"):          ("TUBES",                              3726),
+    ("samsol 45",          "25", "samsol international"): ("TUBES",                     3726),
+    ("samsol 45",          "25", "samsol international private limited"): ("TUBES",      3726),
     ("common purple tube", "25", "samsol"):          ("TUBE COMMON PURPLE",                 6532),
     ("common red tube",    "25", "samsol"):          ("TUBES COMMON RED",                   6470),
     ("men blue",           "25", "samsol"):          ("TUBES MEN BLUE",                     6506),
@@ -303,6 +306,8 @@ FG_ALIASES = {
     ("vivid h.c black",    "35", "vivid cosmetics"): ("V-HC BLACK",                         6531),  # Added v18
 
     # ── PET ─────────────────────────────────────────────────────────────────
+    ("trp bottle",      "150ml", "horizon"):         ("TRANSPARENT BOTTLE 150ML",           8001),
+    ("trp bottle",      "150ml", "horizon chem"):    ("TRANSPARENT BOTTLE 150ML",           8001),
     ("trp bottle",      "150ml", "alpha lab"):       ("TRANSPARENT BOTTLE 150ML",           8001),
     ("trp bottle",       "150ml","alpha lab"):       ("TRANSPARENT BOTTLE 150ML",           8001),
     ("trp bottle",      "150ml", "alpha labs pvt ltd"): ("TRANSPARENT BOTTLE 150ML",        8001),
@@ -334,6 +339,8 @@ FG_ALIASES = {
 # CUSTOMER_MAP: Imran shorthand → ERP name (fallback; PID_TO_CUSTOMER overrides)
 # ─────────────────────────────────────────────────────────────────────────────
 CUSTOMER_MAP = {
+    "horizon":                "Horizon Chem",
+    "horizon chem":           "Horizon Chem",
     "brooks pharma":          "Brookes Pharma Private Limited",
     "samsol international":   "Samsol International Private Limited",
     "samsol":                 "Samsol International Private Limited",
@@ -724,9 +731,9 @@ def write_production_log(ac_path, source_rows):
 
 def _norm_dia(raw):
     s = str(raw).strip().lower()
-    s = re.sub(r'\s*dia\s*$', '', s)
+    s = re.sub(r'\bdia\b', '', s)
     s = re.sub(r'\s+ml$', 'ml', s)
-    return s.strip()
+    return re.sub(r'\s+', ' ', s).strip()
 
 
 def read_fg_stock(prod_path):
@@ -781,6 +788,14 @@ def read_fg_stock(prod_path):
 
         catalog_name = result[0] if result else raw_product
         pid          = result[1] if result else None
+
+        # Custom remarks per instructions:
+        if cust_key in ["horizon", "horizon chem"] and "150" in dia_norm:
+            if "despatch to horizon" not in dispatch_rem.lower():
+                dispatch_rem = (dispatch_rem + " (Despatch to Horizon)").strip() if dispatch_rem else "Despatch to Horizon"
+        if prod_key == "samsol 45":
+            if "samsol 45" not in dispatch_rem.lower():
+                dispatch_rem = ("Samsol 45 - " + dispatch_rem).strip(" -") if dispatch_rem else "Samsol 45"
 
         if pid is not None and pid in PID_TO_CUSTOMER:
             customer_display = PID_TO_CUSTOMER[pid]

@@ -271,8 +271,24 @@ def update_excel(excel_path, xls_items, date_range):
             ws.cell(row=row, column=6).value = 0.0
             ws.cell(row=row, column=7).value = 0.0
 
+            # Set font color to RED for visibility
+            for col in range(1, 12):
+                cell = ws.cell(row=row, column=col)
+                curr_font = cell.font
+                cell.font = Font(
+                    name=curr_font.name if curr_font else "Segoe UI",
+                    size=curr_font.size if curr_font else 9,
+                    bold=curr_font.bold if curr_font else False,
+                    italic=curr_font.italic if curr_font else False,
+                    color="FFFF0000"
+                )
+
             # Note in Column K that this item is inactive
             ws.cell(row=row, column=11).value = "Not active in ERP"
+
+    # Ensure header in K2 is set
+    ws.cell(row=2, column=11).value = "Status / Remarks"
+    ws.cell(row=2, column=11).font = Font(name="Segoe UI", size=9.5, bold=True, color="FF1A1A2E")
 
     # Overwrite same file
     wb.save(excel_path)

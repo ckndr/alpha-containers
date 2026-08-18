@@ -501,6 +501,193 @@ ws.cell(6, 10).value = f'=SUMIF($B${FIRST_ROW}:$B${end},"TUBE",$K${FIRST_ROW}:$K
 ws.cell(8, 4).value = f'=SUMIF($B${FIRST_ROW}:$B${end},"PET",$H${FIRST_ROW}:$H${end})'
 ws.cell(8, 10).value = f'=SUMIF($B${FIRST_ROW}:$B${end},"PET",$K${FIRST_ROW}:$K${end})'
 
+# ── SORT & WRITE DOWNTIME SUMMARY (COLUMNS M:O) ────────────────
+DOWNTIME_CATEGORIES = [
+    ('Mechanical', 'K', 11),
+    ('Electrical', 'L', 12),
+    ('Material Shortage', 'M', 13),
+    ('Changeover', 'N', 14),
+    ('Operations', 'O', 15),
+    ('Power Shutdown', 'P', 16),
+    ('Gas Shutdown', 'Q', 17),
+    ('Workers Shortage', 'R', 18),
+]
+
+tube_dt_map = {k: 0.0 for k, _, _ in DOWNTIME_CATEGORIES}
+pet_dt_map  = {k: 0.0 for k, _, _ in DOWNTIME_CATEGORIES}
+
+for row in ws_pl.iter_rows(min_row=3, values_only=True):
+    machine = row[1]
+    if not machine:
+        continue
+    mach_up = str(machine).upper()
+    is_press_print = mach_up.startswith('PRESS') or mach_up.startswith('PRINT') or mach_up.startswith('PLINE')
+    is_pf_pet      = mach_up.startswith('PF') or mach_up.startswith('PET')
+
+    if is_press_print:
+        for cat, _, col_idx in DOWNTIME_CATEGORIES:
+            val = row[col_idx - 1]
+            if val and isinstance(val, (int, float)):
+                tube_dt_map[cat] += float(val)
+    elif is_pf_pet:
+        for cat, _, col_idx in DOWNTIME_CATEGORIES:
+            val = row[col_idx - 1]
+            if val and isinstance(val, (int, float)):
+                pet_dt_map[cat] += float(val)
+
+active_tube_dt = [(cat, col_letter, tube_dt_map[cat]) for cat, col_letter, _ in DOWNTIME_CATEGORIES if tube_dt_map[cat] > 0]
+active_tube_dt.sort(key=lambda x: x[2], reverse=True)
+
+active_pet_dt = [(cat, col_letter, pet_dt_map[cat]) for cat, col_letter, _ in DOWNTIME_CATEGORIES if pet_dt_map[cat] > 0]
+active_pet_dt.sort(key=lambda x: x[2], reverse=True)
+
+# Unmerge old ranges in M5:O60
+for r_range in list(ws.merged_cells.ranges):
+    if r_range.min_col >= 13 and r_range.max_col <= 15 and r_range.min_row >= 5 and r_range.max_row <= 60:
+        ws.unmerge_cells(str(r_range))
+
+# Clear M5:O60 and S5:U60
+for r in range(5, 61):
+    for c in range(13, 23):
+        cell = ws.cell(r, c)
+        cell.value = None
+        cell.fill = PatternFill()
+        cell.border = Border()
+        cell.alignment = Alignment()
+
+dt_thin = Side(style='thin', color='D9D9D9')
+dt_box_border = Border(left=dt_thin, right=dt_thin, top=dt_thin, bottom=dt_thin)
+
+# 1. TUBE DOWNTIME SECTION (Matches TUBE Card: Navy #1F3864, Text #BDD7EE)
+ws.merge_cells('M5:O5')
+ws.cell(5, 13).value = 'Press & Printing Downtime – MTD (Tubes)'
+ws.cell(5, 13).font = Font(name='Segoe UI', size=11, bold=True, color='FFBDD7EE')
+ws.cell(5, 13).fill = PatternFill('solid', fgColor='FF1F3864')
+ws.cell(5, 13).alignment = Alignment(horizontal='center', vertical='center')
+
+ws.cell(6, 13).value = 'Category'
+ws.cell(6, 14).value = 'Hours (MTD)'
+ws.cell(6, 15).value = '% Share'
+for c in range(13, 16):
+    ws.cell(6, c).font = Font(name='Segoe UI', size=9.5, bold=True, color='FF1F3864')
+    ws.cell(6, c).fill = PatternFill('solid', fgColor='FFD9E1F2')
+    ws.cell(6, c).border = dt_box_border
+    ws.cell(6, c).alignment = Alignment(horizontal='left' if c == 13 else 'right', vertical='center')
+
+curr_row = 7
+if not active_tube_dt:
+    ws.cell(curr_row, 13).value = 'No Downtime'
+    ws.cell(curr_row, 14).value = 0.0
+    ws.cell(curr_row, 15).value = '0.0%'
+    for c in range(13, 16):
+        ws.cell(curr_row, c).font = Font(name='Segoe UI', size=9)
+        ws.cell(curr_row, c).border = dt_box_border
+    curr_row += 1
+    tube_tot_row = curr_row
+    ws.cell(tube_tot_row, 13).value = 'TOTAL'
+    ws.cell(tube_tot_row, 14).value = 0.0
+    ws.cell(tube_tot_row, 15).value = '100%'
+else:
+    tube_start_row = curr_row
+    tube_tot_row = tube_start_row + len(active_tube_dt)
+    for cat, col_letter, _ in active_tube_dt:
+        ws.cell(curr_row, 13).value = cat
+        ws.cell(curr_row, 14).value = f'=SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!${col_letter}$3:${col_letter}$8963)/60'
+        ws.cell(curr_row, 15).value = f'=IFERROR(N{curr_row}/$N${tube_tot_row},"")'
+        
+        ws.cell(curr_row, 13).font = Font(name='Segoe UI', size=9)
+        ws.cell(curr_row, 14).font = Font(name='Segoe UI', size=9)
+        ws.cell(curr_row, 15).font = Font(name='Segoe UI', size=9)
+        
+        ws.cell(curr_row, 13).alignment = Alignment(horizontal='left', vertical='center')
+        ws.cell(curr_row, 14).alignment = Alignment(horizontal='right', vertical='center')
+        ws.cell(curr_row, 15).alignment = Alignment(horizontal='right', vertical='center')
+        
+        ws.cell(curr_row, 14).number_format = '#,##0.0'
+        ws.cell(curr_row, 15).number_format = '0.0%'
+        for c in range(13, 16): ws.cell(curr_row, c).border = dt_box_border
+        curr_row += 1
+        
+    ws.cell(tube_tot_row, 13).value = 'TOTAL'
+    ws.cell(tube_tot_row, 14).value = f'=SUM(N{tube_start_row}:N{tube_tot_row-1})'
+    ws.cell(tube_tot_row, 15).value = '100%'
+
+for c in range(13, 16):
+    ws.cell(tube_tot_row, c).font = Font(name='Segoe UI', size=9, bold=True)
+    ws.cell(tube_tot_row, c).fill = PatternFill('solid', fgColor='FFF2F2F2')
+    ws.cell(tube_tot_row, c).border = dt_box_border
+ws.cell(tube_tot_row, 13).alignment = Alignment(horizontal='left', vertical='center')
+ws.cell(tube_tot_row, 14).alignment = Alignment(horizontal='right', vertical='center')
+ws.cell(tube_tot_row, 15).alignment = Alignment(horizontal='right', vertical='center')
+ws.cell(tube_tot_row, 14).number_format = '#,##0.0'
+ws.cell(tube_tot_row, 15).number_format = '0.0%'
+
+# 2. PET DOWNTIME SECTION (Matches PET Card: Teal #1F6B75, Text #B4E0E0)
+pet_hdr_row = tube_tot_row + 2
+ws.merge_cells(f'M{pet_hdr_row}:O{pet_hdr_row}')
+ws.cell(pet_hdr_row, 13).value = 'PF Machine Downtime – MTD (PET)'
+ws.cell(pet_hdr_row, 13).font = Font(name='Segoe UI', size=11, bold=True, color='FFB4E0E0')
+ws.cell(pet_hdr_row, 13).fill = PatternFill('solid', fgColor='FF1F6B75')
+ws.cell(pet_hdr_row, 13).alignment = Alignment(horizontal='center', vertical='center')
+
+pet_sub_row = pet_hdr_row + 1
+ws.cell(pet_sub_row, 13).value = 'Category'
+ws.cell(pet_sub_row, 14).value = 'Hours (MTD)'
+ws.cell(pet_sub_row, 15).value = '% Share'
+for c in range(13, 16):
+    ws.cell(pet_sub_row, c).font = Font(name='Segoe UI', size=9.5, bold=True, color='FF1F6B75')
+    ws.cell(pet_sub_row, c).fill = PatternFill('solid', fgColor='FFD0EAEA')
+    ws.cell(pet_sub_row, c).border = dt_box_border
+    ws.cell(pet_sub_row, c).alignment = Alignment(horizontal='left' if c == 13 else 'right', vertical='center')
+
+curr_row = pet_sub_row + 1
+if not active_pet_dt:
+    ws.cell(curr_row, 13).value = 'No Downtime'
+    ws.cell(curr_row, 14).value = 0.0
+    ws.cell(curr_row, 15).value = '0.0%'
+    for c in range(13, 16):
+        ws.cell(curr_row, c).font = Font(name='Segoe UI', size=9)
+        ws.cell(curr_row, c).border = dt_box_border
+    curr_row += 1
+    pet_tot_row = curr_row
+    ws.cell(pet_tot_row, 13).value = 'TOTAL'
+    ws.cell(pet_tot_row, 14).value = 0.0
+    ws.cell(pet_tot_row, 15).value = '100%'
+else:
+    pet_start_row = curr_row
+    pet_tot_row = pet_start_row + len(active_pet_dt)
+    for cat, col_letter, _ in active_pet_dt:
+        ws.cell(curr_row, 13).value = cat
+        ws.cell(curr_row, 14).value = f'=SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,2)="PF")+(LEFT(Production_Log!$B$3:$B$8963,3)="PET"))*Production_Log!${col_letter}$3:${col_letter}$8963)/60'
+        ws.cell(curr_row, 15).value = f'=IFERROR(N{curr_row}/$N${pet_tot_row},"")'
+        
+        ws.cell(curr_row, 13).font = Font(name='Segoe UI', size=9)
+        ws.cell(curr_row, 14).font = Font(name='Segoe UI', size=9)
+        ws.cell(curr_row, 15).font = Font(name='Segoe UI', size=9)
+        
+        ws.cell(curr_row, 13).alignment = Alignment(horizontal='left', vertical='center')
+        ws.cell(curr_row, 14).alignment = Alignment(horizontal='right', vertical='center')
+        ws.cell(curr_row, 15).alignment = Alignment(horizontal='right', vertical='center')
+        
+        ws.cell(curr_row, 14).number_format = '#,##0.0'
+        ws.cell(curr_row, 15).number_format = '0.0%'
+        for c in range(13, 16): ws.cell(curr_row, c).border = dt_box_border
+        curr_row += 1
+        
+    ws.cell(pet_tot_row, 13).value = 'TOTAL'
+    ws.cell(pet_tot_row, 14).value = f'=SUM(N{pet_start_row}:N{pet_tot_row-1})'
+    ws.cell(pet_tot_row, 15).value = '100%'
+
+for c in range(13, 16):
+    ws.cell(pet_tot_row, c).font = Font(name='Segoe UI', size=9, bold=True)
+    ws.cell(pet_tot_row, c).fill = PatternFill('solid', fgColor='FFF2F2F2')
+    ws.cell(pet_tot_row, c).border = dt_box_border
+ws.cell(pet_tot_row, 13).alignment = Alignment(horizontal='left', vertical='center')
+ws.cell(pet_tot_row, 14).alignment = Alignment(horizontal='right', vertical='center')
+ws.cell(pet_tot_row, 15).alignment = Alignment(horizontal='right', vertical='center')
+ws.cell(pet_tot_row, 14).number_format = '#,##0.0'
+ws.cell(pet_tot_row, 15).number_format = '0.0%'
+
 # ── SAVE ─────────────────────────────────────────────────────
 wb.save(EXCEL_PATH)
 
