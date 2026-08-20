@@ -83,19 +83,6 @@ for r in range(11, 200):
     except (TypeError, ValueError):
         dispatch_by_row[r] = 0
 
-# Read MRP sheet to resolve Tube order formula lookup values
-mrp_orders = {}
-if 'MRP' in wb_val.sheetnames:
-    ws_mrp = wb_val['MRP']
-    for r_mrp in range(3, 150):
-        pid_val = ws_mrp.cell(r_mrp, 4).value # col D = PID
-        ord_val = ws_mrp.cell(r_mrp, 6).value # col F = Orders
-        if pid_val is not None:
-            try:
-                mrp_orders[int(pid_val)] = int(ord_val) if ord_val else 0
-            except (TypeError, ValueError):
-                pass
-
 wb_val.close()
 
 
@@ -103,6 +90,21 @@ wb_val.close()
 wb = load_workbook(EXCEL_PATH, data_only=False)
 ws = wb['Tubex_Dashboard']
 ws_pl = wb['Production_Log']
+
+# Read MRP sheet (from formula workbook) to resolve order lookup values & arithmetic formulas
+mrp_orders = {}
+if 'MRP' in wb.sheetnames:
+    ws_mrp = wb['MRP']
+    for r_mrp in range(3, 150):
+        pid_val = ws_mrp.cell(r_mrp, 4).value # col D = PID
+        ord_val = ws_mrp.cell(r_mrp, 6).value # col F = Orders
+        if pid_val is not None:
+            try:
+                pid_int = int(pid_val)
+                qty_val = safe_eval_math(ord_val) if isinstance(ord_val, str) else (int(ord_val) if ord_val else 0)
+                mrp_orders[pid_int] = mrp_orders.get(pid_int, 0) + qty_val
+            except (TypeError, ValueError):
+                pass
 
 # Fallback check: evaluate simple arithmetic formulas if data_only read returned None/0
 for r in range(11, 200):
@@ -386,10 +388,12 @@ def write_product_row(ws, r, data):
     ws.cell(r, 5).value = data['dia']        # E = Dia
     ws.cell(r, 6).value = data['pid']        # F = Prod ID
 
-    # G = Orders: If it is a formula string, update standalone relative F{row}/D{row} references (Rule R1-03)
+    # G = Orders: If it is a formula string, update relative F{row} references (and strip any 'Tubex_Dashboard!')
     orders_val = data['orders']
     if isinstance(orders_val, str) and orders_val.startswith('='):
-        orders_val = re.sub(r'(?<![!$\w])([FD])(\d+)\b', r'\g<1>' + str(r), orders_val)
+        orders_val = re.sub(r'(?:Tubex_Dashboard!)?F\d+\b(?!\$)', f'F{r}', orders_val)
+    elif orders_val is None or orders_val == 0 or orders_val == '':
+        orders_val = f'=IFERROR(INDEX(MRP!$F$3:$F$150,MATCH(F{r},MRP!$D$3:$D$150,0)),0)'
     ws.cell(r, 7).value = orders_val
 
     # H = MTD Produced (formula — rebuild for this row position)

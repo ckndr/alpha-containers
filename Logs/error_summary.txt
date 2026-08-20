@@ -3,11 +3,6 @@
   ║  ⚠ DAILY WORKFLOW ERROR SUMMARY                          ║
   ╚══════════════════════════════════════════════════════════╝
 
-  [SYSTEM / FILE CHECK ISSUES]
-    • Inventory: file is stale (50 hours old)
-    • Dispatch (Tube): file is stale (51 hours old)
-    • Dispatch (PET): file is stale (51 hours old)
-
   [INVENTORY: ITEMS MISSING FROM ERP]
     (These rows are highlighted in RED in Excel and zeroed out)
     • [PERSISTENT] Item ID 36 (16X200 3Ply) [Carton] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
@@ -27,8 +22,8 @@
 
   [CROSS-CHECK MISMATCHES]
     • Summary mismatch - Printing Production (MTD): Imran=259,160, Dashboard=212,464 (diff=-46,696)
-    • Summary mismatch - PET Production (MTD): Imran=767,377, Dashboard=60,375 (diff=-707,002)
+    • Summary mismatch - PET Production (MTD): Imran=767,377, Dashboard=61,640 (diff=-705,737)
     • Summary mismatch - Tube Dispatch (MTD): Imran=0, Dashboard=164,682 (diff=+164,682)
-    • Summary mismatch - PET Dispatch (MTD): Imran=0, Dashboard=31,280 (diff=+31,280)
+    • Summary mismatch - PET Dispatch (MTD): Imran=22,080, Dashboard=53,360 (diff=+31,280)
     • Pending Tube Orders mismatch: PENDING ORDER AUGUST 2026 (8).xlsx (13-08-2026)=131,840, MRP Sheet=107,458 (diff=+24,382)
 
