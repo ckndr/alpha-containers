@@ -24,14 +24,15 @@ dispatch_pet.xls (from ERP) ────┘
 ## Script Execution Order (MUST follow this sequence)
 
 ```
-Step 1: update_dispatch.py      ← FIRST (writes fresh dispatch data to Dashboard)
-Step 2: update_production.py    ← Second (populates Production_Log and FG Stock)
-Step 3: update_inventory.py     ← Third (updates Inventory sheet)
-Step 4: sort_dashboard.py       ← AFTER Steps 1-3 (needs fresh production + dispatch data)
-Step 5: update_html.py          ← LAST (reads everything, generates final HTML)
+Step 1: update_production.py    ← First (populates Production_Log and FG Stock)
+Step 2: update_inventory.py     ← Second (updates Inventory sheet)
+Step 3: update_dispatch.py      ← Third (writes fresh dispatch data to Dashboard)
+Step 4: sort_dashboard.py       ← Fourth (sorts active products based on production+dispatch)
+Step 5: build_archives.py       ← Fifth (rebuilds historical production and dashboard archives)
+Step 6: update_html.py          ← LAST (reads all sheets, generates final Tubex.html & updates sw.js)
 ```
 
-> `Run_All_Updates.bat` runs these in the correct order automatically.
+> `daily.py` (or `Daily_Update.bat` / `Run_All_Updates.bat`) runs these in the correct order automatically.
 
 ## Manual/Optional Scripts (NOT in the daily pipeline)
 
@@ -101,3 +102,13 @@ All scripts import from this module:
 - `check_not_locked(filepath)` — Stops if Excel has the file open
 - `log_mismatches(source, items)` — Saves unmatched products to Logs/mismatches.log
 - `replace_copy_export(folder, name)` — Handles "- copy" file renaming from ERP downloads
+
+## Business Rules & Operational Policies (See AUDIT_NOTES.md)
+
+1. **Inventory Inactive Zeroing Policy (Rule R1-02)**:
+   - ERP inventory exports drop items with 0 movement/balance. Missing items in `inventory.xls` are intentionally zeroed out in the workbook to prevent phantom stock from appearing available in plant operations.
+2. **Previous-Day Dispatch Reporting (Rule R1-06)**:
+   - `update_dispatch.py` excludes same-day dispatches because daily management reporting is based on verified, closed dispatches up to the previous operating day.
+3. **Unassigned Product Logging (Rule R1-01)**:
+   - If an unmapped SKU is encountered, the script prompts for a PID or assigns `PID = 0` so production quantities are captured and not lost from machine totals.
+

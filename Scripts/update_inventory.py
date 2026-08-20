@@ -94,14 +94,14 @@ def parse_inventory_xls(xls_path):
     items = {}
     date_range = ""
 
-    # Default column indices (old format)
+    # Default column indices (Item Wise Consolidated 8-column layout)
     col_id = 0
-    col_name = 2
-    col_opening = 6
-    col_inward = 7
-    col_out = 8
-    col_balance = 9
-    col_unit = 10
+    col_name = 1
+    col_opening = 3
+    col_inward = 4
+    col_out = 5
+    col_balance = 6
+    col_unit = 7
 
     # Detect header row to adjust column indices dynamically
     for idx, row in df.iterrows():
@@ -189,11 +189,14 @@ def update_excel(excel_path, xls_items, date_range):
     wb = load_workbook(excel_path)
     ws = wb['Inventory']
 
-    # Update date range in cell A1 if present
+    # Update date range in cell A1 if present (Rule R1-11)
     if date_range:
         cell = ws.cell(row=1, column=1)
-        if cell.value:
-            cell.value = re.sub(r'\(.*?\)', '(' + date_range + ')', str(cell.value))
+        orig_title = str(cell.value or 'Slugs & Raw Materials Inventory').strip()
+        base_title = re.sub(r'[\s\u2014\-\(]+(From|To|\d{1,2}[\-\/]\w+[\-\/]\d{2,4}).*$', '', orig_title).strip()
+        if not base_title:
+            base_title = "Slugs & Raw Materials Inventory"
+        cell.value = f"{base_title} — ({date_range})"
 
     # Build map of item ID -> row number from Inventory sheet (col A)
     excel_ids = {}
@@ -212,6 +215,11 @@ def update_excel(excel_path, xls_items, date_range):
                     slug_items[item_id] = str(name_val or '').strip()
             except (ValueError, TypeError):
                 pass
+
+    # Safety guardrail check (prevent accidental full wipe if export is filtered)
+    if len(xls_items) < 5 and len(excel_ids) >= 10:
+        print(f"\n  WARNING: ERP inventory export has only {len(xls_items)} items ({len(excel_ids)} in sheet).")
+        print("  Please check if inventory.xls is a filtered/partial export before finalizing.")
 
     updated      = []
     not_in_excel = []
@@ -266,7 +274,8 @@ def update_excel(excel_path, xls_items, date_range):
             if str(cat_val or '').strip().lower() == 'slug':
                 missing_slugs.append((item_id, str(name_val or '').strip()))
 
-            # Zero out values to prevent phantom stock
+            # ZERO OUT VALUES TO PREVENT PHANTOM STOCK (Rule R1-02 / AUDIT_NOTES.md:
+            # ERP drops inactive items with 0 balance; setting to 0 ensures accurate stock status)
             ws.cell(row=row, column=5).value = 0.0
             ws.cell(row=row, column=6).value = 0.0
             ws.cell(row=row, column=7).value = 0.0

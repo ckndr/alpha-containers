@@ -315,17 +315,18 @@ print(f"    Last used row: {last_used_row}")
 
 # ── FORMULA TEMPLATES ────────────────────────────────────────
 # Simplified: no MONTH/YEAR filter (user keeps only current month in log)
+pl_max_row = max(ws_pl.max_row, 1000)
 
 TUBE_H_TPL = (
-    '=SUMPRODUCT((Production_Log!$F$3:$F$8963=F{r})'
-    '*(LEFT(Production_Log!$B$3:$B$8963,5)="Print")'
-    '*(ISERROR(SEARCH("(Varnish)",Production_Log!$D$3:$D$8963)))'
-    '*Production_Log!$H$3:$H$8963)'
+    f'=SUMPRODUCT((Production_Log!$F$3:$F${pl_max_row}=F{{r}})'
+    f'*((LEFT(Production_Log!$B$3:$B${pl_max_row},5)="Print")+(LEFT(Production_Log!$B$3:$B${pl_max_row},5)="PLINE"))'
+    f'*(ISERROR(SEARCH("(Varnish)",Production_Log!$D$3:$D${pl_max_row})))'
+    f'*Production_Log!$H$3:$H${pl_max_row})'
 )
 
 PET_H_TPL = (
-    '=SUMPRODUCT((Production_Log!$F$3:$F$8963=F{r})'
-    '*Production_Log!$H$3:$H$8963)'
+    f'=SUMPRODUCT((Production_Log!$F$3:$F${pl_max_row}=F{{r}})'
+    f'*Production_Log!$H$3:$H${pl_max_row})'
 )
 
 I_TPL = '=G{r}-H{r}'
@@ -385,10 +386,10 @@ def write_product_row(ws, r, data):
     ws.cell(r, 5).value = data['dia']        # E = Dia
     ws.cell(r, 6).value = data['pid']        # F = Prod ID
 
-    # G = Orders: If it is a formula string, update F{row}/D{row} reference to current row r
+    # G = Orders: If it is a formula string, update standalone relative F{row}/D{row} references (Rule R1-03)
     orders_val = data['orders']
     if isinstance(orders_val, str) and orders_val.startswith('='):
-        orders_val = re.sub(r'\b([FD])\d+\b', r'\g<1>' + str(r), orders_val)
+        orders_val = re.sub(r'(?<![!$\w])([FD])(\d+)\b', r'\g<1>' + str(r), orders_val)
     ws.cell(r, 7).value = orders_val
 
     # H = MTD Produced (formula — rebuild for this row position)
@@ -592,7 +593,7 @@ else:
     tube_tot_row = tube_start_row + len(active_tube_dt)
     for cat, col_letter, _ in active_tube_dt:
         ws.cell(curr_row, 13).value = cat
-        ws.cell(curr_row, 14).value = f'=SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!${col_letter}$3:${col_letter}$8963)/60'
+        ws.cell(curr_row, 14).value = f'=SUMPRODUCT(((LEFT(Production_Log!$B$3:$B${pl_max_row},5)="Press")+(LEFT(Production_Log!$B$3:$B${pl_max_row},5)="Print")+(LEFT(Production_Log!$B$3:$B${pl_max_row},5)="PLINE"))*Production_Log!${col_letter}$3:${col_letter}${pl_max_row})/60'
         ws.cell(curr_row, 15).value = f'=IFERROR(N{curr_row}/$N${tube_tot_row},"")'
         
         ws.cell(curr_row, 13).font = Font(name='Segoe UI', size=9)
@@ -658,7 +659,7 @@ else:
     pet_tot_row = pet_start_row + len(active_pet_dt)
     for cat, col_letter, _ in active_pet_dt:
         ws.cell(curr_row, 13).value = cat
-        ws.cell(curr_row, 14).value = f'=SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,2)="PF")+(LEFT(Production_Log!$B$3:$B$8963,3)="PET"))*Production_Log!${col_letter}$3:${col_letter}$8963)/60'
+        ws.cell(curr_row, 14).value = f'=SUMPRODUCT(((LEFT(Production_Log!$B$3:$B${pl_max_row},2)="PF")+(LEFT(Production_Log!$B$3:$B${pl_max_row},3)="PET"))*Production_Log!${col_letter}$3:${col_letter}${pl_max_row})/60'
         ws.cell(curr_row, 15).value = f'=IFERROR(N{curr_row}/$N${pet_tot_row},"")'
         
         ws.cell(curr_row, 13).font = Font(name='Segoe UI', size=9)

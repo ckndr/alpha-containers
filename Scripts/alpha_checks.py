@@ -47,7 +47,9 @@ def check_freshness(filepath, max_hours=26, label=None):
         True if fresh, False if stale.
     """
     if not os.path.exists(filepath):
-        return True  # file-not-found is handled elsewhere
+        name = label or os.path.basename(filepath)
+        print("  !! ERROR: %s not found at: %s" % (name, filepath))
+        return False
 
     name = label or os.path.basename(filepath)
     mod_time = os.path.getmtime(filepath)
@@ -165,6 +167,15 @@ def replace_copy_export(folder, target_name):
     # Find the most recently modified copy file
     latest_copy_path = max(matches, key=os.path.getmtime)
     
+    # Verify candidate copy is valid and non-empty (>512 bytes) before replacing (Rule R1-20)
+    try:
+        if os.path.getsize(latest_copy_path) < 512:
+            print("  !! WARNING: Downloaded copy %s is incomplete/empty (<512 bytes). Skipping replacement." % os.path.basename(latest_copy_path))
+            return False
+    except Exception as e:
+        print("  !! WARNING: Could not inspect %s: %s" % (os.path.basename(latest_copy_path), e))
+        return False
+
     # Overwrite the target file with the latest copy
     try:
         os.replace(latest_copy_path, target_path)
@@ -193,3 +204,36 @@ def replace_copy_export(folder, target_name):
                 ))
                 
     return True
+
+
+def get_active_tubex_file(folder):
+    """
+    Find the active Tubex master workbook in folder using standard version sorting (Rule R1-22).
+    Excludes temporary Excel lock files (~$).
+    """
+    import glob
+    excels = glob.glob(os.path.join(folder, "Tubex*.xlsx"))
+    excels = [f for f in excels if not os.path.basename(f).startswith("~$")]
+    if not excels:
+        return None
+    return sorted(excels)[-1]
+
+
+def cleanup_stale_lockfiles(folder):
+    """
+    Remove orphaned Excel lockfiles (~$*.xlsx) that are not currently held by open Excel sessions (Rule R4-07).
+    """
+    import glob
+    lockfiles = glob.glob(os.path.join(folder, "~$*.xlsx"))
+    cleaned = 0
+    for lf in lockfiles:
+        try:
+            os.remove(lf)
+            cleaned += 1
+            print("  Cleaned stale lockfile: %s" % os.path.basename(lf))
+        except Exception:
+            # File is actively held by an open application — leave intact
+            pass
+    return cleaned
+
+

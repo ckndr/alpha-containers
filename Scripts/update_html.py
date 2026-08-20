@@ -41,21 +41,34 @@ def recalculate_formulas_via_com(file_path):
     import platform
     if platform.system() != 'Windows':
         return False
+    excel = None
+    wb_com = None
     try:
         import win32com.client
         abs_path = os.path.abspath(file_path)
-        excel = win32com.client.Dispatch("Excel.Application")
+        excel = win32com.client.DispatchEx("Excel.Application")
         excel.Visible = False
         excel.DisplayAlerts = False
         wb_com = excel.Workbooks.Open(abs_path)
         wb_com.Save()
-        wb_com.Close(SaveChanges=True)
-        excel.Quit()
         print(f"  Recalculated formulas in Excel via COM: {os.path.basename(file_path)}")
         return True
     except Exception as e:
         print(f"  Warning: Could not recalculate formulas via Excel COM: {e}")
         return False
+    finally:
+        if wb_com is not None:
+            try:
+                wb_com.Close(SaveChanges=False)
+            except Exception:
+                pass
+        if excel is not None:
+            try:
+                excel.Quit()
+            except Exception:
+                pass
+        del wb_com
+        del excel
 
 # Evaluate safe math formulas like "=400000-98056"
 def evaluate_math_formula(formula_str):
@@ -210,11 +223,21 @@ if latest_date:
         is_varn  = '(VARNISH)' in str(prod_name).upper()
         if is_print and not is_varn:
             yest_tube += int(good_qty)
-        elif is_pet:
-            yest_pet += int(good_qty)
+# Build PID to product type lookup from Product_Catalog (Rule R1-13)
+cat_pid_type = {}
+for row in ws_cat.iter_rows(min_row=3, values_only=True):
+    pid_raw = row[0]
+    dia_raw = row[4]
+    if pid_raw:
+        try:
+            pid_k = int(pid_raw)
+            dia_s = str(dia_raw or '').lower()
+            cat_pid_type[pid_k] = 'PET' if 'ml' in dia_s or (8000 <= pid_k < 9000) else 'TUBE'
+        except (ValueError, TypeError):
+            pass
 
-tube_mtd = sum(v for k, v in mtd_by_pid.items() if k < 8000)
-pet_mtd  = sum(v for k, v in mtd_by_pid.items() if k >= 8000)
+tube_mtd = sum(v for k, v in mtd_by_pid.items() if cat_pid_type.get(k, 'PET' if k >= 8000 else 'TUBE') == 'TUBE')
+pet_mtd  = sum(v for k, v in mtd_by_pid.items() if cat_pid_type.get(k, 'PET' if k >= 8000 else 'TUBE') == 'PET')
 
 print(f"\nKPIs for {month_name}:")
 print(f"  Tube MTD: {tube_mtd:,}  |  Yesterday: {yest_tube:,}")
@@ -495,8 +518,9 @@ DOWNTIME_ICONS = {
 }
 
 dash_data = {
-    'month':       month_name,
-    'lastUpdated': f"Updated {now.strftime('%d-%b-%Y %H:%M')} from {os.path.basename(EXCEL_PATH)}",
+    'month':         month_name,
+    'lastUpdated':   f"Updated {now.strftime('%d-%b-%Y %H:%M')} from {os.path.basename(EXCEL_PATH)}",
+    'timestamp_iso': now.isoformat(),
     'kpi': {
         'tubeYest':         yest_tube,
         'tubeMTD':          tube_mtd,

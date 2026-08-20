@@ -1,0 +1,601 @@
+================================================================================
+ANALYZING: Production.xlsx
+================================================================================
+
+### SHEET: Dashbord (Rows: 47, Cols: 14)
+Row 1: ['PLANT PRODUCTION DASHBOARD —  AUGUST 2026', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 4: ['Tubes Aluminnium Summary ', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 5: ['Printing Production Yesterday', '', 'Total Printing Production Monthly', '', 'Total Dispatch Yesterday', '', 'Total Dispatch Monthly', 'Printing MTD Compliance', '', 'Target Printing Plan (MTD)', 'Pending Printing Plan (MTD)', '', '', '']
+  Table: Table6, Ref: A16:N21
+  Col A: 2 formulas, 12 constants.
+    First formula (row 6): ='Summary 14-08-2026'!$B$14 -> Val: 0
+    Last formula (row 11): ='Summary 14-08-2026'!$B$3 -> Val: 8740
+  Col B: 5 formulas, 1 constants.
+    First formula (row 17): =INDEX(Table2[[Sr'#]:[%age Waste]],MATCH(Dashbord!$A17,Table2[Sr'#],0),MATCH(Dashbord!B$16,Table2[[#Headers],[Sr'#]:[%age Waste]],0)) -> Val: 2026-08-12 00:00:00
+    Last formula (row 21): =INDEX(Table2[[Sr'#]:[%age Waste]],MATCH(Dashbord!$A21,Table2[Sr'#],0),MATCH(Dashbord!B$16,Table2[[#Headers],[Sr'#]:[%age Waste]],0)) -> Val: 2026-08-12 00:00:00
+  Col C: 7 formulas, 3 constants.
+    First formula (row 6): ='Summary 14-08-2026'!$B$15 -> Val: 212464
+    Last formula (row 21): =INDEX(Table2[Month],MATCH(Dashbord!$A21,Table2[Sr'#],0)) -> Val: Aug-26
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [10, 16]
+  Col D: 5 formulas, 1 constants.
+    First formula (row 17): =INDEX(Table2[Machines],MATCH(Dashbord!$A17,Table2[Sr'#],0)) -> Val: PF Machine
+    Last formula (row 21): =INDEX(Table2[Machines],MATCH(Dashbord!$A21,Table2[Sr'#],0)) -> Val: Latex-01
+  Col E: 7 formulas, 3 constants.
+    First formula (row 6): ='Summary 14-08-2026'!$B$21 -> Val: 0
+    Last formula (row 21): =INDEX(Table2[Customer],MATCH(Dashbord!$A21,Table2[Sr'#],0)) -> Val: Golden Pearl
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [10, 16]
+  Col F: 5 formulas, 1 constants.
+    First formula (row 17): =INDEX(Table2[Product Name],MATCH(Dashbord!$A17,Table2[Sr'#],0)) -> Val: Trp Bottle
+    Last formula (row 21): =INDEX(Table2[Product Name],MATCH(Dashbord!$A21,Table2[Sr'#],0)) -> Val: Hello Hair
+  Col G: 7 formulas, 3 constants.
+    First formula (row 6): ='Summary 14-08-2026'!$B$22 -> Val: 164682
+    Last formula (row 21): =INDEX(Table2[Dia(mm)/Volume],MATCH(Dashbord!$A21,Table2[Sr'#],0)) -> Val: 30
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [10, 16]
+  Col H: 7 formulas, 3 constants.
+    First formula (row 6): ='Summary 14-08-2026'!$B$20 -> Val: 0.8198178731285692
+    Last formula (row 21): =INDEX(Table2[Actual Time],MATCH(Dashbord!$A21,Table2[Sr'#],0)) -> Val: 480
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [10, 16]
+  Col I: 5 formulas, 1 constants.
+    First formula (row 17): =INDEX(Table2[Downtime],MATCH(Dashbord!$A17,Table2[Sr'#],0)) -> Val: 960
+    Last formula (row 21): =INDEX(Table2[Downtime],MATCH(Dashbord!$A21,Table2[Sr'#],0)) -> Val: 0
+  Col J: 7 formulas, 3 constants.
+    First formula (row 6): ='Summary 14-08-2026'!$B$16 -> Val: 259160
+    Last formula (row 21): =INDEX(Table2[Available time],MATCH(Dashbord!$A21,Table2[Sr'#],0)) -> Val: 480
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [10, 16]
+  Col K: 7 formulas, 3 constants.
+    First formula (row 6): ='Summary 14-08-2026'!$B$17 -> Val: 46696
+    Last formula (row 21): =INDEX(Table2[Total Production],MATCH(Dashbord!$A21,Table2[Sr'#],0)) -> Val: 27370
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [10, 16]
+  Col L: 5 formulas, 1 constants.
+    First formula (row 17): =INDEX(Table2[Wastage],MATCH(Dashbord!$A17,Table2[Sr'#],0)) -> Val: 0
+    Last formula (row 21): =INDEX(Table2[Wastage],MATCH(Dashbord!$A21,Table2[Sr'#],0)) -> Val: 20
+  Col M: 5 formulas, 1 constants.
+    First formula (row 17): =INDEX(Table2[Good Production],MATCH(Dashbord!$A17,Table2[Sr'#],0)) -> Val: 0
+    Last formula (row 21): =INDEX(Table2[Good Production],MATCH(Dashbord!$A21,Table2[Sr'#],0)) -> Val: 27350
+  Col N: 5 formulas, 1 constants.
+    First formula (row 17): =INDEX(Table2[%age Waste],MATCH(Dashbord!$A17,Table2[Sr'#],)) -> Val: 0%
+    Last formula (row 21): =INDEX(Table2[%age Waste],MATCH(Dashbord!$A21,Table2[Sr'#],)) -> Val: 0.0007312614259597807
+
+### SHEET: Production Day wise (Rows: 73, Cols: 25)
+Row 1: ['', '', '', '', '', '', '', '', '', '', '', '', '=SUBTOTAL(9,M3:M28442)', '=SUBTOTAL(101,N3:N28442)', '=SUBTOTAL(9,O3:O28442)', '=SUBTOTAL(9,P3:P28442)', '=SUBTOTAL(9,Q3:Q28442)', '=SUBTOTAL(9,R3:R28442)', '=SUBTOTAL(9,S3:S28442)', '=SUBTOTAL(9,T3:T28442)', '=SUBTOTAL(9,U3:U28442)', '=SUBTOTAL(9,V3:V28442)', '=SUBTOTAL(9,W3:W28442)', '=SUBTOTAL(9,X3:X28442)', '']
+Row 2: ['Sr#', 'Date', 'Month', 'Machines', 'Customer', 'Product Name', 'Dia(mm)/Volume', 'Actual Time', 'Downtime', 'Available time', 'Total Production', 'Wastage', 'Good Production', '%age Waste', 'Mechanical Downtime', 'Electrical Downtime', 'ChangeOver', 'Operations Downtime', 'Power Shut Down', 'Gas Shut Down', 'Workers Shortage', 'Material Shortage ', 'Compressor Issue', 'Order not available', '']
+Row 3: ['1', '2026-08-01 00:00:00', '=TEXT(Table2[[#This Row],[Date]],"mmm-yy")', 'PF Machine', 'Alpha Lab', 'Trp Bottle', '150 ml', '960', '120', '=Table2[[#This Row],[Actual Time]]-I3', '9650', '450', '=K3-L3', '=IFERROR(L3/M3,"0%")', '120', '', '', '', '', '', '', '', '', '', '']
+Row 4: ['2', '2026-08-01 00:00:00', '=TEXT(Table2[[#This Row],[Date]],"mmm-yy")', 'Press-04', 'Golden Pearl', 'Hello Hair', '30', '480', '180', '=Table2[[#This Row],[Actual Time]]-I4', '21000', '150', '=K4-L4', '=IFERROR(L4/M4,"0%")', '', '', '', '', '', '', '', '', '', '', '']
+Row 5: ['3', '2026-08-01 00:00:00', '=TEXT(Table2[[#This Row],[Date]],"mmm-yy")', 'Lacquer-03', 'Golden Pearl', 'Hello Hair', '30', '480', '0', '=Table2[[#This Row],[Actual Time]]-I5', '25000', '410', '=K5-L5', '=IFERROR(L5/M5,"0%")', '', '', '', '', '', '', '', '', '', '', '']
+  Table: Table2, Ref: A2:X73
+  Col C: 71 formulas, 1 constants.
+    First formula (row 3): =TEXT(Table2[[#This Row],[Date]],"mmm-yy") -> Val: Aug-26
+    Last formula (row 73): =TEXT(Table2[[#This Row],[Date]],"mmm-yy") -> Val: Aug-26
+  Col J: 67 formulas, 1 constants.
+    First formula (row 3): =Table2[[#This Row],[Actual Time]]-I3 -> Val: 840
+    Last formula (row 69): =Table2[[#This Row],[Actual Time]]-I69 -> Val: 720
+  Col K: 16 formulas, 52 constants.
+    First formula (row 6): =24038+460 -> Val: 24498
+    Last formula (row 69): =8740+350 -> Val: 9090
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 22, 23, 25, 26, 27, 28, 30, 31, 32, 33, 35, 36, 37, 38, 40, 41, 42, 43, 44, 45, 48, 49, 50, 51, 52, 54, 55, 56, 58, 59, 60, 61, 63, 64, 65, 66, 68]
+  Col M: 68 formulas, 1 constants.
+    First formula (row 1): =SUBTOTAL(9,M3:M28442) -> Val: 8740
+    Last formula (row 69): =K69-L69 -> Val: 8740
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [2]
+  Col N: 72 formulas, 1 constants.
+    First formula (row 1): =SUBTOTAL(101,N3:N28442) -> Val: 0.04004576659038902
+    Last formula (row 73): =IFERROR(L73/M73,"0%") -> Val: 0%
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [2]
+  Col O: 1 formulas, 10 constants.
+    First formula (row 1): =SUBTOTAL(9,O3:O28442) -> Val: 0
+  Col P: 1 formulas, 5 constants.
+    First formula (row 1): =SUBTOTAL(9,P3:P28442) -> Val: 240
+  Col Q: 1 formulas, 1 constants.
+    First formula (row 1): =SUBTOTAL(9,Q3:Q28442) -> Val: 0
+  Col R: 1 formulas, 8 constants.
+    First formula (row 1): =SUBTOTAL(9,R3:R28442) -> Val: 0
+  Col S: 1 formulas, 2 constants.
+    First formula (row 1): =SUBTOTAL(9,S3:S28442) -> Val: 0
+  Col T: 1 formulas, 1 constants.
+    First formula (row 1): =SUBTOTAL(9,T3:T28442) -> Val: 0
+  Col U: 1 formulas, 1 constants.
+    First formula (row 1): =SUBTOTAL(9,U3:U28442) -> Val: 0
+  Col V: 1 formulas, 13 constants.
+    First formula (row 1): =SUBTOTAL(9,V3:V28442) -> Val: 0
+  Col W: 1 formulas, 1 constants.
+    First formula (row 1): =SUBTOTAL(9,W3:W28442) -> Val: 0
+  Col X: 1 formulas, 1 constants.
+    First formula (row 1): =SUBTOTAL(9,X3:X28442) -> Val: 0
+
+### SHEET: Downtime Summary. (Rows: 13, Cols: 6)
+Row 2: ['Month', '(All)', '', '', '', '']
+Row 3: ['Downtimes Summary', '', '', '', '', '']
+Row 4: ['Machines', 'Mechanical Downtime.', 'Material Shortage .', 'Power Shut Down.', 'Operations Downtime.', 'Electrical Downtime.']
+Row 5: ['Lacquer-03', '', '540', '', '', '']
+
+### SHEET: Downtime Summary (Rows: 10, Cols: 10)
+Row 1: ['Date', '2026-08-14 00:00:00', '', '', '', '', '', '', '', '']
+Row 2: ['Month', 'Aug-26', '', '', '', '', '', '', '', '']
+Row 3: ['Downtime Summary', '', '', '', '', '', '', '', '', '']
+Row 4: ['Machines', 'Mechanical Downtime.', 'Electrical Downtime.', 'Operations Downtime.', 'Power Shut Down.', 'Workers Shortage.', 'Material Shortage .', 'Compressor Issue.', 'Order not available.', 'ChangeOver.']
+Row 5: ['Lacquer-03', '', '', '', '', '', '', '', '', '']
+
+### SHEET: Summary 14-08-2026 (Rows: 26, Cols: 14)
+Row 1: ['2026-08-14 00:00:00', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 2: ['Overall Summary ', 'Units', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 3: ['Actual PET Production (Today)', '=SUMIFS(\'Production Day wise\'!$M:$M,\'Production Day wise\'!$B:$B,$A$1,\'Production Day wise\'!$D:$D,"PF*")', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 4: ['Total PET Production (Monthly)', '=SUMIFS(\'Production Day wise\'!$M:$M,\'Production Day wise\'!$B:$B,">="&EOMONTH($A$1,-1)+1,\'Production Day wise\'!$B:$B,"<="&EOMONTH($A$1,0),\'Production Day wise\'!$D:$D,"PF*")', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 5: ['Target PET Plan (MTD)', '767377', '', '', '', '', '', '', '', '', '', '', '', '']
+  [ERROR IN COL B] 2 error cells:
+    Cell B13: Formula='=B11/B12', CachedVal='#DIV/0!'
+    Cell B24: Formula='=B22/B23', CachedVal='#DIV/0!'
+  Col B: 18 formulas, 5 constants.
+    First formula (row 3): =SUMIFS('Production Day wise'!$M:$M,'Production Day wise'!$B:$B,$A$1,'Production Day wise'!$D:$D,"PF*") -> Val: 8740
+    Last formula (row 24): =B22/B23 -> Val: #DIV/0!
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [5, 12, 16, 23]
+
+### SHEET: FG Stock In hand (Rows: 1756, Cols: 9)
+Row 1: ['', '', '', '', '', '=SUBTOTAL(9,F3:F3307)', '', '', '']
+Row 2: ['Sr.', 'Date', 'Customer / Brand', 'Product Description', 'Diameter', 'Stock in Hand (Qty)', 'Production Remarks', 'Dispatch Remarks', 'Production Produce Date']
+Row 3: ['=ROW()-ROW($A$2)', '2026-02-26 00:00:00', 'Alpha Lab', 'Trp Bottle', '150ml', '85560', 'OK', 'Ready for dispatch', 'Ready for dispatch']
+Row 4: ['=ROW()-ROW($A$2)', '2026-02-26 00:00:00', 'Samsol', 'Common Purple Tube', '25 dia', '27216', 'OK', 'Ready for dispatch', 'Ready for dispatch']
+Row 5: ['=ROW()-ROW($A$2)', '2026-02-26 00:00:00', 'Active Pro', 'Tube', '30 dia', '15000', 'OK', 'Ready for dispatch', 'Ready for dispatch']
+  Table: Table3, Ref: A2:I1756
+  Col A: 1754 formulas, 1 constants.
+    First formula (row 3): =ROW()-ROW($A$2) -> Val: 1
+    Last formula (row 1756): =ROW()-ROW($A$2) -> Val: 1754
+  Col F: 103 formulas, 1653 constants.
+    First formula (row 1): =SUBTOTAL(9,F3:F3307) -> Val: 379675
+    Last formula (row 1751): =46990+12852 -> Val: 59842
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427, 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 452, 453, 454, 455, 456, 457, 458, 459, 460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493, 494, 495, 496, 497, 498, 499, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 535, 536, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573, 574, 575, 576, 578, 579, 580, 581, 582, 583, 584, 585, 586, 587, 588, 589, 590, 591, 592, 593, 594, 595, 596, 597, 598, 599, 600, 601, 602, 604, 605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 628, 629, 630, 631, 632, 633, 634, 635, 636, 637, 638, 639, 640, 641, 642, 643, 644, 645, 646, 647, 648, 649, 650, 651, 654, 655, 656, 657, 658, 659, 660, 661, 662, 663, 664, 665, 666, 667, 668, 669, 670, 671, 675, 676, 677, 678, 679, 680, 681, 682, 683, 684, 685, 686, 687, 688, 689, 690, 691, 695, 696, 697, 698, 699, 700, 701, 702, 703, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 716, 717, 718, 719, 720, 721, 722, 723, 724, 725, 726, 727, 728, 729, 730, 731, 732, 733, 734, 737, 738, 739, 740, 741, 742, 743, 744, 745, 746, 747, 748, 749, 750, 751, 752, 753, 754, 755, 756, 757, 760, 761, 762, 763, 764, 765, 766, 767, 768, 769, 770, 771, 772, 773, 774, 775, 776, 777, 778, 779, 783, 784, 785, 786, 787, 788, 789, 790, 791, 792, 793, 794, 795, 796, 797, 798, 799, 800, 801, 804, 805, 806, 807, 808, 809, 810, 811, 812, 813, 814, 815, 816, 817, 818, 819, 820, 821, 822, 823, 824, 825, 828, 829, 830, 833, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850, 853, 855, 857, 858, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 871, 872, 875, 876, 877, 879, 880, 881, 882, 883, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893, 894, 895, 896, 898, 899, 900, 901, 902, 904, 905, 906, 907, 908, 909, 910, 911, 912, 913, 914, 915, 916, 917, 920, 921, 922, 925, 926, 927, 928, 930, 931, 932, 933, 934, 935, 936, 937, 939, 940, 941, 944, 946, 947, 949, 950, 951, 952, 953, 954, 955, 956, 957, 958, 959, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 973, 974, 975, 977, 978, 979, 980, 981, 982, 983, 984, 985, 986, 987, 988, 989, 990, 992, 994, 995, 996, 997, 998, 999, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1011, 1013, 1014, 1015, 1016, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1036, 1037, 1038, 1039, 1040, 1041, 1042, 1044, 1045, 1046, 1047, 1048, 1049, 1050, 1051, 1052, 1053, 1054, 1055, 1056, 1057, 1058, 1059, 1061, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074, 1075, 1077, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1093, 1095, 1096, 1097, 1098, 1099, 1100, 1101, 1102, 1103, 1104, 1105, 1106, 1108, 1110, 1111, 1112, 1113, 1114, 1115, 1116, 1117, 1118, 1119, 1120, 1121, 1122, 1123, 1125, 1127, 1128, 1129, 1130, 1131, 1132, 1133, 1134, 1135, 1136, 1137, 1138, 1139, 1141, 1143, 1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1157, 1159, 1160, 1161, 1162, 1163, 1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1174, 1175, 1176, 1177, 1178, 1179, 1180, 1181, 1182, 1183, 1184, 1185, 1186, 1187, 1188, 1189, 1190, 1192, 1193, 1195, 1196, 1197, 1198, 1199, 1200, 1201, 1202, 1203, 1204, 1205, 1206, 1207, 1208, 1209, 1210, 1211, 1213, 1214, 1215, 1216, 1217, 1218, 1219, 1220, 1221, 1222, 1223, 1224, 1225, 1226, 1227, 1228, 1229, 1231, 1232, 1233, 1234, 1235, 1236, 1237, 1238, 1239, 1240, 1241, 1242, 1243, 1244, 1245, 1246, 1248, 1249, 1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258, 1259, 1260, 1261, 1262, 1264, 1265, 1266, 1267, 1268, 1269, 1270, 1271, 1272, 1273, 1274, 1275, 1276, 1277, 1278, 1280, 1281, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289, 1290, 1291, 1292, 1293, 1294, 1295, 1296, 1297, 1298, 1299, 1300, 1301, 1302, 1303, 1304, 1305, 1306, 1307, 1308, 1309, 1310, 1311, 1312, 1313, 1314, 1315, 1316, 1317, 1318, 1319, 1320, 1321, 1322, 1323, 1324, 1325, 1326, 1327, 1328, 1329, 1330, 1331, 1332, 1333, 1334, 1335, 1336, 1337, 1338, 1339, 1340, 1341, 1343, 1344, 1345, 1346, 1347, 1348, 1349, 1350, 1351, 1352, 1353, 1354, 1355, 1356, 1357, 1358, 1359, 1360, 1361, 1362, 1363, 1364, 1365, 1366, 1367, 1368, 1369, 1370, 1371, 1372, 1373, 1374, 1375, 1376, 1377, 1378, 1379, 1380, 1381, 1382, 1383, 1384, 1385, 1386, 1387, 1388, 1389, 1390, 1391, 1392, 1393, 1394, 1395, 1396, 1397, 1398, 1399, 1400, 1401, 1402, 1403, 1404, 1405, 1406, 1407, 1408, 1409, 1410, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1437, 1438, 1439, 1440, 1441, 1442, 1443, 1444, 1445, 1446, 1447, 1448, 1449, 1450, 1451, 1452, 1453, 1454, 1455, 1456, 1457, 1458, 1459, 1460, 1461, 1462, 1463, 1464, 1465, 1466, 1467, 1468, 1469, 1470, 1471, 1472, 1473, 1474, 1475, 1476, 1477, 1478, 1479, 1480, 1481, 1482, 1483, 1484, 1485, 1486, 1487, 1488, 1489, 1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 1500, 1501, 1502, 1503, 1504, 1505, 1506, 1507, 1508, 1509, 1510, 1511, 1512, 1513, 1514, 1515, 1516, 1517, 1518, 1519, 1520, 1521, 1522, 1523, 1524, 1525, 1526, 1527, 1528, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548, 1549, 1550, 1551, 1552, 1553, 1554, 1555, 1556, 1557, 1558, 1559, 1560, 1561, 1562, 1563, 1564, 1565, 1566, 1567, 1568, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1579, 1580, 1581, 1582, 1584, 1585, 1586, 1587, 1588, 1589, 1590, 1591, 1592, 1593, 1594, 1596, 1597, 1598, 1599, 1600, 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631, 1633, 1634, 1635, 1636, 1637, 1638, 1639, 1642, 1643, 1644, 1645, 1646, 1647, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1678, 1679, 1680, 1681, 1682, 1683, 1684, 1686, 1687, 1688, 1689, 1690, 1691, 1692, 1693, 1694, 1695, 1697, 1698, 1699, 1700, 1701, 1702, 1703, 1705, 1706, 1707, 1708, 1709, 1710, 1711, 1712, 1714, 1715, 1717, 1718, 1719, 1720, 1721, 1723, 1724, 1725, 1726, 1727, 1728, 1730, 1731, 1733, 1735, 1736, 1737, 1738, 1739, 1741, 1742, 1743, 1744, 1745, 1746, 1748]
+
+### SHEET: Alu Tubes dispatch (Rows: 125, Cols: 7)
+Row 1: ['', '', '', '', '', '', '=SUBTOTAL(9,Table23[QTY])']
+Row 2: ['DAYWISE DISPATCH REPORT Tubes DETAIL ', '', '', '', '', '', '']
+Row 3: ['DATE', 'Months', 'JOB', 'Customer Name', 'PRODUCT NAME', 'DIA ', 'QTY']
+Row 4: ['2026-01-07 00:00:00', '=TEXT(Table23[[#This Row],[DATE]],"MMM-YYY")', '6841', 'GOLDEN PEARL', 'HELLO HAIR', '30', '50225']
+Row 5: ['2026-01-09 00:00:00', '=TEXT(Table23[[#This Row],[DATE]],"MMM-YYY")', '6842', 'SAMSOL INTERNATIONAL', 'SAMSOL COMMON RED', '25', '25536']
+  Table: Table23, Ref: A3:G125
+  Col B: 122 formulas, 1 constants.
+    First formula (row 4): =TEXT(Table23[[#This Row],[DATE]],"MMM-YYY") -> Val: Jan-2026
+    Last formula (row 125): =TEXT(Table23[[#This Row],[DATE]],"MMM-YYY") -> Val: Aug-2026
+  Col G: 1 formulas, 123 constants.
+    First formula (row 1): =SUBTOTAL(9,Table23[QTY]) -> Val: 164682
+
+### SHEET: Pet Bottles dispatch (Rows: 523, Cols: 7)
+Row 1: ['', '', '', '', '', '', '=SUBTOTAL(9,Table235[QTY])']
+Row 2: ['DAYWISE DISPATCH REPORT Pet DETAIL ', '', '', '', '', '', '']
+Row 3: ['DATE', 'Months', 'JOB', 'Customer Name', 'PRODUCT NAME', 'Volume ', 'QTY']
+Row 4: ['2026-08-04 00:00:00', '=TEXT(Table235[[#This Row],[DATE]],"MMM-YYY")', '319', 'Alpha Lab', 'Trp Bottle', '150 ML', '12880']
+Row 5: ['2026-08-06 00:00:00', '=TEXT(Table235[[#This Row],[DATE]],"MMM-YYY")', '341', 'Alpha Lab', 'Trp Bottle', '150 ML', '18400']
+  Table: Table235, Ref: A3:G5
+  Col B: 2 formulas, 1 constants.
+    First formula (row 4): =TEXT(Table235[[#This Row],[DATE]],"MMM-YYY") -> Val: Aug-2026
+    Last formula (row 5): =TEXT(Table235[[#This Row],[DATE]],"MMM-YYY") -> Val: Aug-2026
+  Col G: 1 formulas, 3 constants.
+    First formula (row 1): =SUBTOTAL(9,Table235[QTY]) -> Val: 31280
+
+### SHEET: Sheet3 (Rows: 30, Cols: 16)
+Row 1: ['  PRODUCT CATALOG — Master lookup for all products (matches ERP)', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 2: ['Product ID', 'BOM ID', 'Customer', 'Product Name', 'Dia (mm)', 'Length (mm)', 'Latex', 'Pcs/Carton', '# of Pieces', 'Slug (KG)', 'Base Coat (KG)', 'Lacquer (KG)', 'Latex (KG)', 'Zinc (KG)', 'Caps (PCS)', 'Cartons (PCS)']
+Row 3: ['1085', '187', 'Brooks Pharma', 'PYODINE GEL 20GM', '19', '106', 'No', '588', '', '=IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="SLUG")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0))', '=IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="BASE COAT")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0))', '=IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="LECQUER")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0))', '=IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="LATEX")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0))', '=IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="ZINC POWDER")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0))', '=IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="CAP")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0))', '=IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="CARTON")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0))']
+Row 4: ['6559', '188', 'Brooks Pharma', 'PHLOGIN GEL 20G', '19', '106', 'No', '588', '', '=IF(I4="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A4)*([1]!TableBOM[Material Category]="SLUG")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I4/1000,0))', '=IF(I4="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A4)*([1]!TableBOM[Material Category]="BASE COAT")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I4/1000,0))', '=IF(I4="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A4)*([1]!TableBOM[Material Category]="LECQUER")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I4/1000,0))', '=IF(I4="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A4)*([1]!TableBOM[Material Category]="LATEX")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I4/1000,0))', '=IF(I4="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A4)*([1]!TableBOM[Material Category]="ZINC POWDER")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I4/1000,0))', '=IF(I4="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A4)*([1]!TableBOM[Material Category]="CAP")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I4/1000,0))', '=IF(I4="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A4)*([1]!TableBOM[Material Category]="CARTON")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I4/1000,0))']
+Row 5: ['6560', '189', 'Brooks Pharma', 'CONTRATUBEX GEL 20G', '19', '106', 'No', '588', '', '=IF(I5="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A5)*([1]!TableBOM[Material Category]="SLUG")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I5/1000,0))', '=IF(I5="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A5)*([1]!TableBOM[Material Category]="BASE COAT")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I5/1000,0))', '=IF(I5="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A5)*([1]!TableBOM[Material Category]="LECQUER")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I5/1000,0))', '=IF(I5="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A5)*([1]!TableBOM[Material Category]="LATEX")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I5/1000,0))', '=IF(I5="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A5)*([1]!TableBOM[Material Category]="ZINC POWDER")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I5/1000,0))', '=IF(I5="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A5)*([1]!TableBOM[Material Category]="CAP")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I5/1000,0))', '=IF(I5="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A5)*([1]!TableBOM[Material Category]="CARTON")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I5/1000,0))']
+  Col J: 26 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="SLUG")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 29): =IF(I29="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A29)*([1]!TableBOM[Material Category]="SLUG")*[1]!TableBOM[Per 1000 Units])*I29/1000,0)) -> Val: 
+  Col K: 26 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="BASE COAT")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 29): =IF(I29="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A29)*([1]!TableBOM[Material Category]="BASE COAT")*[1]!TableBOM[Per 1000 Units])*I29/1000,0)) -> Val: 
+  Col L: 26 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="LECQUER")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 29): =IF(I29="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A29)*([1]!TableBOM[Material Category]="LECQUER")*[1]!TableBOM[Per 1000 Units])*I29/1000,0)) -> Val: 
+  Col M: 26 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="LATEX")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 29): =IF(I29="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A29)*([1]!TableBOM[Material Category]="LATEX")*[1]!TableBOM[Per 1000 Units])*I29/1000,0)) -> Val: 
+  Col N: 26 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="ZINC POWDER")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 29): =IF(I29="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A29)*([1]!TableBOM[Material Category]="ZINC POWDER")*[1]!TableBOM[Per 1000 Units])*I29/1000,0)) -> Val: 
+  Col O: 26 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="CAP")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 29): =IF(I29="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A29)*([1]!TableBOM[Material Category]="CAP")*[1]!TableBOM[Per 1000 Units])*I29/1000,0)) -> Val: 
+  Col P: 26 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A3)*([1]!TableBOM[Material Category]="CARTON")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 29): =IF(I29="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A29)*([1]!TableBOM[Material Category]="CARTON")*[1]!TableBOM[Per 1000 Units])*I29/1000,0)) -> Val: 
+
+### SHEET: Sheet2 (Rows: 23, Cols: 2)
+Row 3: ['12.5', 'Press-01']
+Row 4: ['16', 'Press-02']
+Row 5: ['19', 'Press-03']
+================================================================================
+ANALYZING: Pending.xlsx
+================================================================================
+
+### SHEET: 01-05-2026 (Rows: 33, Cols: 9)
+Row 1: ['PENDING ORDER 02-05-2026', '', '', '', '', '', '', '', '']
+Row 3: ['JOB NO', 'Length', 'JOB DATE', 'Product Name', 'Dia', 'pending+ new Order Qty', 'Total Printing', 'Balance', 'Remarks:']
+Row 4: ['', '', '', '', '12.5', '', '', '', '']
+  Col G: 2 formulas, 1 constants.
+    First formula (row 17): =9744+12432 -> Val: 22176
+    Last formula (row 27): =9540+2520+8640 -> Val: 20700
+  Col H: 17 formulas, 1 constants.
+    First formula (row 6): =SUM(H4:H5) -> Val: 0
+    Last formula (row 30): =H6+H9+H12+H15+H20+H23+H26+H29 -> Val: 63124
+================================================================================
+ANALYZING: August_Plan.xlsx
+================================================================================
+
+### SHEET: August Tubes Weekly (Rows: 13, Cols: 3)
+Row 2: ['August 2026 TUBES Weekly Summary', '', '']
+Row 3: ['Week / Customer', 'Dia', 'Order Qty']
+Row 4: ['Week 01', '', '']
+Row 5: ['Golden Pearl Cosmetics (PVT) LTD', '', '']
+
+### SHEET: August Tubes Plan (Rows: 54, Cols: 15)
+Row 1: ['AUGUST 2026 - TUBES DAILY PLAN', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 2: ['Week', 'Date.', 'DIA/ML', 'Customer', 'Product Name', 'Order Quantity', 'Machine ', '', 'MAY REQUIRED ORDERS', '', '', '', '', '', '']
+Row 3: ['Week 01', '2026-08-05 00:00:00', '30', 'Golden Pearl Cosmetics (PVT) LTD', 'HELLO HAIR COLOR', '22000', 'Pline-04', '', 'Dia', 'Client', 'Product', 'Required', 'Planned', 'Remaining', 'Status']
+Row 4: ['Week 01', '2026-08-06 00:00:00', '30', 'Golden Pearl Cosmetics (PVT) LTD', 'HELLO HAIR COLOR', '22000', 'Pline-04', '', '30', 'Golden Pearl Cosmetics (PVT) LTD', 'HELLO HAIR COLOR', '231932', '=SUMIF(E:E,K4,F:F)', '=L4-M4', 'Hold (No Caps)']
+Row 5: ['Week 01', '2026-08-07 00:00:00', '30', 'Golden Pearl Cosmetics (PVT) LTD', 'HELLO HAIR COLOR', '22000', 'Pline-04', '', '', '', '', '', '', '', '']
+  Col F: 1 formulas, 12 constants.
+    First formula (row 14): =SUM(F3:F13) -> Val: 242000
+  Col L: 1 formulas, 2 constants.
+    First formula (row 7): =SUM(L4:L6) -> Val: 231932
+  Col M: 2 formulas, 1 constants.
+    First formula (row 4): =SUMIF(E:E,K4,F:F) -> Val: 242000
+    Last formula (row 7): =SUM(M4:M6) -> Val: 242000
+  Col N: 2 formulas, 1 constants.
+    First formula (row 4): =L4-M4 -> Val: -10068
+    Last formula (row 7): =SUM(N4:N6) -> Val: -10068
+
+### SHEET: August Plan PET (Rows: 51, Cols: 14)
+Row 1: ['PET DAILY PLAN', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 2: ['Week', 'Date.', 'ML', 'Customer', 'Product Name', 'Ordered Quantity', '', '', '', '', '', '', '', '']
+Row 3: ['Week 2', '2026-08-08 00:00:00', '150 ml', 'Alpha Labs PVT LTD', 'PET BOTTLE (150ML)TRANSPARENT BODY MIST', 'Maintaince', '', '', '', '', '', '', '', '']
+Row 4: ['Week 2', '2026-08-10 00:00:00', '150 ml', 'Alpha Labs PVT LTD', 'PET BOTTLE (150ML)TRANSPARENT BODY MIST', '18000', '', 'PET PLAN', '', '', '', '', '', '']
+Row 5: ['Week 2', '2026-08-11 00:00:00', '150 ml', 'Alpha Labs PVT LTD', 'PET BOTTLE (150ML)TRANSPARENT BODY MIST', '18000', '', 'ML', 'Client', 'Product', 'Required', 'Planned', 'Remaining', '']
+  Col F: 1 formulas, 49 constants.
+    First formula (row 51): =SUM(F4:F50) -> Val: 971000
+  Col K: 1 formulas, 5 constants.
+    First formula (row 10): =SUM(K6:K8) -> Val: 940000
+  Col L: 5 formulas, 1 constants.
+    First formula (row 6): =SUMIF(E:E,J6,F:F) -> Val: 891000
+    Last formula (row 10): =SUM(L6:L8) -> Val: 934000
+  Col M: 5 formulas, 1 constants.
+    First formula (row 6): =K6-L6 -> Val: 9000
+    Last formula (row 10): =SUM(M6:M8) -> Val: 6000
+================================================================================
+ANALYZING: Aerosol/Aerosol BOM.xlsx
+================================================================================
+
+### SHEET: Theoretical BOM (Rows: 23, Cols: 14)
+Row 1: [' AEROSOL BILL OF MATERIALS — Customer-Specific', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 2: ['P.ID', 'BOM ID', 'Customer', 'Product Name', 'Dia', 'Material Group', 'Item ID', 'Item Name', 'UOM', 'Net Qty / 1000', 'Waste + Tolerance', 'Gross Qty / 1000', 'Remarks', 'Calculations']
+Row 3: ['9001', '100', 'Aerosol Customer', 'Aerosol Can 45mm', '45', 'Aluminum Slugs', '501', '45mm Aluminum Slug', 'kg', '20', '0.1', '=J3/(1-K3)', 'Aluminum disc pressed into can shape. 20g per slug. 100% solid, nothing evaporates.', 'Slug weight per can × 1000. Fixed material input.']
+Row 4: ['9001', '100', 'Aerosol Customer', 'Aerosol Can 45mm', '45', 'Lubricant', '502', 'SAPILUB LUBRIMET GR8', 'kg', '0.021', '0.1', '=J4/(1-K4)', 'Slug lubricant. TDS: 105g per 100kg slugs. Burns off during wash, none stays on can.', '105g per 100kg slugs × 20kg slugs/1000 = 0.021 kg/1000. (Ref: LUBRIMET GR8 TDS)']
+Row 5: ['9001', '100', 'Aerosol Customer', 'Aerosol Can 45mm', '45', 'Cleaner', '503', 'SAPILUB ALULIQUID 13', 'kg', '5', '0.1', '=J5/(1-K5)', 'Post-press wash chemical. No TDS rate; 5 kg/1000 is empirical. Fully drains off.', 'Empirical / supplier recommendation. No TDS rate available.']
+  Col L: 21 formulas, 1 constants.
+    First formula (row 3): =J3/(1-K3) -> Val: 
+    Last formula (row 23): =J23/(1-K23) -> Val: 
+
+### SHEET: Required Spec for BOM (Rows: 19, Cols: 7)
+Row 1: ['Sr.No', 'Parameter', 'Standard Specification', '', '', '', '']
+Row 2: ['1', 'Can Type', 'Necked-in or Straight Wall', '', '', '', '']
+Row 3: ['=A2+1', 'Can Diameter', 'mm', '', '', '', '']
+Row 4: ['=A3+1', 'Can Height', 'mm', '', '', '', '']
+Row 5: ['=A4+1', 'Neck Opening', 'mm', '', '', '', '']
+  Table: Table2, Ref: A1:C19
+  Col A: 17 formulas, 2 constants.
+    First formula (row 3): =A2+1 -> Val: 
+    Last formula (row 19): =A18+1 -> Val: 
+
+### SHEET: Req. Calculator (Rows: 25, Cols: 8)
+Row 1: ['AEROSOL BILL OF MATERIALS — Material Requirement Calculator', '', '', '', '', '', '', '']
+Row 2: [' Target Production Qty (Cans):', '', '', '750000', '', '', '', '']
+Row 3: ['#', 'Item Name', 'Material Group', 'UOM', 'Per 1,000 Cans', 'Waste %', 'Net Required (kg)', 'Net+Waste Gross Required (kg)']
+Row 4: ['1', "='Theoretical BOM'!H3", "='Theoretical BOM'!F3", "='Theoretical BOM'!I3", "='Theoretical BOM'!J3", "='Theoretical BOM'!K3", '=(D$2/1000)*E4', "=(D$2/1000)*'Theoretical BOM'!L3"]
+Row 5: ['2', "='Theoretical BOM'!H4", "='Theoretical BOM'!F4", "='Theoretical BOM'!I4", "='Theoretical BOM'!J4", "='Theoretical BOM'!K4", '=(D$2/1000)*E5', "=(D$2/1000)*'Theoretical BOM'!L4"]
+  Col B: 21 formulas, 1 constants.
+    First formula (row 4): ='Theoretical BOM'!H3 -> Val: 
+    Last formula (row 24): ='Theoretical BOM'!H23 -> Val: 
+  Col C: 21 formulas, 1 constants.
+    First formula (row 4): ='Theoretical BOM'!F3 -> Val: 
+    Last formula (row 24): ='Theoretical BOM'!F23 -> Val: 
+  Col D: 21 formulas, 2 constants.
+    First formula (row 4): ='Theoretical BOM'!I3 -> Val: 
+    Last formula (row 24): ='Theoretical BOM'!I23 -> Val: 
+  Col E: 21 formulas, 1 constants.
+    First formula (row 4): ='Theoretical BOM'!J3 -> Val: 
+    Last formula (row 24): ='Theoretical BOM'!J23 -> Val: 
+  Col F: 21 formulas, 1 constants.
+    First formula (row 4): ='Theoretical BOM'!K3 -> Val: 
+    Last formula (row 24): ='Theoretical BOM'!K23 -> Val: 
+  Col G: 22 formulas, 1 constants.
+    First formula (row 4): =(D$2/1000)*E4 -> Val: 
+    Last formula (row 25): =SUM(G4:G24) -> Val: 
+  Col H: 22 formulas, 1 constants.
+    First formula (row 4): =(D$2/1000)*'Theoretical BOM'!L3 -> Val: 
+    Last formula (row 25): =SUM(H4:H24) -> Val: 
+================================================================================
+ANALYZING: Aerosol/Aerosol Raw Materials.xlsx
+================================================================================
+
+### SHEET: Item_list (Rows: 27, Cols: 4)
+Row 1: ['Item Name & Code', 'Category', 'Description & Details', 'Shelf Life']
+Row 2: ['SAPILUB LUBRIMET GR8', 'Extrusion Lubricant', 'A soft, greasy slug lubricant paste based on natural, renewable fatty acids. Prevents galling during extrusion. Recommended dosage is 105 grams per 100 kg of 45mm aluminum slugs. ', '36 months (at 5°C - 30°C) ']
+Row 3: ['SAPILUB ALULIQUID 13', 'Alkaline Cleaner', 'Liquid, phosphate-free and surfactant-free alkaline metal cleaner. Cleans aluminum in spray washers without etching. Used at a low 0.7% to 1.4% bath concentration at 70°C. ', '36 months (at 5°C - 35°C) ']
+Row 4: ['SCHEKOSOL INT PROT Gold (400 9 901)', 'Internal Lacquer', 'Gold-tinted epoxy resin internal protective lacquer for isolating the metal from active products. Requires a dry film weight of 10.0 to 12.0 μm and cures at 220°C - 240°C. ', '9 months (at ~20°C) ']
+Row 5: ['SCHEKOSOL INT BEIGE (400 4 902)', 'Internal Lacquer', 'Beige-tinted epoxy resin internal protective lacquer. Requires a dry film weight of 10 to 12 μm and cures between 240°C and 280°C. ', '8 months (at ~25°C) ']
+
+### SHEET: Sheet1 (Rows: 1, Cols: 1)
+================================================================================
+ANALYZING: Aerosol/Aerosol_Job_Card.xlsx
+================================================================================
+
+### SHEET: Job Card (Rows: 48, Cols: 6)
+Row 1: ['', 'ALPHA AEROSOLS PRODUCTION JOB CARD', '', '', 'Doc #: AER-JC-001', '']
+Row 2: ['', '', '', '', 'Date: ____________', '']
+Row 3: ['', '', '', '', 'Revision: 00', '']
+Row 5: ['1. JOB / ORDER DETAILS', '', '', '', '', '']
+  Col B: 29 formulas, 5 constants.
+    First formula (row 12): =IFERROR(VLOOKUP($B$7&"_"&$A12, Aerosol_BOM!$A:$O, 7, FALSE), "") -> Val: Aluminum Slugs
+    Last formula (row 42): =IFERROR(VLOOKUP($B$7, Products_DB!A:O, 13, FALSE), "") -> Val: Glossy
+  Col C: 25 formulas, 9 constants.
+    First formula (row 12): =IFERROR(VLOOKUP($B$7&"_"&$A12, Aerosol_BOM!$A:$O, 9, FALSE), "") -> Val: 45mm Aluminum Slug
+    Last formula (row 36): =IFERROR(VLOOKUP($B$7&"_"&$A36, Aerosol_BOM!$A:$O, 9, FALSE), "") -> Val: 
+  Col D: 30 formulas, 3 constants.
+    First formula (row 7): =IFERROR(VLOOKUP(B7, Products_DB!A:C, 2, FALSE), "") -> Val: 9001
+    Last formula (row 42): =IFERROR(VLOOKUP($B$7, Products_DB!A:O, 14, FALSE), "") -> Val: 100 per Carton
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [8, 11]
+  Col E: 25 formulas, 11 constants.
+    First formula (row 12): =IFERROR(VLOOKUP($B$7&"_"&$A12, Aerosol_BOM!$A:$O, 13, FALSE) * ($B$8*(1+$D$8)) / 1000, "") -> Val: 1166.6666666666665
+    Last formula (row 36): =IFERROR(VLOOKUP($B$7&"_"&$A36, Aerosol_BOM!$A:$O, 13, FALSE) * ($B$8*(1+$D$8)) / 1000, "") -> Val: 
+  Col F: 30 formulas, 1 constants.
+    First formula (row 6): =IFERROR(VLOOKUP(B7, Products_DB!A:C, 3, FALSE), "") -> Val: Aerosol Customer
+    Last formula (row 42): =F8 -> Val: 0
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [11]
+
+### SHEET: Aerosol_BOM (Rows: 22, Cols: 15)
+Row 1: ['LookupKey', 'P.ID', 'BOM ID', 'Customer', 'Product Name', 'Dia', 'Material Group', 'Item ID', 'Item Name', 'UOM', 'Net Qty / 1000', 'Waste + Tolerance', 'Gross Qty / 1000', 'Remarks', 'Calculations']
+Row 2: ['=$E$2&"_"&COUNTIF($E$2:$E$2, $E$2)', '9001', '100', 'Aerosol Customer', 'Aerosol Can 45mm', '45', 'Aluminum Slugs', '501', '45mm Aluminum Slug', 'kg', '20', '0.1', '22.22222222222222', '', 'Slug weight per can × 1000. Fixed material input.']
+Row 3: ['=$E$3&"_"&COUNTIF($E$2:$E$3, $E$3)', '9001', '100', 'Aerosol Customer', 'Aerosol Can 45mm', '45', 'Lubricant', '502', 'SAPILUB LUBRIMET GR8', 'kg', '0.021', '0.1', '0.02333333333333333', '105g per 100kg slugs × 20kg slugs/1000 = 0.021 kg/1000. (Ref: LUBRIMET GR8 TDS)', '105g per 100kg slugs × 20kg slugs/1000 = 0.021 kg/1000. (Ref: LUBRIMET GR8 TDS)']
+Row 4: ['=$E$4&"_"&COUNTIF($E$2:$E$4, $E$4)', '9001', '100', 'Aerosol Customer', 'Aerosol Can 45mm', '45', 'Cleaner', '503', 'SAPILUB ALULIQUID 13', 'kg', '5', '0.1', '5.555555555555555', 'Empirical / supplier recommendation. No TDS rate available.', 'Empirical / supplier recommendation. No TDS rate available.']
+Row 5: ['=$E$5&"_"&COUNTIF($E$2:$E$5, $E$5)', '9001', '100', 'Aerosol Customer', 'Aerosol Can 45mm', '45', 'Lacquer', '504', 'SCHEKOSOL INT PROT Gold (400 9 901)', 'kg', '1.045', '0.1', '1.161111111111111', 'Can inner surface area (0.02375 m²) × High-end TDS wet film (44.0 g/m²) = 1.045 g/can = 1.045 kg/1000', 'Can inner surface area (0.02375 m²) × High-end TDS wet film (44.0 g/m²) = 1.045 g/can = 1.045 kg/1000']
+  Col A: 21 formulas, 1 constants.
+    First formula (row 2): =$E$2&"_"&COUNTIF($E$2:$E$2, $E$2) -> Val: Aerosol Can 45mm_1
+    Last formula (row 22): =$E$22&"_"&COUNTIF($E$2:$E$22, $E$22) -> Val: Aerosol Can 45mm_21
+
+### SHEET: Products_DB (Rows: 31, Cols: 16)
+Row 1: ['Product Name', 'Product ID', 'Customer', 'Can Type', 'Can Diameter', 'Can Height', 'Neck Opening', 'Wall Thickness', 'Dome Thickness', 'Internal Coating', 'Base Coat Color', 'Print Colors', 'Varnish Type', 'Packing Standard', '', 'Dates_List']
+Row 2: ['Aerosol Can 45mm', '9001', 'Aerosol Customer', 'Necked-in', '45mm', '150mm', '1 inch', '0.35mm', '0.35mm', 'Epoxy Gold', 'White', '4 Colors', 'Glossy', '100 per Carton', '', '08-Jul-2026']
+Row 3: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '09-Jul-2026']
+Row 4: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '10-Jul-2026']
+Row 5: ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '11-Jul-2026']
+================================================================================
+ANALYZING: Aerosol/Aerosol_Production_Entry.xlsx
+================================================================================
+
+### SHEET: Data_Entry (Rows: 498, Cols: 12)
+Row 1: ['AEROSOL PLANT — DAILY PRODUCTION DATA ENTRY', '', '', '', '', '', '', '', '', '', '', '']
+Row 2: ['Date', 'Machine', 'POF #', 'Product Name', 'PID', 'Customer', 'Total Production\n(pcs)', 'Good Production\n(pcs)', 'Rejects\n(pcs)', 'Rejection\n%', 'DownTime', 'Remarks']
+Row 3: ['', 'Press', '', '5002 - AEROSOL CAN 45x160 PRINTED', '=IF(D3="","",VALUE(LEFT(D3,FIND(" - ",D3)-1)))', '=IF(D3="","",VLOOKUP(E3,Product_Master!A:D,4,FALSE)&"")', '', '', '', '=IF(G3="","",IFERROR(I3/G3,""))', '', '']
+Row 4: ['', '', '', '', '=IF(D4="","",VALUE(LEFT(D4,FIND(" - ",D4)-1)))', '=IF(D4="","",VLOOKUP(E4,Product_Master!A:D,4,FALSE)&"")', '', '', '', '=IF(G4="","",IFERROR(I4/G4,""))', '', '']
+Row 5: ['', '', '', '', '=IF(D5="","",VALUE(LEFT(D5,FIND(" - ",D5)-1)))', '=IF(D5="","",VLOOKUP(E5,Product_Master!A:D,4,FALSE)&"")', '', '', '', '=IF(G5="","",IFERROR(I5/G5,""))', '', '']
+  Col E: 496 formulas, 1 constants.
+    First formula (row 3): =IF(D3="","",VALUE(LEFT(D3,FIND(" - ",D3)-1))) -> Val: 5002
+    Last formula (row 498): =IF(D498="","",VALUE(LEFT(D498,FIND(" - ",D498)-1))) -> Val: 
+  Col F: 496 formulas, 1 constants.
+    First formula (row 3): =IF(D3="","",VLOOKUP(E3,Product_Master!A:D,4,FALSE)&"") -> Val: 
+    Last formula (row 498): =IF(D498="","",VLOOKUP(E498,Product_Master!A:D,4,FALSE)&"") -> Val: 
+  Col J: 496 formulas, 1 constants.
+    First formula (row 3): =IF(G3="","",IFERROR(I3/G3,"")) -> Val: 
+    Last formula (row 498): =IF(G498="","",IFERROR(I498/G498,"")) -> Val: 
+
+### SHEET: Validation_Lists (Rows: 99, Cols: 3)
+Row 1: ['Shifts', 'Machines', 'Active Display Strings']
+Row 2: ['A', 'Accumulator', '=IF(Product_Master!E2=TRUE, Product_Master!G2, "")']
+Row 3: ['', 'Base Coat', '=IF(Product_Master!E3=TRUE, Product_Master!G3, "")']
+Row 4: ['', 'Compressor', '=IF(Product_Master!E4=TRUE, Product_Master!G4, "")']
+Row 5: ['', 'Decoration Oven', '=IF(Product_Master!E5=TRUE, Product_Master!G5, "")']
+  Col C: 98 formulas, 1 constants.
+    First formula (row 2): =IF(Product_Master!E2=TRUE, Product_Master!G2, "") -> Val: 5001 - AEROSOL CAN 45x160 PLAIN
+    Last formula (row 99): =IF(Product_Master!E99=TRUE, Product_Master!G99, "") -> Val: 
+
+### SHEET: Product_Master (Rows: 99, Cols: 9)
+Row 1: ['PID', 'Product Name', 'Can Size', 'Customer', 'Active', 'BOM Number', 'Display String', 'Unit', 'Notes']
+Row 2: ['5001', 'AEROSOL CAN 45x160 PLAIN', '45x160', '', 'True', '', '=A2&" - "&B2', 'pcs', 'Placeholder']
+Row 3: ['5002', 'AEROSOL CAN 45x160 PRINTED', '45x160', '', 'True', '', '=A3&" - "&B3', 'pcs', 'Placeholder']
+Row 4: ['5003', 'AEROSOL CAN 45x160 LACQUERED', '45x160', '', 'True', '', '=A4&" - "&B4', 'pcs', 'Placeholder']
+Row 5: ['9001', 'AEROSOL CAN 45mm', '45x160', 'Aerosol Customer', 'True', '100', '=A5&" - "&B5', 'pcs', 'From Theoretical BOM']
+  Col G: 98 formulas, 1 constants.
+    First formula (row 2): =A2&" - "&B2 -> Val: 5001 - AEROSOL CAN 45x160 PLAIN
+    Last formula (row 99): =IF(A99="","",A99&" - "&B99) -> Val: 
+================================================================================
+ANALYZING: Aerosol/Tubex_v10_30.xlsx
+================================================================================
+
+### SHEET: Tubex_Dashboard (Rows: 199, Cols: 29)
+Row 2: ['', 'TUBEX  — July 2026 Month to Date Report', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 3: ['', "Report Date (Yesterday's Production):", '', '', '', '', '', '=TODAY()-1', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 5: ['', 'TUBE — YESTERDAY', '', 'TUBE — MTD', '', '', 'TUBE — REJECT %', '', '', 'Dispatch — MTD', '', '', 'Press & Printing Downtime — MTD', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  Col B: 2 formulas, 58 constants.
+    First formula (row 6): =SUMPRODUCT((Production_Log!$A$3:$A$8963=MAX(Production_Log!$A$3:$A$8963))*(LEFT(Production_Log!$B$3:$B$8963,5)="Print")*(ISERROR(SEARCH("(Varnish)",Production_Log!$D$3:$D$8963)))*Production_Log!$H$3:$H$8963) -> Val: 21724
+    Last formula (row 8): =SUMPRODUCT((Production_Log!$A$3:$A$8963=MAX(Production_Log!$A$3:$A$8963))*(Production_Log!$B$3:$B$8963="PF Machine")*Production_Log!$H$3:$H$8963) -> Val: 5400
+  Col D: 1 formulas, 58 constants.
+    First formula (row 6): =SUMIF($B$11:$B$64,"TUBE",$H$11:$H$64) -> Val: 83072
+  Col G: 42 formulas, 17 constants.
+    First formula (row 11): =IFERROR(INDEX(MRP!$F$3:$F$8,MATCH(Tubex_Dashboard!F11,MRP!$D$3:$D$8,0)),0) -> Val: 25000
+    Last formula (row 58): =IFERROR(INDEX(MRP!$F$3:$F$8,MATCH(Tubex_Dashboard!F58,MRP!$D$3:$D$8,0)),0) -> Val: 0
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [18, 19, 20, 21, 22, 23]
+  Col H: 55 formulas, 1 constants.
+    First formula (row 3): =TODAY()-1 -> Val: 2026-07-06 00:00:00
+    Last formula (row 64): =SUMPRODUCT((Production_Log!$F$3:$F$8963=F64)*Production_Log!$H$3:$H$8963) -> Val: 0
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [10]
+  Col I: 54 formulas, 1 constants.
+    First formula (row 11): =G11-H11 -> Val: 25000
+    Last formula (row 64): =G64-H64 -> Val: 0
+  Col J: 54 formulas, 3 constants.
+    First formula (row 6): =SUMIF($B$11:$B$64,"TUBE",$K$11:$K$64) -> Val: 76160
+    Last formula (row 64): =IF(G64=0,"-",H64/G64) -> Val: -
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [7, 10]
+  Col K: 2 formulas, 3 constants.
+    First formula (row 17): =SUM(K11:K16) -> Val: 76160
+    Last formula (row 24): =SUM(K18:K23) -> Val: 13800
+  Col M: 7 formulas, 3 constants.
+    First formula (row 7): =IFERROR(INDEX($S$9:$S$21,MATCH(LARGE($U$9:$U$21,1),$U$9:$U$21,0)),"") -> Val: Operations
+    Last formula (row 13): =IFERROR(INDEX($S$9:$S$21,MATCH(LARGE($U$9:$U$21,7),$U$9:$U$21,0)),"") -> Val: Material Shortage
+  Col N: 8 formulas, 1 constants.
+    First formula (row 7): =(IFERROR(INDEX($T$9:$T$21,MATCH(LARGE($U$9:$U$21,1),$U$9:$U$21,0)),""))/60 -> Val: 14
+    Last formula (row 14): =SUM($T$9:$T$21)/60 -> Val: 33
+  Col O: 7 formulas, 2 constants.
+    First formula (row 7): =IFERROR(N7/$N$14,"") -> Val: 0.42424242424242425
+    Last formula (row 13): =IFERROR(N13/$N$14,"") -> Val: 0
+  Col T: 9 formulas, 0 constants.
+    First formula (row 9): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!$K$3:$K$8963) -> Val: 480
+    Last formula (row 33): =SUMPRODUCT((MONTH(Production_Log!$A$3:$A$8963)=MONTH(TODAY()))*(YEAR(Production_Log!$A$3:$A$8963)=YEAR(TODAY()))*Production_Log!$Q$3:$Q$8963) -> Val: 0
+  Col U: 9 formulas, 0 constants.
+    First formula (row 9): =T9+0.00001 -> Val: 480.00001
+    Last formula (row 33): =T34+0.00006 -> Val: 6e-05
+
+### SHEET: MRP (Rows: 149, Cols: 19)
+Row 1: ['JULY 2026 Tube Required Orders', '', '', '', '', '', 'Date:', '=TODAY()', '', '', '', '', '', '', '', '', '', '', '']
+Row 2: ['Dia', 'Customer', 'Product Name', 'Product ID', 'Job Order #', 'Required Qty', 'Produced', 'Remaining Balance', 'Remarks', '', '', '', '', '', '', '', '', '', '']
+Row 3: ['16', 'Brookes Pharma Private Limited', 'ECZEMUS OINTMENT 0.03% 10G', '6561', '6849', '25000', '=INDEX(Tubex_Dashboard!$H$11:$H$56,MATCH(MRP!D3,Tubex_Dashboard!$F$11:$F$56,0))', '=F3-G3', 'CAPS Not Approved', '', '', '', '', '', '', '', '', '', '']
+Row 4: ['25', 'Samsol International Private Limited', 'S-45', '5389', '6892', '100000', '=INDEX(Tubex_Dashboard!$H$11:$H$56,MATCH(MRP!D4,Tubex_Dashboard!$F$11:$F$56,0))', '=F4-G4', '100k Extra Planned', '', '', '', '', '', '', '', '', '', '']
+Row 5: ['25', 'Samsol International Private Limited', 'S 43 25MM', '3447', '6891', '78976', '=INDEX(Tubex_Dashboard!$H$11:$H$56,MATCH(MRP!D5,Tubex_Dashboard!$F$11:$F$56,0))', '=F5-G5', '100k Extra Planned', '', '', '', '', '', '', '', '', '', '']
+  Col E: 124 formulas, 17 constants.
+    First formula (row 12): =SUMPRODUCT((TableBOM[Item ID]=A12)*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D$3:$D$8,TableBOM[Product ID],$H$3:$H$8)/1000) -> Val: 0
+    Last formula (row 149): =SUMPRODUCT((TableBOM[Item ID]=A149)*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D$98:$D$103,TableBOM[Product ID],$H$98:$H$103)/1000) -> Val: 0
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [97, 98, 99, 100, 101, 103, 104, 106]
+  [ERROR IN COL F] 4 error cells:
+    Cell F118: Formula='=IF(E111=0,0,ROUND(H111/E111*30,1))', CachedVal='#VALUE!'
+    Cell F119: Formula='=IF(E112=0,0,ROUND(H112/E112*30,1))', CachedVal='#VALUE!'
+    Cell F120: Formula='=IF(E113=0,0,ROUND(H113/E113*30,1))', CachedVal='#VALUE!'
+    Cell F121: Formula='=IF(E114=0,0,ROUND(H114/E114*30,1))', CachedVal='#VALUE!'
+  Col F: 130 formulas, 11 constants.
+    First formula (row 9): =SUM(F3:F8) -> Val: 421414
+    Last formula (row 149): =IF(E142=0,0,ROUND(H142/E142*30,1)) -> Val: 0
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [11, 97, 106, 117]
+  [ERROR IN COL G] 4 error cells:
+    Cell G118: Formula='=IF(E111=0,"Not needed",IF(H111-E111<0,"SHORTAGE",IF(H111-E111<E111,"LOW","OK")))', CachedVal='#VALUE!'
+    Cell G119: Formula='=IF(E112=0,"Not needed",IF(H112-E112<0,"SHORTAGE",IF(H112-E112<E112,"LOW","OK")))', CachedVal='#VALUE!'
+    Cell G120: Formula='=IF(E113=0,"Not needed",IF(H113-E113<0,"SHORTAGE",IF(H113-E113<E113,"LOW","OK")))', CachedVal='#VALUE!'
+    Cell G121: Formula='=IF(E114=0,"Not needed",IF(H114-E114<0,"SHORTAGE",IF(H114-E114<E114,"LOW","OK")))', CachedVal='#VALUE!'
+  Col G: 136 formulas, 6 constants.
+    First formula (row 3): =INDEX(Tubex_Dashboard!$H$11:$H$56,MATCH(MRP!D3,Tubex_Dashboard!$F$11:$F$56,0)) -> Val: 0
+    Last formula (row 149): =IF(E142=0,"Not needed",IF(H142-E142<0,"SHORTAGE",IF(H142-E142<E142,"LOW","OK"))) -> Val: Not needed
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [11, 97, 106, 117]
+  Col H: 139 formulas, 4 constants.
+    First formula (row 1): =TODAY() -> Val: 2026-07-07 00:00:00
+    Last formula (row 149): =IF(LEN(IF((COUNTIFS(TableBOM[Product ID],$D$98,TableBOM[Item ID],$A149)>0)*($H$98>0),$C$98&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$99,TableBOM[Item ID],$A149)>0)*($H$99>0),$C$99&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$100,TableBOM[Item ID],$A149)>0)*($H$100>0),$C$100&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$101,TableBOM[Item ID],$A149)>0)*($H$101>0),$C$101&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$102,TableBOM[Item ID],$A149)>0)*($H$102>0),$C$102&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$103,TableBOM[Item ID],$A149)>0)*($H$103>0),$C$103&", ",""))>1,LEFT(IF((COUNTIFS(TableBOM[Product ID],$D$98,TableBOM[Item ID],$A149)>0)*($H$98>0),$C$98&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$99,TableBOM[Item ID],$A149)>0)*($H$99>0),$C$99&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$100,TableBOM[Item ID],$A149)>0)*($H$100>0),$C$100&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$101,TableBOM[Item ID],$A149)>0)*($H$101>0),$C$101&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$102,TableBOM[Item ID],$A149)>0)*($H$102>0),$C$102&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$103,TableBOM[Item ID],$A149)>0)*($H$103>0),$C$103&", ",""),LEN(IF((COUNTIFS(TableBOM[Product ID],$D$98,TableBOM[Item ID],$A149)>0)*($H$98>0),$C$98&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$99,TableBOM[Item ID],$A149)>0)*($H$99>0),$C$99&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$100,TableBOM[Item ID],$A149)>0)*($H$100>0),$C$100&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$101,TableBOM[Item ID],$A149)>0)*($H$101>0),$C$101&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$102,TableBOM[Item ID],$A149)>0)*($H$102>0),$C$102&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$103,TableBOM[Item ID],$A149)>0)*($H$103>0),$C$103&", ",""))-2),"") -> Val: 
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [2, 11, 97, 106]
+  Col I: 86 formulas, 45 constants.
+    First formula (row 12): =IF(E12=0,"Not needed",IF(G12<0,"SHORTAGE",IF(G12<F12*0.1,"LOW","OK"))) -> Val: Not needed
+    Last formula (row 114): =IF(E114=0,"Not needed",IF(G114<0,"SHORTAGE",IF(G114<F114*0.1,"LOW","OK"))) -> Val: SHORTAGE
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [25, 45, 68, 69, 97, 106]
+
+### SHEET: Production_Log (Rows: 247, Cols: 19)
+Row 1: ['  PRODUCTION LOG — One row per machine per product per day.', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 2: ['Date', 'Machine', 'Customer', 'Product Name', 'Dia / Volume', 'Product ID', 'Target Quantity', 'Good Quantity Produced', 'Reject/Scrap Quantity', 'Waste%', 'Mechanical DT', 'Electrical DT', 'Material Shortage DT', 'Changeover DT', 'Operations DT', 'Power Shutdown DT', 'Gas Shutdown DT', 'Workers Shortage DT', '']
+Row 3: ['2026-07-01 00:00:00', 'Lacquer-03', 'Golden Pearl Cosmetics (PVT) LTD', 'HELLO HAIR COLOR', '30', '6206', '12000', '11735', '265', '=IFERROR(I3/(H3+I3),"")', '', '', '', '', '', '180', '', '', '']
+Row 4: ['2026-07-01 00:00:00', 'Latex-01', 'Golden Pearl Cosmetics (PVT) LTD', 'HELLO HAIR COLOR', '30', '6206', '13000', '12990', '10', '=IFERROR(I4/(H4+I4),"")', '', '', '', '', '', '180', '', '', '']
+Row 5: ['2026-07-01 00:00:00', 'PF Machine', 'Alpha Labs PVT LTD', 'TRANSPARENT BOTTLE 150ML', '150 ml', '8001', '0', '0', '0', '=IFERROR(I5/(H5+I5),"")', '', '240', '', '', '', '240', '', '', '']
+  Col J: 31 formulas, 1 constants.
+    First formula (row 3): =IFERROR(I3/(H3+I3),"") -> Val: 0.022083333333333333
+    Last formula (row 33): =IFERROR(I33/(H33+I33),"") -> Val: 0.01852353844763712
+
+### SHEET: BOM (Rows: 352, Cols: 17)
+Row 1: ['  BILL OF MATERIALS — Customer-Specific', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 2: ['Product ID', 'BOM ID', 'Customer', 'Product Name', 'Dia', 'Material Category', 'Item ID', 'Item Name', 'UOM', 'Per 1000 Units', 'Material Group', 'Scrap %', 'Change Note', '', '', '', '']
+Row 3: ['6561', '190', 'Brookes Pharma Private Limited', 'ECZEMUS OINTMENT 0.03% 10G', '16', 'SLUG', '2799', '16x4.5', 'kg', '2.51889', 'Aluminum Slugs', '0.1', 'Updated manually, update in erp', '', '', '', '']
+Row 4: ['6561', '190', 'Brookes Pharma Private Limited', 'ECZEMUS OINTMENT 0.03% 10G', '16', 'BASE COAT', '3595', 'POLYSTER BASE COAT WHITE 234', 'kg', '0.29', 'Base Coat', '0.1', "Item name kept as ERP ('POLYSTER BASE COAT WHITE 234'). Rehan wrote 'BASE COAT WHITE 23410 CT' — corrected. (16-Apr-2026) — Verify in ERP", '', '', '', '']
+Row 5: ['6561', '190', 'Brookes Pharma Private Limited', 'ECZEMUS OINTMENT 0.03% 10G', '16', 'CAP', '69', 'M-7 S/M F/P (S) WHITE', 'PCS', '1000', 'Caps', '0.02', 'Value changed manually v9.30 (16-Apr-2026) — Update in ERP BOM', '', '', '', '']
+  Table: TableBOM, Ref: A2:M337
+
+### SHEET: Inventory (Rows: 111, Cols: 16)
+Row 1: ['Slugs Inventory — July 2026 MONTH TO DATE', '', '', '', '', '', '', '', 'Date:', '=TODAY()', '', '', '', '', '', '']
+Row 2: ['Item ID', 'Category', 'Item Name (ERP)', 'UOM', 'Opening', 'Received from Vendor', 'Issued to Production', 'Store Balance', 'Work In Process', 'Pieces Can Be Produced (Store + Floor Stock)', '', '', '', '', '', '']
+Row 3: ['31', 'Slug', '13.5X4.2', 'kg', '71.5', '0', '0', '=E3+F3-G3', '', '=IFERROR(IF(AVERAGEIF(TableBOM[Item ID],A3,TableBOM[Per 1000 Units])=0,"-",ROUND((H3+I3)/(AVERAGEIF(TableBOM[Item ID],A3,TableBOM[Per 1000 Units])/1000),0)),"-")', '', '', '', '', '', '']
+Row 4: ['2799', 'Slug', '16x4.5', 'kg', '88', '0', '0', '=E4+F4-G4', '', '=IFERROR(IF(AVERAGEIF(TableBOM[Item ID],A4,TableBOM[Per 1000 Units])=0,"-",ROUND((H4+I4)/(AVERAGEIF(TableBOM[Item ID],A4,TableBOM[Per 1000 Units])/1000),0)),"-")', '', '', '', '', '', '']
+Row 5: ['19', 'Slug', '19X4.5 S/M', 'kg', '425', '0', '0', '=E5+F5-G5', '', '=IFERROR(IF(AVERAGEIF(TableBOM[Item ID],A5,TableBOM[Per 1000 Units])=0,"-",ROUND((H5+I5)/(AVERAGEIF(TableBOM[Item ID],A5,TableBOM[Per 1000 Units])/1000),0)),"-")', '', '', '', '', '', '']
+  Table: TableInventory, Ref: A2:J111
+  Col H: 103 formulas, 3 constants.
+    First formula (row 3): =E3+F3-G3 -> Val: 71.5
+    Last formula (row 111): =E111+F111-G111 -> Val: 0
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [12, 13]
+  Col J: 105 formulas, 2 constants.
+    First formula (row 1): =TODAY() -> Val: 2026-07-07 00:00:00
+    Last formula (row 111): =IFERROR(IF(AVERAGEIF(TableBOM[Item ID],A111,TableBOM[Per 1000 Units])=0,"-",ROUND((H111+I111)/(AVERAGEIF(TableBOM[Item ID],A111,TableBOM[Per 1000 Units])/1000),0)),"-") -> Val: 0
+    [WARNING: FORMULA INTERRUPT] Constants intermixed at rows: [2, 13]
+
+### SHEET: Product_Catalog (Rows: 65, Cols: 19)
+Row 1: ['  PRODUCT CATALOG — Master lookup for all products', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+Row 2: ['Product ID', 'BOM ID', 'Customer', 'Product Name', 'Dia (mm)', 'Length (mm)', 'Latex', 'Pcs/Carton', '# of Pieces', 'Slug (kg)', 'Base Coat (kg)', 'Lacquer (kg)', 'Latex (kg)', 'Zinc (kg)', 'Caps (PCS)', 'Cartons (PCS)', 'Ink Used', 'Ink Used', 'Ink Used']
+Row 3: ['9004', '904', 'Bahadur', 'BAHADUR TUBE 12.5MM', '12.5', '0', 'No', '0', '', '=IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0))', '=IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0))', '=IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0))', '=IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0))', '=IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0))', '=IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0))', '=IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0))', '', '', '']
+Row 4: ['6561', '190', 'Brookes Pharma Private Limited', 'ECZEMUS OINTMENT 0.03% 10G', '16', '100', 'No', '588', '', '=IF(I4="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A4)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I4/1000,0))', '=IF(I4="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A4)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I4/1000,0))', '=IF(I4="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A4)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I4/1000,0))', '=IF(I4="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A4)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I4/1000,0))', '=IF(I4="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A4)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I4/1000,0))', '=IF(I4="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A4)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I4/1000,0))', '=IF(I4="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A4)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I4/1000,0))', '', '', '']
+Row 5: ['1085', '187', 'Brookes Pharma Private Limited', 'PYODINE GEL 20GM', '19', '106', 'No', '588', '', '=IF(I5="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A5)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I5/1000,0))', '=IF(I5="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A5)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I5/1000,0))', '=IF(I5="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A5)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I5/1000,0))', '=IF(I5="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A5)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I5/1000,0))', '=IF(I5="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A5)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I5/1000,0))', '=IF(I5="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A5)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I5/1000,0))', '=IF(I5="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A5)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I5/1000,0))', '', '', '']
+  Col J: 51 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 54): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0)) -> Val: 
+  Col K: 51 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 54): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0)) -> Val: 
+  Col L: 51 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 54): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0)) -> Val: 
+  Col M: 51 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 54): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0)) -> Val: 
+  Col N: 51 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 54): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0)) -> Val: 
+  Col O: 51 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 54): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0)) -> Val: 
+  Col P: 51 formulas, 1 constants.
+    First formula (row 3): =IF(I3="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A3)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I3/1000,0)) -> Val: 
+    Last formula (row 54): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0)) -> Val: 
+
+### SHEET: BOM Issues (Rows: 159, Cols: 11)
+Row 1: ['BOM ISSUES — ERP Action Register (v10.21 · May 2026)', '', '', '', '', '', '', '', '', '', '']
+Row 2: ['Open items only. Fixed/resolved items are removed. Colour code: RED=CRITICAL · ORANGE=HIGH · YELLOW=MEDIUM · WHITE=LOW.', '', '', '', '', '', '', '', '', '', '']
+Row 4: ['S1 — NEW ERP BOMs REQUIRED: TUBE PRODUCTS', '', '', '', '', '', '', '', '', '', '']
+Row 5: ['PID', 'BOM#', 'Customer', 'Product', 'Dia', 'Issue', 'ERP Action Required', 'Priority', 'Status', '', '']
+
+### SHEET: FG Stock (Rows: 99, Cols: 9)
+Row 1: ['FG STOCK IN HAND — Last Updated: 07-Jul-2026', '', '', '', '', '', '', '', '']
+Row 2: ['Shows latest date only from FG Stock In hand (Production.xlsx). Older dates are discarded. Re-run update_production.py to refresh.', '', '', '', '', '', '', '', '']
+Row 3: ['Sr.', 'PID', 'Customer', 'Product (Catalog Name)', 'Dia / Vol', 'FG Qty (pcs)', 'Status', 'Dispatch Remarks', 'Cap Item ID (auto)']
+Row 4: ['1', '8010', 'Mablay Beauty PVT LTD.', 'PET BOTTLE SMALL (130ML) TRANSPARENT', '130ml', '12420', 'OK', 'Ready for dispatch', '=IFERROR(SUMPRODUCT((TableBOM[Product ID]=B4)*(TableBOM[Material Category]="CAP")*TableBOM[Item ID]),0)']
+Row 5: ['2', '', 'Samsol International Private Limited', 'Trp Bottle', '200ml', '5400', 'OK', 'Ready for dispatch', '=IFERROR(SUMPRODUCT((TableBOM[Product ID]=B5)*(TableBOM[Material Category]="CAP")*TableBOM[Item ID]),0)']
+  Col I: 96 formulas, 1 constants.
+    First formula (row 4): =IFERROR(SUMPRODUCT((TableBOM[Product ID]=B4)*(TableBOM[Material Category]="CAP")*TableBOM[Item ID]),0) -> Val: 0
+    Last formula (row 99): =IFERROR(SUMPRODUCT((TableBOM[Product ID]=B99)*(TableBOM[Material Category]="CAP")*TableBOM[Item ID]),0) -> Val: 0
+
+### SHEET: Notes & Guide (Rows: 162, Cols: 6)
+Row 1: ['ALPHA CONTAINERS — PROJECT REFERENCE GUIDE', '', '', '', '', '']
+Row 2: ['Last Updated: 16-May-2026 | File: AlphaContainers_v10_27.xlsx | 9 sheets', '', '', '', '', '']
+Row 4: ['S0 — DAILY WORKFLOW', '', '', '', '', '']
+Row 5: ['Automated pipeline via Run_All_Updates.bat or individual scripts.', '', '', '', '', '']
+================================================================================
+ANALYZING: PET_SKUs.xlsx
+================================================================================
+
+### SHEET: Sheet1 (Rows: 22, Cols: 3)
+Row 1: ['Original Product Name', 'Color', 'Volume']
+Row 2: ['PET BOTTLE SMALL (120ML) YELLOW', 'Colored (Yellow)', '120 ML']
+Row 3: ['BLACK SMALL BOTTLE 120ML', 'Colored (Black)', '120 ML']
+Row 4: ['WHITE SMALL BOTTLE 120ML', 'Colored (White)', '120 ML']
+Row 5: ['PET BOTTLE SMALL (120 ML) YELLOW', 'Colored (Yellow)', '120 ML']
+================================================================================
+ANALYZING: Pet Format.xlsx
+================================================================================
+
+### SHEET: Old PET Format (Rows: 30, Cols: 2)
+Row 1: ['Department: PET                       Shift Summary                    DATE:_______                      Doc No:                                                                                                                                                                                                    ', '']
+Row 2: ['PET # 1', '']
+Row 3: ['Worker Name', '']
+Row 4: ['1.________________   2._______________\n3.________________   4.________________\n \n\n\n', '']
+Row 5: ['Customer Name:', '']
+
+### SHEET: New PET Format (Rows: 16, Cols: 7)
+Row 1: ['TUBEX PET (Shift Summary)', '', '', '', '', 'Date:\nShift:', '']
+Row 2: ['Workers:   1. ________________    2. ________________    3. ________________    4. ________________', '', '', '', '', '', '']
+Row 3: ['PRODUCT DETAILS', '', '', '', '', '', '']
+Row 4: ['Customer Name:', '', '', 'Job Card No.:', '', 'Product Name:', '']
+Row 5: ['Volume (ml):', '', '', 'Color:', '', 'Bottle Weight (g):', '']

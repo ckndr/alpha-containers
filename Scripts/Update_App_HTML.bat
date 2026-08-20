@@ -39,8 +39,10 @@ if errorlevel 1 (
 git -C "%~dp0.." add Tubex.html
 if exist "%~dp0..\sw.js"         git -C "%~dp0.." add sw.js
 if exist "%~dp0..\manifest.json" git -C "%~dp0.." add manifest.json
-if exist "%~dp0..\icon-192.png"  git -C "%~dp0.." add icon-192.png
-if exist "%~dp0..\icon-512.png"  git -C "%~dp0.." add icon-512.png
+if exist "%~dp0..\icon-192-any.png"      git -C "%~dp0.." add icon-192-any.png
+if exist "%~dp0..\icon-512-any.png"      git -C "%~dp0.." add icon-512-any.png
+if exist "%~dp0..\icon-192-maskable.png" git -C "%~dp0.." add icon-192-maskable.png
+if exist "%~dp0..\icon-512-maskable.png" git -C "%~dp0.." add icon-512-maskable.png
 
 git -C "%~dp0.." diff --cached --quiet
 if errorlevel 1 (

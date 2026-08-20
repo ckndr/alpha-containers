@@ -1,0 +1,679 @@
+================================================================================
+COMPREHENSIVE MATHEMATICAL & DATA INTEGRITY AUDIT
+================================================================================
+
+==================================================
+FILE: Tubex_Aug26.xlsx
+==================================================
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col G: 3 distinct formula patterns:
+    Pattern (38 rows, e.g. [12, 13, 20, 21, 22]): =IFERROR(INDEX(MRP!$F$3:$F$3,MATCH(Tubex_Dashboard!F{R},MRP!$D$3:$D$3,0)),0)
+    Pattern (1 rows, e.g. [14]): =SUM(G11:G13)
+    Pattern (1 rows, e.g. [19]): =SUM(G15:G18)
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col H: 5 distinct formula patterns:
+    Pattern (1 rows, e.g. [3]): =MAX(Production_Log!$A${R}:$A$8961)
+    Pattern (40 rows, e.g. [11, 12, 13, 20, 21]): =SUMPRODUCT((Production_Log!$F$3:$F$8963=F{R})*(LEFT(Production_Log!$B$3:$B$8963,5)="Print")*(ISERROR(SEARCH("(Varnish)",Production_Log!$D$3:$D$8963)))*Production_Log!$H$3:$H$8963)
+    Pattern (1 rows, e.g. [14]): =SUM(H11:H13)
+    Pattern (14 rows, e.g. [15, 16, 17, 18, 57]): =SUMPRODUCT((Production_Log!$F$3:$F$8963=F{R})*Production_Log!$H$3:$H$8963)
+    Pattern (1 rows, e.g. [19]): =SUM(H15:H18)
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col I: 3 distinct formula patterns:
+    Pattern (54 rows, e.g. [11, 12, 13, 15, 16]): =G{R}-H{R}
+    Pattern (1 rows, e.g. [14]): =SUMIF(I11:I13,">"&0)
+    Pattern (1 rows, e.g. [19]): =SUMIF(I15:I18,">"&0)
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col J: 3 distinct formula patterns:
+    Pattern (1 rows, e.g. [6]): =SUMIF($B$11:$B$66,"TUBE",$K$11:$K$66)
+    Pattern (1 rows, e.g. [8]): =SUMIF($B$11:$B$66,"PET",$K$11:$K$66)
+    Pattern (54 rows, e.g. [11, 12, 13, 15, 16]): =IF(G{R}=0,"-",H{R}/G{R})
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col N: 9 distinct formula patterns:
+    Pattern (1 rows, e.g. [7]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!$M$3:$M$8963)/60
+    Pattern (1 rows, e.g. [8]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!$O$3:$O$8963)/60
+    Pattern (1 rows, e.g. [9]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!$K$3:$K$8963)/60
+    Pattern (1 rows, e.g. [10]): =SUM(N7:N9)
+    Pattern (1 rows, e.g. [14]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,2)="PF")+(LEFT(Production_Log!$B$3:$B$8963,3)="PET"))*Production_Log!$K$3:$K$8963)/60
+    Pattern (1 rows, e.g. [15]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,2)="PF")+(LEFT(Production_Log!$B$3:$B$8963,3)="PET"))*Production_Log!$L$3:$L$8963)/60
+    Pattern (1 rows, e.g. [16]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,2)="PF")+(LEFT(Production_Log!$B$3:$B$8963,3)="PET"))*Production_Log!$O$3:$O$8963)/60
+    Pattern (1 rows, e.g. [17]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,2)="PF")+(LEFT(Production_Log!$B$3:$B$8963,3)="PET"))*Production_Log!$P$3:$P$8963)/60
+    Pattern (1 rows, e.g. [18]): =SUM(N14:N17)
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col O: 2 distinct formula patterns:
+    Pattern (3 rows, e.g. [7, 8, 9]): =IFERROR(N{R}/$N$10,"")
+    Pattern (4 rows, e.g. [14, 15, 16, 17]): =IFERROR(N{R}/$N$18,"")
+  [FORMULA PATTERN ANOMALY] Sheet 'MRP' Col E: 2 distinct formula patterns:
+    Pattern (82 rows, e.g. [7, 8, 9, 10, 11]): =SUMPRODUCT((TableBOM[Item ID]=A{R})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D$3:$D$3,TableBOM[Product ID],$H$3:$H$3)/1000)
+    Pattern (7 rows, e.g. [100, 101, 102, 103, 104]): =SUMPRODUCT((TableBOM[Item ID]=A{R})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D$93:$D$96,TableBOM[Product ID],$H$93:$H$96)/1000)
+  [FORMULA PATTERN ANOMALY] Sheet 'MRP' Col F: 5 distinct formula patterns:
+    Pattern (1 rows, e.g. [4]): =SUM(F3:F3)
+    Pattern (89 rows, e.g. [7, 8, 9, 10, 11]): =IFERROR(INDEX(TableInventory[Store Balance],MATCH(A{R},TableInventory[Item ID],0)),0)+IFERROR(INDEX(TableInventory[Work In Process],MATCH(A{R},TableInventory[Item ID],0)),0)
+    Pattern (1 rows, e.g. [93]): =7160+30000
+    Pattern (1 rows, e.g. [95]): =100000+116667-15410+500000
+    Pattern (1 rows, e.g. [97]): =SUM(F93:F96)
+  [FORMULA PATTERN ANOMALY] Sheet 'MRP' Col G: 4 distinct formula patterns:
+    Pattern (5 rows, e.g. [3, 93, 94, 95, 96]): =INDEX(Tubex_Dashboard!$H$11:$H$100,MATCH(MRP!D{R},Tubex_Dashboard!$F$11:$F$100,0))
+    Pattern (1 rows, e.g. [4]): =SUM(G3:G3)
+    Pattern (89 rows, e.g. [7, 8, 9, 10, 11]): =F{R}-E{R}
+    Pattern (1 rows, e.g. [97]): =SUM(G93:G96)
+  [FORMULA PATTERN ANOMALY] Sheet 'MRP' Col H: 6 distinct formula patterns:
+    Pattern (1 rows, e.g. [1]): =TODAY()
+    Pattern (5 rows, e.g. [3, 93, 94, 95, 96]): =F{R}-G{R}
+    Pattern (1 rows, e.g. [4]): =SUMIF(H3:H3, ">0")
+    Pattern (82 rows, e.g. [7, 8, 9, 10, 11]): =IFERROR(IF(SUMPRODUCT((TableBOM[Item ID]=A{R})*(TableBOM[Product ID]=$D$3)*($H$3>0)*TableBOM[Per 1000 Units])=0,"-",ROUND(F{R}/(SUMPRODUCT((TableBOM[Item ID]=A{R})*(TableBOM[Product ID]=$D$3)*($H$3>0)*TableBOM[Per 1000 Units])/1000),0)),"-")
+    Pattern (1 rows, e.g. [97]): =SUM(H93:H96)
+    Pattern (7 rows, e.g. [100, 101, 102, 103, 104]): =IFERROR(IF(SUMPRODUCT((TableBOM[Item ID]=A{R})*((SUMIF($D$93:$D$96,TableBOM[Product ID],$H$93:$H$96))>0)*(SUMIF($D$93:$D$96,TableBOM[Product ID],$H$93:$H$96))*TableBOM[Per 1000 Units])=0,"-",ROUND(F{R}*1000*SUMPRODUCT((TableBOM[Item ID]=A{R})*((SUMIF($D$93:$D$96,TableBOM[Product ID],$H$93:$H$96))>0)*(SUMIF($D$93:$D$96,TableBOM[Product ID],$H$93:$H$96)))/SUMPRODUCT((TableBOM[Item ID]=A{R})*((SUMIF($D$93:$D$96,TableBOM[Product ID],$H$93:$H$96))>0)*(SUMIF($D$93:$D$96,TableBOM[Product ID],$H$93:$H$96))*TableBOM[Per 1000 Units]),0)),"-")
+  [FORMULA PATTERN ANOMALY] Sheet 'MRP' Col I: 2 distinct formula patterns:
+    Pattern (84 rows, e.g. [7, 8, 9, 10, 11]): =IF(E{R}=0,"Not needed",IF(G{R}<0,"SHORTAGE",IF(G{R}<F{R}*0.1,"LOW","OK")))
+    Pattern (1 rows, e.g. [58]): =IF(E{R}=0,"Not needed",IF(G{R}<0,"SHORTAGE",IF(G{R}<F{R}*0.05,"LOW","OK")))
+  [FORMULA PATTERN ANOMALY] Sheet 'MRP' Col J: 2 distinct formula patterns:
+    Pattern (82 rows, e.g. [7, 8, 9, 10, 11]): =IF(LEN(IF((COUNTIFS(TableBOM[Product ID],$D$3,TableBOM[Item ID],$A{R})>0)*($H$3>0),$C$3&", ",""))>1,LEFT(IF((COUNTIFS(TableBOM[Product ID],$D$3,TableBOM[Item ID],$A{R})>0)*($H$3>0),$C$3&", ",""),LEN(IF((COUNTIFS(TableBOM[Product ID],$D$3,TableBOM[Item ID],$A{R})>0)*($H$3>0),$C$3&", ",""))-2),"")
+    Pattern (1 rows, e.g. [105]): =IF(LEN(IF((COUNTIFS(TableBOM[Product ID],$D$93,TableBOM[Item ID],$A{R})>0)*($H$93>0),$C$93&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$94,TableBOM[Item ID],$A{R})>0)*($H$94>0),$C$94&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$95,TableBOM[Item ID],$A{R})>0)*($H$95>0),$C$95&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$96,TableBOM[Item ID],$A{R})>0)*($H$96>0),$C$96&", ",""))>1,LEFT(IF((COUNTIFS(TableBOM[Product ID],$D$93,TableBOM[Item ID],$A{R})>0)*($H$93>0),$C$93&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$94,TableBOM[Item ID],$A{R})>0)*($H$94>0),$C$94&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$95,TableBOM[Item ID],$A{R})>0)*($H$95>0),$C$95&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$96,TableBOM[Item ID],$A{R})>0)*($H$96>0),$C$96&", ",""),LEN(IF((COUNTIFS(TableBOM[Product ID],$D$93,TableBOM[Item ID],$A{R})>0)*($H$93>0),$C$93&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$94,TableBOM[Item ID],$A{R})>0)*($H$94>0),$C$94&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$95,TableBOM[Item ID],$A{R})>0)*($H$95>0),$C$95&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$96,TableBOM[Item ID],$A{R})>0)*($H$96>0),$C$96&", ",""))-2),"")
+  [FORMULA PATTERN ANOMALY] Sheet 'Inventory' Col J: 3 distinct formula patterns:
+    Pattern (2 rows, e.g. [1, 12]): =TODAY()
+    Pattern (102 rows, e.g. [3, 4, 5, 6, 7]): =IFERROR(IF(AVERAGEIF(TableBOM[Item ID],A{R},TableBOM[Per 1000 Units])=0,"-",ROUND((H{R}+I{R})/(AVERAGEIF(TableBOM[Item ID],A{R},TableBOM[Per 1000 Units])/1000),0)),"-")
+    Pattern (1 rows, e.g. [63]): =IFERROR(IF(AVERAGEIF(TableBOM[Item ID],A62,TableBOM[Per 1000 Units])=0,"-",ROUND((H{R}+I{R})/(AVERAGEIF(TableBOM[Item ID],A62,TableBOM[Per 1000 Units])/1000),0)),"-")
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col J: 6 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [50]): =IF(I49="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A49)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I49/1000,0))
+    Pattern (2 rows, e.g. [51, 52]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [55]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col K: 6 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [50]): =IF(I49="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A49)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I49/1000,0))
+    Pattern (2 rows, e.g. [51, 52]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [55]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col L: 6 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [50]): =IF(I49="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A49)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I49/1000,0))
+    Pattern (2 rows, e.g. [51, 52]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [55]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col M: 6 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [50]): =IF(I49="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A49)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I49/1000,0))
+    Pattern (2 rows, e.g. [51, 52]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [55]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col N: 6 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [50]): =IF(I49="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A49)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I49/1000,0))
+    Pattern (2 rows, e.g. [51, 52]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [55]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col O: 6 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [50]): =IF(I49="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A49)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I49/1000,0))
+    Pattern (2 rows, e.g. [51, 52]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [55]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col P: 6 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [50]): =IF(I49="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A49)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I49/1000,0))
+    Pattern (2 rows, e.g. [51, 52]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [55]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+
+==================================================
+FILE: Production.xlsx
+==================================================
+  [FORMULA PATTERN ANOMALY] Sheet 'Dashbord' Col C: 3 distinct formula patterns:
+    Pattern (1 rows, e.g. [6]): ='Summary 14-08-2026'!$B$15
+    Pattern (1 rows, e.g. [11]): ='Summary 14-08-2026'!$B$4
+    Pattern (5 rows, e.g. [17, 18, 19, 20, 21]): =INDEX(Table2[Month],MATCH(Dashbord!$A{R},Table2[Sr'#],0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Dashbord' Col E: 3 distinct formula patterns:
+    Pattern (1 rows, e.g. [6]): ='Summary 14-08-2026'!$B$21
+    Pattern (1 rows, e.g. [11]): ='Summary 14-08-2026'!$B$10
+    Pattern (5 rows, e.g. [17, 18, 19, 20, 21]): =INDEX(Table2[Customer],MATCH(Dashbord!$A{R},Table2[Sr'#],0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Dashbord' Col G: 3 distinct formula patterns:
+    Pattern (1 rows, e.g. [6]): ='Summary 14-08-2026'!$B$22
+    Pattern (1 rows, e.g. [11]): ='Summary 14-08-2026'!$B${R}
+    Pattern (5 rows, e.g. [17, 18, 19, 20, 21]): =INDEX(Table2[Dia(mm)/Volume],MATCH(Dashbord!$A{R},Table2[Sr'#],0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Dashbord' Col H: 3 distinct formula patterns:
+    Pattern (1 rows, e.g. [6]): ='Summary 14-08-2026'!$B$20
+    Pattern (1 rows, e.g. [11]): ='Summary 14-08-2026'!$B$9
+    Pattern (5 rows, e.g. [17, 18, 19, 20, 21]): =INDEX(Table2[Actual Time],MATCH(Dashbord!$A{R},Table2[Sr'#],0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Dashbord' Col J: 3 distinct formula patterns:
+    Pattern (1 rows, e.g. [6]): ='Summary 14-08-2026'!$B$16
+    Pattern (1 rows, e.g. [11]): ='Summary 14-08-2026'!$B$5
+    Pattern (5 rows, e.g. [17, 18, 19, 20, 21]): =INDEX(Table2[Available time],MATCH(Dashbord!$A{R},Table2[Sr'#],0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Dashbord' Col K: 3 distinct formula patterns:
+    Pattern (1 rows, e.g. [6]): ='Summary 14-08-2026'!$B$17
+    Pattern (1 rows, e.g. [11]): ='Summary 14-08-2026'!$B$6
+    Pattern (5 rows, e.g. [17, 18, 19, 20, 21]): =INDEX(Table2[Total Production],MATCH(Dashbord!$A{R},Table2[Sr'#],0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Production Day wise' Col K: 16 distinct formula patterns:
+    Pattern (1 rows, e.g. [6]): =24038+460
+    Pattern (1 rows, e.g. [13]): =5712+160
+    Pattern (1 rows, e.g. [14]): =3808+135
+    Pattern (1 rows, e.g. [20]): =12768+285
+    Pattern (1 rows, e.g. [21]): =2856+100
+    Pattern (1 rows, e.g. [24]): =10925+550
+    Pattern (1 rows, e.g. [29]): =19824+410
+    Pattern (1 rows, e.g. [34]): =24038+465
+    Pattern (1 rows, e.g. [39]): =19516+395
+    Pattern (1 rows, e.g. [46]): =5040+160
+    Pattern (1 rows, e.g. [47]): =18088+350
+    Pattern (1 rows, e.g. [53]): =16800+310
+    Pattern (1 rows, e.g. [57]): =22134+460
+    Pattern (1 rows, e.g. [62]): =24990+470
+    Pattern (1 rows, e.g. [67]): =12852+310
+    Pattern (1 rows, e.g. [69]): =8740+350
+  [FORMULA PATTERN ANOMALY] Sheet 'Production Day wise' Col M: 2 distinct formula patterns:
+    Pattern (1 rows, e.g. [1]): =SUBTOTAL(9,M3:M28442)
+    Pattern (67 rows, e.g. [3, 4, 5, 6, 7]): =K{R}-L{R}
+  [FORMULA PATTERN ANOMALY] Sheet 'Production Day wise' Col N: 2 distinct formula patterns:
+    Pattern (1 rows, e.g. [1]): =SUBTOTAL(101,N3:N28442)
+    Pattern (71 rows, e.g. [3, 4, 5, 6, 7]): =IFERROR(L{R}/M{R},"0%")
+  [FORMULA PATTERN ANOMALY] Sheet 'Summary 14-08-2026' Col B: 18 distinct formula patterns:
+    Pattern (1 rows, e.g. [3]): =SUMIFS('Production Day wise'!$M:$M,'Production Day wise'!$B:$B,$A$1,'Production Day wise'!$D:$D,"PF*")
+    Pattern (1 rows, e.g. [4]): =SUMIFS('Production Day wise'!$M:$M,'Production Day wise'!$B:$B,">="&EOMONTH($A$1,-1)+1,'Production Day wise'!$B:$B,"<="&EOMONTH($A$1,0),'Production Day wise'!$D:$D,"PF*")
+    Pattern (1 rows, e.g. [6]): =B5-B4
+    Pattern (1 rows, e.g. [7]): =B4/9
+    Pattern (1 rows, e.g. [8]): =B6/18
+    Pattern (1 rows, e.g. [9]): =IF(B5=0,0,B4/B5)
+    Pattern (1 rows, e.g. [10]): =SUMIFS('Pet Bottles dispatch'!$G:$G,'Pet Bottles dispatch'!$A:$A,$A$1)
+    Pattern (1 rows, e.g. [11]): =SUMIFS('Pet Bottles dispatch'!$G:$G,'Pet Bottles dispatch'!$A:$A,">="&EOMONTH($A$1,-1)+1,'Pet Bottles dispatch'!$A:$A,"<="&EOMONTH($A$1,0))
+    Pattern (1 rows, e.g. [13]): =B11/B12
+    Pattern (1 rows, e.g. [14]): =SUMIFS('Production Day wise'!$M:$M,'Production Day wise'!$B:$B,$A$1,'Production Day wise'!$D:$D,"Printing*")
+    Pattern (1 rows, e.g. [15]): =SUMIFS('Production Day wise'!$M:$M,'Production Day wise'!$B:$B,">="&EOMONTH($A$1,-1)+1,'Production Day wise'!$B:$B,"<="&EOMONTH($A$1,0),'Production Day wise'!$D:$D,"Printing*")
+    Pattern (1 rows, e.g. [17]): =B16-B15
+    Pattern (1 rows, e.g. [18]): =B15/9
+    Pattern (1 rows, e.g. [19]): =B17/18
+    Pattern (1 rows, e.g. [20]): =IF(B16=0,0,B15/B16)
+    Pattern (1 rows, e.g. [21]): =SUMIFS('Alu Tubes dispatch'!$G:$G,'Alu Tubes dispatch'!$A:$A,$A$1)
+    Pattern (1 rows, e.g. [22]): =SUMIFS('Alu Tubes dispatch'!$G:$G,'Alu Tubes dispatch'!$A:$A,">="&EOMONTH($A$1,-1)+1,'Alu Tubes dispatch'!$A:$A,"<="&EOMONTH($A$1,0))
+    Pattern (1 rows, e.g. [24]): =B22/B23
+  [FORMULA PATTERN ANOMALY] Sheet 'FG Stock In hand' Col F: 39 distinct formula patterns:
+    Pattern (1 rows, e.g. [1]): =SUBTOTAL(9,F3:F3307)
+    Pattern (1 rows, e.g. [451]): =51200+24990
+    Pattern (21 rows, e.g. [500, 518, 534, 556, 577]): =17472+2352
+    Pattern (1 rows, e.g. [653]): =23856+15120
+    Pattern (1 rows, e.g. [672]): =56168+24038
+    Pattern (1 rows, e.g. [674]): =23856+15120+32256
+    Pattern (1 rows, e.g. [692]): =56168+24038+24990
+    Pattern (1 rows, e.g. [694]): =23856+15120+32256+24864
+    Pattern (3 rows, e.g. [715, 736, 759]): =23856+15120+32256+24864+9072
+    Pattern (1 rows, e.g. [780]): =70000+14280
+    Pattern (5 rows, e.g. [782, 803, 827, 852, 874]): =23856+15120+32256+24864+9072+11760
+    Pattern (1 rows, e.g. [831]): =9120+14920
+    Pattern (1 rows, e.g. [832]): =2380+17850
+    Pattern (1 rows, e.g. [854]): =78208+7488
+    Pattern (5 rows, e.g. [856, 878, 903, 924, 943]): =2380+17850+3332
+    Pattern (1 rows, e.g. [918]): =11760+9744
+    Pattern (1 rows, e.g. [923]): =18088+18564
+    Pattern (2 rows, e.g. [929, 948]): =20355+6095
+    Pattern (1 rows, e.g. [942]): =18088+18564+24990
+    Pattern (16 rows, e.g. [945, 960, 976, 993, 1010]): =5292+9996
+    Pattern (1 rows, e.g. [991]): =9744+12432
+    Pattern (1 rows, e.g. [1012]): =28060+3680
+    Pattern (1 rows, e.g. [1094]): =10580+8280
+    Pattern (1 rows, e.g. [1109]): =10580+8280+1840
+    Pattern (2 rows, e.g. [1126, 1142]): =10580+8280+5520+1840+8280+25300-34960
+    Pattern (1 rows, e.g. [1158]): =10580+8280+5520+1840+8280+25300-34960+10005
+    Pattern (6 rows, e.g. [1194, 1212, 1230, 1247, 1263]): =10810+1610
+    Pattern (1 rows, e.g. [1342]): =3360+13440
+    Pattern (2 rows, e.g. [1583, 1595]): =2688+3696
+    Pattern (1 rows, e.g. [1632]): =2760+2760
+    Pattern (1 rows, e.g. [1640]): =7360+10925
+    Pattern (3 rows, e.g. [1641, 1658, 1677]): =1344+19824
+    Pattern (6 rows, e.g. [1648, 1666, 1685, 1704, 1722]): =2760+2760+2760
+    Pattern (1 rows, e.g. [1696]): =1344+19824+5040
+    Pattern (3 rows, e.g. [1713, 1732, 1750]): =1344+19824+5040+16800
+    Pattern (3 rows, e.g. [1716, 1729, 1747]): =23520
+    Pattern (1 rows, e.g. [1734]): =11000+24990
+    Pattern (1 rows, e.g. [1749]): =18400+8740
+    Pattern (1 rows, e.g. [1751]): =46990+12852
+  [FORMULA PATTERN ANOMALY] Sheet 'Alu Tubes dispatch' Col B: 2 distinct formula patterns:
+    Pattern (121 rows, e.g. [4, 5, 6, 7, 8]): =TEXT(Table23[[#This Row],[DATE]],"MMM-YYY")
+    Pattern (1 rows, e.g. [23]): =TEXT(Table{R}[[#This Row],[DATE]],"MMM-YYY")
+  [FORMULA PATTERN ANOMALY] Sheet 'Sheet3' Col J: 2 distinct formula patterns:
+    Pattern (15 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="SLUG")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (11 rows, e.g. [18, 19, 20, 21, 22]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="SLUG")*[1]!TableBOM[Per 1000 Units])*I{R}/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Sheet3' Col K: 2 distinct formula patterns:
+    Pattern (15 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="BASE COAT")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (11 rows, e.g. [18, 19, 20, 21, 22]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="BASE COAT")*[1]!TableBOM[Per 1000 Units])*I{R}/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Sheet3' Col L: 2 distinct formula patterns:
+    Pattern (15 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="LECQUER")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (11 rows, e.g. [18, 19, 20, 21, 22]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="LECQUER")*[1]!TableBOM[Per 1000 Units])*I{R}/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Sheet3' Col M: 2 distinct formula patterns:
+    Pattern (15 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="LATEX")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (11 rows, e.g. [18, 19, 20, 21, 22]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="LATEX")*[1]!TableBOM[Per 1000 Units])*I{R}/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Sheet3' Col N: 2 distinct formula patterns:
+    Pattern (15 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="ZINC POWDER")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (11 rows, e.g. [18, 19, 20, 21, 22]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="ZINC POWDER")*[1]!TableBOM[Per 1000 Units])*I{R}/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Sheet3' Col O: 2 distinct formula patterns:
+    Pattern (15 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="CAP")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (11 rows, e.g. [18, 19, 20, 21, 22]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="CAP")*[1]!TableBOM[Per 1000 Units])*I{R}/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Sheet3' Col P: 2 distinct formula patterns:
+    Pattern (15 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="CARTON")*[1]!TableBOM[Per 1000 Units]*(1+[1]!TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (11 rows, e.g. [18, 19, 20, 21, 22]): =IF(I{R}="","",IFERROR(SUMPRODUCT(([1]!TableBOM[Product ID]=A{R})*([1]!TableBOM[Material Category]="CARTON")*[1]!TableBOM[Per 1000 Units])*I{R}/1000,0))
+
+==================================================
+FILE: Pending.xlsx
+==================================================
+  [FORMULA PATTERN ANOMALY] Sheet '01-05-2026' Col H: 10 distinct formula patterns:
+    Pattern (1 rows, e.g. [6]): =SUM(H4:H5)
+    Pattern (8 rows, e.g. [7, 13, 16, 17, 22]): =F{R}-G{R}
+    Pattern (1 rows, e.g. [9]): =SUM(H7:H8)
+    Pattern (1 rows, e.g. [12]): =SUM(H10:H11)
+    Pattern (1 rows, e.g. [15]): =SUM(H13:H14)
+    Pattern (1 rows, e.g. [20]): =SUM(H16:H19)
+    Pattern (1 rows, e.g. [23]): =SUM(H21:H22)
+    Pattern (1 rows, e.g. [26]): =SUM(H24:H25)
+    Pattern (1 rows, e.g. [29]): =SUM(H27:H28)
+    Pattern (1 rows, e.g. [30]): =H6+H9+H12+H15+H20+H23+H26+H29
+
+==================================================
+FILE: August_Plan.xlsx
+==================================================
+  [FORMULA PATTERN ANOMALY] Sheet 'August Plan PET' Col L: 2 distinct formula patterns:
+    Pattern (4 rows, e.g. [6, 7, 8, 9]): =SUMIF(E:E,J{R},F:F)
+    Pattern (1 rows, e.g. [10]): =SUM(L6:L8)
+  [FORMULA PATTERN ANOMALY] Sheet 'August Plan PET' Col M: 2 distinct formula patterns:
+    Pattern (4 rows, e.g. [6, 7, 8, 9]): =K{R}-L{R}
+    Pattern (1 rows, e.g. [10]): =SUM(M6:M8)
+
+==================================================
+FILE: Aerosol/Aerosol BOM.xlsx
+==================================================
+  [FORMULA PATTERN ANOMALY] Sheet 'Required Spec for BOM' Col A: 17 distinct formula patterns:
+    Pattern (1 rows, e.g. [3]): =A2+1
+    Pattern (1 rows, e.g. [4]): =A3+1
+    Pattern (1 rows, e.g. [5]): =A4+1
+    Pattern (1 rows, e.g. [6]): =A5+1
+    Pattern (1 rows, e.g. [7]): =A6+1
+    Pattern (1 rows, e.g. [8]): =A7+1
+    Pattern (1 rows, e.g. [9]): =A8+1
+    Pattern (1 rows, e.g. [10]): =A9+1
+    Pattern (1 rows, e.g. [11]): =A10+1
+    Pattern (1 rows, e.g. [12]): =A11+1
+    Pattern (1 rows, e.g. [13]): =A12+1
+    Pattern (1 rows, e.g. [14]): =A13+1
+    Pattern (1 rows, e.g. [15]): =A14+1
+    Pattern (1 rows, e.g. [16]): =A15+1
+    Pattern (1 rows, e.g. [17]): =A16+1
+    Pattern (1 rows, e.g. [18]): =A17+1
+    Pattern (1 rows, e.g. [19]): =A18+1
+  [FORMULA PATTERN ANOMALY] Sheet 'Req. Calculator' Col B: 21 distinct formula patterns:
+    Pattern (1 rows, e.g. [4]): ='Theoretical BOM'!H3
+    Pattern (1 rows, e.g. [5]): ='Theoretical BOM'!H4
+    Pattern (1 rows, e.g. [6]): ='Theoretical BOM'!H5
+    Pattern (1 rows, e.g. [7]): ='Theoretical BOM'!H6
+    Pattern (1 rows, e.g. [8]): ='Theoretical BOM'!H7
+    Pattern (1 rows, e.g. [9]): ='Theoretical BOM'!H8
+    Pattern (1 rows, e.g. [10]): ='Theoretical BOM'!H9
+    Pattern (1 rows, e.g. [11]): ='Theoretical BOM'!H10
+    Pattern (1 rows, e.g. [12]): ='Theoretical BOM'!H11
+    Pattern (1 rows, e.g. [13]): ='Theoretical BOM'!H12
+    Pattern (1 rows, e.g. [14]): ='Theoretical BOM'!H13
+    Pattern (1 rows, e.g. [15]): ='Theoretical BOM'!H14
+    Pattern (1 rows, e.g. [16]): ='Theoretical BOM'!H15
+    Pattern (1 rows, e.g. [17]): ='Theoretical BOM'!H16
+    Pattern (1 rows, e.g. [18]): ='Theoretical BOM'!H17
+    Pattern (1 rows, e.g. [19]): ='Theoretical BOM'!H18
+    Pattern (1 rows, e.g. [20]): ='Theoretical BOM'!H19
+    Pattern (1 rows, e.g. [21]): ='Theoretical BOM'!H20
+    Pattern (1 rows, e.g. [22]): ='Theoretical BOM'!H21
+    Pattern (1 rows, e.g. [23]): ='Theoretical BOM'!H22
+    Pattern (1 rows, e.g. [24]): ='Theoretical BOM'!H23
+  [FORMULA PATTERN ANOMALY] Sheet 'Req. Calculator' Col C: 21 distinct formula patterns:
+    Pattern (1 rows, e.g. [4]): ='Theoretical BOM'!F3
+    Pattern (1 rows, e.g. [5]): ='Theoretical BOM'!F4
+    Pattern (1 rows, e.g. [6]): ='Theoretical BOM'!F5
+    Pattern (1 rows, e.g. [7]): ='Theoretical BOM'!F6
+    Pattern (1 rows, e.g. [8]): ='Theoretical BOM'!F7
+    Pattern (1 rows, e.g. [9]): ='Theoretical BOM'!F8
+    Pattern (1 rows, e.g. [10]): ='Theoretical BOM'!F9
+    Pattern (1 rows, e.g. [11]): ='Theoretical BOM'!F10
+    Pattern (1 rows, e.g. [12]): ='Theoretical BOM'!F11
+    Pattern (1 rows, e.g. [13]): ='Theoretical BOM'!F12
+    Pattern (1 rows, e.g. [14]): ='Theoretical BOM'!F13
+    Pattern (1 rows, e.g. [15]): ='Theoretical BOM'!F14
+    Pattern (1 rows, e.g. [16]): ='Theoretical BOM'!F15
+    Pattern (1 rows, e.g. [17]): ='Theoretical BOM'!F16
+    Pattern (1 rows, e.g. [18]): ='Theoretical BOM'!F17
+    Pattern (1 rows, e.g. [19]): ='Theoretical BOM'!F18
+    Pattern (1 rows, e.g. [20]): ='Theoretical BOM'!F19
+    Pattern (1 rows, e.g. [21]): ='Theoretical BOM'!F20
+    Pattern (1 rows, e.g. [22]): ='Theoretical BOM'!F21
+    Pattern (1 rows, e.g. [23]): ='Theoretical BOM'!F22
+    Pattern (1 rows, e.g. [24]): ='Theoretical BOM'!F23
+  [FORMULA PATTERN ANOMALY] Sheet 'Req. Calculator' Col D: 21 distinct formula patterns:
+    Pattern (1 rows, e.g. [4]): ='Theoretical BOM'!I3
+    Pattern (1 rows, e.g. [5]): ='Theoretical BOM'!I4
+    Pattern (1 rows, e.g. [6]): ='Theoretical BOM'!I5
+    Pattern (1 rows, e.g. [7]): ='Theoretical BOM'!I6
+    Pattern (1 rows, e.g. [8]): ='Theoretical BOM'!I7
+    Pattern (1 rows, e.g. [9]): ='Theoretical BOM'!I8
+    Pattern (1 rows, e.g. [10]): ='Theoretical BOM'!I9
+    Pattern (1 rows, e.g. [11]): ='Theoretical BOM'!I10
+    Pattern (1 rows, e.g. [12]): ='Theoretical BOM'!I11
+    Pattern (1 rows, e.g. [13]): ='Theoretical BOM'!I12
+    Pattern (1 rows, e.g. [14]): ='Theoretical BOM'!I13
+    Pattern (1 rows, e.g. [15]): ='Theoretical BOM'!I14
+    Pattern (1 rows, e.g. [16]): ='Theoretical BOM'!I15
+    Pattern (1 rows, e.g. [17]): ='Theoretical BOM'!I16
+    Pattern (1 rows, e.g. [18]): ='Theoretical BOM'!I17
+    Pattern (1 rows, e.g. [19]): ='Theoretical BOM'!I18
+    Pattern (1 rows, e.g. [20]): ='Theoretical BOM'!I19
+    Pattern (1 rows, e.g. [21]): ='Theoretical BOM'!I20
+    Pattern (1 rows, e.g. [22]): ='Theoretical BOM'!I21
+    Pattern (1 rows, e.g. [23]): ='Theoretical BOM'!I22
+    Pattern (1 rows, e.g. [24]): ='Theoretical BOM'!I23
+  [FORMULA PATTERN ANOMALY] Sheet 'Req. Calculator' Col E: 21 distinct formula patterns:
+    Pattern (1 rows, e.g. [4]): ='Theoretical BOM'!J3
+    Pattern (1 rows, e.g. [5]): ='Theoretical BOM'!J4
+    Pattern (1 rows, e.g. [6]): ='Theoretical BOM'!J5
+    Pattern (1 rows, e.g. [7]): ='Theoretical BOM'!J6
+    Pattern (1 rows, e.g. [8]): ='Theoretical BOM'!J7
+    Pattern (1 rows, e.g. [9]): ='Theoretical BOM'!J8
+    Pattern (1 rows, e.g. [10]): ='Theoretical BOM'!J9
+    Pattern (1 rows, e.g. [11]): ='Theoretical BOM'!J10
+    Pattern (1 rows, e.g. [12]): ='Theoretical BOM'!J11
+    Pattern (1 rows, e.g. [13]): ='Theoretical BOM'!J12
+    Pattern (1 rows, e.g. [14]): ='Theoretical BOM'!J13
+    Pattern (1 rows, e.g. [15]): ='Theoretical BOM'!J14
+    Pattern (1 rows, e.g. [16]): ='Theoretical BOM'!J15
+    Pattern (1 rows, e.g. [17]): ='Theoretical BOM'!J16
+    Pattern (1 rows, e.g. [18]): ='Theoretical BOM'!J17
+    Pattern (1 rows, e.g. [19]): ='Theoretical BOM'!J18
+    Pattern (1 rows, e.g. [20]): ='Theoretical BOM'!J19
+    Pattern (1 rows, e.g. [21]): ='Theoretical BOM'!J20
+    Pattern (1 rows, e.g. [22]): ='Theoretical BOM'!J21
+    Pattern (1 rows, e.g. [23]): ='Theoretical BOM'!J22
+    Pattern (1 rows, e.g. [24]): ='Theoretical BOM'!J23
+  [FORMULA PATTERN ANOMALY] Sheet 'Req. Calculator' Col F: 21 distinct formula patterns:
+    Pattern (1 rows, e.g. [4]): ='Theoretical BOM'!K3
+    Pattern (1 rows, e.g. [5]): ='Theoretical BOM'!K4
+    Pattern (1 rows, e.g. [6]): ='Theoretical BOM'!K5
+    Pattern (1 rows, e.g. [7]): ='Theoretical BOM'!K6
+    Pattern (1 rows, e.g. [8]): ='Theoretical BOM'!K7
+    Pattern (1 rows, e.g. [9]): ='Theoretical BOM'!K8
+    Pattern (1 rows, e.g. [10]): ='Theoretical BOM'!K9
+    Pattern (1 rows, e.g. [11]): ='Theoretical BOM'!K10
+    Pattern (1 rows, e.g. [12]): ='Theoretical BOM'!K11
+    Pattern (1 rows, e.g. [13]): ='Theoretical BOM'!K12
+    Pattern (1 rows, e.g. [14]): ='Theoretical BOM'!K13
+    Pattern (1 rows, e.g. [15]): ='Theoretical BOM'!K14
+    Pattern (1 rows, e.g. [16]): ='Theoretical BOM'!K15
+    Pattern (1 rows, e.g. [17]): ='Theoretical BOM'!K16
+    Pattern (1 rows, e.g. [18]): ='Theoretical BOM'!K17
+    Pattern (1 rows, e.g. [19]): ='Theoretical BOM'!K18
+    Pattern (1 rows, e.g. [20]): ='Theoretical BOM'!K19
+    Pattern (1 rows, e.g. [21]): ='Theoretical BOM'!K20
+    Pattern (1 rows, e.g. [22]): ='Theoretical BOM'!K21
+    Pattern (1 rows, e.g. [23]): ='Theoretical BOM'!K22
+    Pattern (1 rows, e.g. [24]): ='Theoretical BOM'!K23
+  [FORMULA PATTERN ANOMALY] Sheet 'Req. Calculator' Col G: 2 distinct formula patterns:
+    Pattern (21 rows, e.g. [4, 5, 6, 7, 8]): =(D$2/1000)*E{R}
+    Pattern (1 rows, e.g. [25]): =SUM(G4:G24)
+  [FORMULA PATTERN ANOMALY] Sheet 'Req. Calculator' Col H: 22 distinct formula patterns:
+    Pattern (1 rows, e.g. [4]): =(D$2/1000)*'Theoretical BOM'!L3
+    Pattern (1 rows, e.g. [5]): =(D$2/1000)*'Theoretical BOM'!L4
+    Pattern (1 rows, e.g. [6]): =(D$2/1000)*'Theoretical BOM'!L5
+    Pattern (1 rows, e.g. [7]): =(D$2/1000)*'Theoretical BOM'!L6
+    Pattern (1 rows, e.g. [8]): =(D$2/1000)*'Theoretical BOM'!L7
+    Pattern (1 rows, e.g. [9]): =(D$2/1000)*'Theoretical BOM'!L8
+    Pattern (1 rows, e.g. [10]): =(D$2/1000)*'Theoretical BOM'!L9
+    Pattern (1 rows, e.g. [11]): =(D$2/1000)*'Theoretical BOM'!L10
+    Pattern (1 rows, e.g. [12]): =(D$2/1000)*'Theoretical BOM'!L11
+    Pattern (1 rows, e.g. [13]): =(D$2/1000)*'Theoretical BOM'!L12
+    Pattern (1 rows, e.g. [14]): =(D$2/1000)*'Theoretical BOM'!L13
+    Pattern (1 rows, e.g. [15]): =(D$2/1000)*'Theoretical BOM'!L14
+    Pattern (1 rows, e.g. [16]): =(D$2/1000)*'Theoretical BOM'!L15
+    Pattern (1 rows, e.g. [17]): =(D$2/1000)*'Theoretical BOM'!L16
+    Pattern (1 rows, e.g. [18]): =(D$2/1000)*'Theoretical BOM'!L17
+    Pattern (1 rows, e.g. [19]): =(D$2/1000)*'Theoretical BOM'!L18
+    Pattern (1 rows, e.g. [20]): =(D$2/1000)*'Theoretical BOM'!L19
+    Pattern (1 rows, e.g. [21]): =(D$2/1000)*'Theoretical BOM'!L20
+    Pattern (1 rows, e.g. [22]): =(D$2/1000)*'Theoretical BOM'!L21
+    Pattern (1 rows, e.g. [23]): =(D$2/1000)*'Theoretical BOM'!L22
+    Pattern (1 rows, e.g. [24]): =(D$2/1000)*'Theoretical BOM'!L23
+    Pattern (1 rows, e.g. [25]): =SUM(H4:H24)
+
+==================================================
+FILE: Aerosol/Aerosol Raw Materials.xlsx
+==================================================
+
+==================================================
+FILE: Aerosol/Aerosol_Job_Card.xlsx
+==================================================
+  [FORMULA PATTERN ANOMALY] Sheet 'Job Card' Col B: 5 distinct formula patterns:
+    Pattern (25 rows, e.g. [12, 13, 14, 15, 16]): =IFERROR(VLOOKUP($B$7&"_"&$A{R}, Aerosol_BOM!$A:$O, 7, FALSE), "")
+    Pattern (1 rows, e.g. [39]): =IFERROR(VLOOKUP($B$7, Products_DB!A:O, 4, FALSE), "")
+    Pattern (1 rows, e.g. [40]): =IFERROR(VLOOKUP($B$7, Products_DB!A:O, 7, FALSE), "")
+    Pattern (1 rows, e.g. [41]): =IFERROR(VLOOKUP($B$7, Products_DB!A:O, 10, FALSE), "")
+    Pattern (1 rows, e.g. [42]): =IFERROR(VLOOKUP($B$7, Products_DB!A:O, 13, FALSE), "")
+  [FORMULA PATTERN ANOMALY] Sheet 'Job Card' Col D: 6 distinct formula patterns:
+    Pattern (1 rows, e.g. [7]): =IFERROR(VLOOKUP(B{R}, Products_DB!A:C, 2, FALSE), "")
+    Pattern (25 rows, e.g. [12, 13, 14, 15, 16]): =IFERROR(VLOOKUP($B$7&"_"&$A{R}, Aerosol_BOM!$A:$O, 8, FALSE), "")
+    Pattern (1 rows, e.g. [39]): =IFERROR(VLOOKUP($B$7, Products_DB!A:O, 5, FALSE), "")
+    Pattern (1 rows, e.g. [40]): =IFERROR(VLOOKUP($B$7, Products_DB!A:O, 8, FALSE), "")
+    Pattern (1 rows, e.g. [41]): =IFERROR(VLOOKUP($B$7, Products_DB!A:O, 11, FALSE), "")
+    Pattern (1 rows, e.g. [42]): =IFERROR(VLOOKUP($B$7, Products_DB!A:O, 14, FALSE), "")
+  [FORMULA PATTERN ANOMALY] Sheet 'Job Card' Col E: 2 distinct formula patterns:
+    Pattern (24 rows, e.g. [12, 14, 15, 16, 17]): =IFERROR(VLOOKUP($B$7&"_"&$A{R}, Aerosol_BOM!$A:$O, 13, FALSE) * ($B$8*(1+$D$8)) / 1000, "")
+    Pattern (1 rows, e.g. [13]): =IFERROR(VLOOKUP($B$7&"_"&$A{R}, Aerosol_BOM!$A:$O, {R}, FALSE) * ($B$8*(1+$D$8)) / 1000, "")
+  [FORMULA PATTERN ANOMALY] Sheet 'Job Card' Col F: 6 distinct formula patterns:
+    Pattern (1 rows, e.g. [6]): =IFERROR(VLOOKUP(B7, Products_DB!A:C, 3, FALSE), "")
+    Pattern (25 rows, e.g. [12, 13, 14, 15, 16]): =IFERROR(VLOOKUP($B$7&"_"&$A{R}, Aerosol_BOM!$A:$O, 10, FALSE), "")
+    Pattern (1 rows, e.g. [39]): =IFERROR(VLOOKUP($B$7, Products_DB!A:O, 6, FALSE), "")
+    Pattern (1 rows, e.g. [40]): =IFERROR(VLOOKUP($B$7, Products_DB!A:O, 9, FALSE), "")
+    Pattern (1 rows, e.g. [41]): =IFERROR(VLOOKUP($B$7, Products_DB!A:O, 12, FALSE), "")
+    Pattern (1 rows, e.g. [42]): =F8
+  [FORMULA PATTERN ANOMALY] Sheet 'Aerosol_BOM' Col A: 2 distinct formula patterns:
+    Pattern (1 rows, e.g. [2]): =$E${R}&"_"&COUNTIF($E${R}:$E${R}, $E${R})
+    Pattern (20 rows, e.g. [3, 4, 5, 6, 7]): =$E${R}&"_"&COUNTIF($E$2:$E${R}, $E${R})
+
+==================================================
+FILE: Aerosol/Aerosol_Production_Entry.xlsx
+==================================================
+  [FORMULA PATTERN ANOMALY] Sheet 'Data_Entry' Col F: 2 distinct formula patterns:
+    Pattern (495 rows, e.g. [3, 5, 6, 7, 8]): =IF(D{R}="","",VLOOKUP(E{R},Product_Master!A:D,4,FALSE)&"")
+    Pattern (1 rows, e.g. [4]): =IF(D{R}="","",VLOOKUP(E{R},Product_Master!A:D,{R},FALSE)&"")
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Master' Col G: 2 distinct formula patterns:
+    Pattern (4 rows, e.g. [2, 3, 4, 5]): =A{R}&" - "&B{R}
+    Pattern (94 rows, e.g. [6, 7, 8, 9, 10]): =IF(A{R}="","",A{R}&" - "&B{R})
+
+==================================================
+FILE: Aerosol/Tubex_v10_30.xlsx
+==================================================
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col G: 3 distinct formula patterns:
+    Pattern (40 rows, e.g. [11, 12, 13, 14, 15]): =IFERROR(INDEX(MRP!$F$3:$F$8,MATCH(Tubex_Dashboard!F{R},MRP!$D$3:$D$8,0)),0)
+    Pattern (1 rows, e.g. [17]): =SUM(G11:G16)
+    Pattern (1 rows, e.g. [24]): =SUM(G18:G23)
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col H: 5 distinct formula patterns:
+    Pattern (1 rows, e.g. [3]): =TODAY()-1
+    Pattern (40 rows, e.g. [11, 12, 13, 14, 15]): =SUMPRODUCT((Production_Log!$F$3:$F$8963=F{R})*(LEFT(Production_Log!$B$3:$B$8963,5)="Print")*(ISERROR(SEARCH("(Varnish)",Production_Log!$D$3:$D$8963)))*Production_Log!$H$3:$H$8963)
+    Pattern (1 rows, e.g. [17]): =SUM(H11:H16)
+    Pattern (12 rows, e.g. [18, 19, 20, 21, 22]): =SUMPRODUCT((Production_Log!$F$3:$F$8963=F{R})*Production_Log!$H$3:$H$8963)
+    Pattern (1 rows, e.g. [24]): =SUM(H18:H23)
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col I: 3 distinct formula patterns:
+    Pattern (52 rows, e.g. [11, 12, 13, 14, 15]): =G{R}-H{R}
+    Pattern (1 rows, e.g. [17]): =SUMIF(I11:I16,">"&0)
+    Pattern (1 rows, e.g. [24]): =SUMIF(I18:I23,">"&0)
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col J: 3 distinct formula patterns:
+    Pattern (1 rows, e.g. [6]): =SUMIF($B$11:$B$64,"TUBE",$K$11:$K$64)
+    Pattern (1 rows, e.g. [8]): =SUMIF($B$11:$B$64,"PET",$K$11:$K$64)
+    Pattern (52 rows, e.g. [11, 12, 13, 14, 15]): =IF(G{R}=0,"-",H{R}/G{R})
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col M: 7 distinct formula patterns:
+    Pattern (1 rows, e.g. [7]): =IFERROR(INDEX($S$9:$S$21,MATCH(LARGE($U$9:$U$21,1),$U$9:$U$21,0)),"")
+    Pattern (1 rows, e.g. [8]): =IFERROR(INDEX($S$9:$S$21,MATCH(LARGE($U$9:$U$21,2),$U$9:$U$21,0)),"")
+    Pattern (1 rows, e.g. [9]): =IFERROR(INDEX($S${R}:$S$21,MATCH(LARGE($U${R}:$U$21,3),$U${R}:$U$21,0)),"")
+    Pattern (1 rows, e.g. [10]): =IFERROR(INDEX($S$9:$S$21,MATCH(LARGE($U$9:$U$21,4),$U$9:$U$21,0)),"")
+    Pattern (1 rows, e.g. [11]): =IFERROR(INDEX($S$9:$S$21,MATCH(LARGE($U$9:$U$21,5),$U$9:$U$21,0)),"")
+    Pattern (1 rows, e.g. [12]): =IFERROR(INDEX($S$9:$S$21,MATCH(LARGE($U$9:$U$21,6),$U$9:$U$21,0)),"")
+    Pattern (1 rows, e.g. [13]): =IFERROR(INDEX($S$9:$S$21,MATCH(LARGE($U$9:$U$21,7),$U$9:$U$21,0)),"")
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col N: 8 distinct formula patterns:
+    Pattern (1 rows, e.g. [7]): =(IFERROR(INDEX($T$9:$T$21,MATCH(LARGE($U$9:$U$21,1),$U$9:$U$21,0)),""))/60
+    Pattern (1 rows, e.g. [8]): =IFERROR(INDEX($T$9:$T$21,MATCH(LARGE($U$9:$U$21,2),$U$9:$U$21,0)),"")/60
+    Pattern (1 rows, e.g. [9]): =IFERROR(INDEX($T${R}:$T$21,MATCH(LARGE($U${R}:$U$21,3),$U${R}:$U$21,0)),"")/60
+    Pattern (1 rows, e.g. [10]): =IFERROR(INDEX($T$9:$T$21,MATCH(LARGE($U$9:$U$21,4),$U$9:$U$21,0)),"")/60
+    Pattern (1 rows, e.g. [11]): =IFERROR(INDEX($T$9:$T$21,MATCH(LARGE($U$9:$U$21,5),$U$9:$U$21,0)),"")/60
+    Pattern (1 rows, e.g. [12]): =IFERROR(INDEX($T$9:$T$21,MATCH(LARGE($U$9:$U$21,6),$U$9:$U$21,0)),"")/60
+    Pattern (1 rows, e.g. [13]): =IFERROR(INDEX($T$9:$T$21,MATCH(LARGE($U$9:$U$21,7),$U$9:$U$21,0)),"")/60
+    Pattern (1 rows, e.g. [14]): =SUM($T$9:$T$21)/60
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col T: 9 distinct formula patterns:
+    Pattern (1 rows, e.g. [9]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!$K$3:$K$8963)
+    Pattern (1 rows, e.g. [10]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!$L$3:$L$8963)
+    Pattern (1 rows, e.g. [12]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!$M$3:$M$8963)
+    Pattern (1 rows, e.g. [13]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!$N$3:$N$8963)
+    Pattern (1 rows, e.g. [14]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!$O$3:$O$8963)
+    Pattern (1 rows, e.g. [16]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!$P$3:$P$8963)
+    Pattern (1 rows, e.g. [18]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!$Q$3:$Q$8963)
+    Pattern (1 rows, e.g. [19]): =SUMPRODUCT(((LEFT(Production_Log!$B$3:$B$8963,5)="Press")+(LEFT(Production_Log!$B$3:$B$8963,5)="Print"))*Production_Log!$R$3:$R$8963)
+    Pattern (1 rows, e.g. [33]): =SUMPRODUCT((MONTH(Production_Log!$A$3:$A$8963)=MONTH(TODAY()))*(YEAR(Production_Log!$A$3:$A$8963)=YEAR(TODAY()))*Production_Log!$Q$3:$Q$8963)
+  [FORMULA PATTERN ANOMALY] Sheet 'Tubex_Dashboard' Col U: 9 distinct formula patterns:
+    Pattern (1 rows, e.g. [9]): =T{R}+0.00001
+    Pattern (1 rows, e.g. [10]): =T{R}+0.00002
+    Pattern (1 rows, e.g. [12]): =T{R}+0.00003
+    Pattern (1 rows, e.g. [13]): =T{R}+0.00004
+    Pattern (1 rows, e.g. [14]): =T{R}+0.00005
+    Pattern (1 rows, e.g. [16]): =T{R}+0.00006
+    Pattern (1 rows, e.g. [18]): =T{R}+0.00007
+    Pattern (1 rows, e.g. [19]): =T{R}+0.00008
+    Pattern (1 rows, e.g. [33]): =T34+0.00006
+  [FORMULA PATTERN ANOMALY] Sheet 'MRP' Col E: 2 distinct formula patterns:
+    Pattern (82 rows, e.g. [12, 13, 14, 15, 16]): =SUMPRODUCT((TableBOM[Item ID]=A{R})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D$3:$D$8,TableBOM[Product ID],$H$3:$H$8)/1000)
+    Pattern (42 rows, e.g. [107, 108, 109, 110, 111]): =SUMPRODUCT((TableBOM[Item ID]=A{R})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D$98:$D$103,TableBOM[Product ID],$H$98:$H$103)/1000)
+  [FORMULA PATTERN ANOMALY] Sheet 'MRP' Col F: 36 distinct formula patterns:
+    Pattern (1 rows, e.g. [9]): =SUM(F3:F8)
+    Pattern (90 rows, e.g. [12, 13, 14, 15, 16]): =IFERROR(INDEX(TableInventory[Store Balance],MATCH(A{R},TableInventory[Item ID],0)),0)+IFERROR(INDEX(TableInventory[Work In Process],MATCH(A{R},TableInventory[Item ID],0)),0)
+    Pattern (6 rows, e.g. [98, 99, 100, 101, 102]): =INDEX(Tubex_Dashboard!$G$11:$G$61,MATCH(MRP!D{R},Tubex_Dashboard!$F$11:$F$61,0))
+    Pattern (1 rows, e.g. [104]): =SUM(F98:F103)
+    Pattern (1 rows, e.g. [118]): =IF(E111=0,0,ROUND(H111/E111*30,1))
+    Pattern (1 rows, e.g. [119]): =IF(E112=0,0,ROUND(H112/E112*30,1))
+    Pattern (1 rows, e.g. [120]): =IF(E113=0,0,ROUND(H113/E113*30,1))
+    Pattern (1 rows, e.g. [121]): =IF(E114=0,0,ROUND(H114/E114*30,1))
+    Pattern (1 rows, e.g. [122]): =IF(E115=0,0,ROUND(H115/E115*30,1))
+    Pattern (1 rows, e.g. [123]): =IF(E116=0,0,ROUND(H116/E116*30,1))
+    Pattern (1 rows, e.g. [124]): =IF(E117=0,0,ROUND(H117/E117*30,1))
+    Pattern (1 rows, e.g. [125]): =IF(E118=0,0,ROUND(H118/E118*30,1))
+    Pattern (1 rows, e.g. [126]): =IF(E119=0,0,ROUND(H119/E119*30,1))
+    Pattern (1 rows, e.g. [127]): =IF(E120=0,0,ROUND(H120/E120*30,1))
+    Pattern (1 rows, e.g. [128]): =IF(E121=0,0,ROUND(H121/E121*30,1))
+    Pattern (1 rows, e.g. [129]): =IF(E122=0,0,ROUND(H122/E122*30,1))
+    Pattern (1 rows, e.g. [130]): =IF(E123=0,0,ROUND(H123/E123*30,1))
+    Pattern (1 rows, e.g. [131]): =IF(E124=0,0,ROUND(H124/E124*30,1))
+    Pattern (1 rows, e.g. [132]): =IF(E125=0,0,ROUND(H125/E125*30,1))
+    Pattern (1 rows, e.g. [133]): =IF(E126=0,0,ROUND(H126/E126*30,1))
+    Pattern (1 rows, e.g. [134]): =IF(E127=0,0,ROUND(H127/E127*30,1))
+    Pattern (1 rows, e.g. [135]): =IF(E128=0,0,ROUND(H128/E128*30,1))
+    Pattern (1 rows, e.g. [136]): =IF(E129=0,0,ROUND(H129/E129*30,1))
+    Pattern (1 rows, e.g. [137]): =IF(E130=0,0,ROUND(H130/E130*30,1))
+    Pattern (1 rows, e.g. [138]): =IF(E131=0,0,ROUND(H131/E131*30,1))
+    Pattern (1 rows, e.g. [139]): =IF(E132=0,0,ROUND(H132/E132*30,1))
+    Pattern (1 rows, e.g. [140]): =IF(E133=0,0,ROUND(H133/E133*30,1))
+    Pattern (1 rows, e.g. [141]): =IF(E134=0,0,ROUND(H134/E134*30,1))
+    Pattern (1 rows, e.g. [142]): =IF(E135=0,0,ROUND(H135/E135*30,1))
+    Pattern (1 rows, e.g. [143]): =IF(E136=0,0,ROUND(H136/E136*30,1))
+    Pattern (1 rows, e.g. [144]): =IF(E137=0,0,ROUND(H137/E137*30,1))
+    Pattern (1 rows, e.g. [145]): =IF(E138=0,0,ROUND(H138/E138*30,1))
+    Pattern (1 rows, e.g. [146]): =IF(E139=0,0,ROUND(H139/E139*30,1))
+    Pattern (1 rows, e.g. [147]): =IF(E140=0,0,ROUND(H140/E140*30,1))
+    Pattern (1 rows, e.g. [148]): =IF(E141=0,0,ROUND(H141/E141*30,1))
+    Pattern (1 rows, e.g. [149]): =IF(E142=0,0,ROUND(H142/E142*30,1))
+  [FORMULA PATTERN ANOMALY] Sheet 'MRP' Col G: 38 distinct formula patterns:
+    Pattern (5 rows, e.g. [3, 4, 5, 6, 8]): =INDEX(Tubex_Dashboard!$H$11:$H$56,MATCH(MRP!D{R},Tubex_Dashboard!$F$11:$F$56,0))
+    Pattern (6 rows, e.g. [7, 98, 99, 101, 102]): =INDEX(Tubex_Dashboard!$H$11:$H$100,MATCH(MRP!D{R},Tubex_Dashboard!$F$11:$F$100,0))
+    Pattern (1 rows, e.g. [9]): =SUM(G3:G8)
+    Pattern (90 rows, e.g. [12, 13, 14, 15, 16]): =F{R}-E{R}
+    Pattern (1 rows, e.g. [100]): =INDEX(Tubex_Dashboard!$H$11:$H${R},MATCH(MRP!D{R},Tubex_Dashboard!$F$11:$F${R},0))
+    Pattern (1 rows, e.g. [104]): =SUM(G98:G103)
+    Pattern (1 rows, e.g. [118]): =IF(E111=0,"Not needed",IF(H111-E111<0,"SHORTAGE",IF(H111-E111<E111,"LOW","OK")))
+    Pattern (1 rows, e.g. [119]): =IF(E112=0,"Not needed",IF(H112-E112<0,"SHORTAGE",IF(H112-E112<E112,"LOW","OK")))
+    Pattern (1 rows, e.g. [120]): =IF(E113=0,"Not needed",IF(H113-E113<0,"SHORTAGE",IF(H113-E113<E113,"LOW","OK")))
+    Pattern (1 rows, e.g. [121]): =IF(E114=0,"Not needed",IF(H114-E114<0,"SHORTAGE",IF(H114-E114<E114,"LOW","OK")))
+    Pattern (1 rows, e.g. [122]): =IF(E115=0,"Not needed",IF(H115-E115<0,"SHORTAGE",IF(H115-E115<E115,"LOW","OK")))
+    Pattern (1 rows, e.g. [123]): =IF(E116=0,"Not needed",IF(H116-E116<0,"SHORTAGE",IF(H116-E116<E116,"LOW","OK")))
+    Pattern (1 rows, e.g. [124]): =IF(E117=0,"Not needed",IF(H117-E117<0,"SHORTAGE",IF(H117-E117<E117,"LOW","OK")))
+    Pattern (1 rows, e.g. [125]): =IF(E118=0,"Not needed",IF(H118-E118<0,"SHORTAGE",IF(H118-E118<E118,"LOW","OK")))
+    Pattern (1 rows, e.g. [126]): =IF(E119=0,"Not needed",IF(H119-E119<0,"SHORTAGE",IF(H119-E119<E119,"LOW","OK")))
+    Pattern (1 rows, e.g. [127]): =IF(E120=0,"Not needed",IF(H120-E120<0,"SHORTAGE",IF(H120-E120<E120,"LOW","OK")))
+    Pattern (1 rows, e.g. [128]): =IF(E121=0,"Not needed",IF(H121-E121<0,"SHORTAGE",IF(H121-E121<E121,"LOW","OK")))
+    Pattern (1 rows, e.g. [129]): =IF(E122=0,"Not needed",IF(H122-E122<0,"SHORTAGE",IF(H122-E122<E122,"LOW","OK")))
+    Pattern (1 rows, e.g. [130]): =IF(E123=0,"Not needed",IF(H123-E123<0,"SHORTAGE",IF(H123-E123<E123,"LOW","OK")))
+    Pattern (1 rows, e.g. [131]): =IF(E124=0,"Not needed",IF(H124-E124<0,"SHORTAGE",IF(H124-E124<E124,"LOW","OK")))
+    Pattern (1 rows, e.g. [132]): =IF(E125=0,"Not needed",IF(H125-E125<0,"SHORTAGE",IF(H125-E125<E125,"LOW","OK")))
+    Pattern (1 rows, e.g. [133]): =IF(E126=0,"Not needed",IF(H126-E126<0,"SHORTAGE",IF(H126-E126<E126,"LOW","OK")))
+    Pattern (1 rows, e.g. [134]): =IF(E127=0,"Not needed",IF(H127-E127<0,"SHORTAGE",IF(H127-E127<E127,"LOW","OK")))
+    Pattern (1 rows, e.g. [135]): =IF(E128=0,"Not needed",IF(H128-E128<0,"SHORTAGE",IF(H128-E128<E128,"LOW","OK")))
+    Pattern (1 rows, e.g. [136]): =IF(E129=0,"Not needed",IF(H129-E129<0,"SHORTAGE",IF(H129-E129<E129,"LOW","OK")))
+    Pattern (1 rows, e.g. [137]): =IF(E130=0,"Not needed",IF(H130-E130<0,"SHORTAGE",IF(H130-E130<E130,"LOW","OK")))
+    Pattern (1 rows, e.g. [138]): =IF(E131=0,"Not needed",IF(H131-E131<0,"SHORTAGE",IF(H131-E131<E131,"LOW","OK")))
+    Pattern (1 rows, e.g. [139]): =IF(E132=0,"Not needed",IF(H132-E132<0,"SHORTAGE",IF(H132-E132<E132,"LOW","OK")))
+    Pattern (1 rows, e.g. [140]): =IF(E133=0,"Not needed",IF(H133-E133<0,"SHORTAGE",IF(H133-E133<E133,"LOW","OK")))
+    Pattern (1 rows, e.g. [141]): =IF(E134=0,"Not needed",IF(H134-E134<0,"SHORTAGE",IF(H134-E134<E134,"LOW","OK")))
+    Pattern (1 rows, e.g. [142]): =IF(E135=0,"Not needed",IF(H135-E135<0,"SHORTAGE",IF(H135-E135<E135,"LOW","OK")))
+    Pattern (1 rows, e.g. [143]): =IF(E136=0,"Not needed",IF(H136-E136<0,"SHORTAGE",IF(H136-E136<E136,"LOW","OK")))
+    Pattern (1 rows, e.g. [144]): =IF(E137=0,"Not needed",IF(H137-E137<0,"SHORTAGE",IF(H137-E137<E137,"LOW","OK")))
+    Pattern (1 rows, e.g. [145]): =IF(E138=0,"Not needed",IF(H138-E138<0,"SHORTAGE",IF(H138-E138<E138,"LOW","OK")))
+    Pattern (1 rows, e.g. [146]): =IF(E139=0,"Not needed",IF(H139-E139<0,"SHORTAGE",IF(H139-E139<E139,"LOW","OK")))
+    Pattern (1 rows, e.g. [147]): =IF(E140=0,"Not needed",IF(H140-E140<0,"SHORTAGE",IF(H140-E140<E140,"LOW","OK")))
+    Pattern (1 rows, e.g. [148]): =IF(E141=0,"Not needed",IF(H141-E141<0,"SHORTAGE",IF(H141-E141<E141,"LOW","OK")))
+    Pattern (1 rows, e.g. [149]): =IF(E142=0,"Not needed",IF(H142-E142<0,"SHORTAGE",IF(H142-E142<E142,"LOW","OK")))
+  [FORMULA PATTERN ANOMALY] Sheet 'MRP' Col H: 6 distinct formula patterns:
+    Pattern (1 rows, e.g. [1]): =TODAY()
+    Pattern (12 rows, e.g. [3, 4, 5, 6, 7]): =F{R}-G{R}
+    Pattern (1 rows, e.g. [9]): =SUMIF(H3:H8, ">0")
+    Pattern (82 rows, e.g. [12, 13, 14, 15, 16]): =IF(LEN(IF((COUNTIFS(TableBOM[Product ID],$D$3,TableBOM[Item ID],$A{R})>0)*($H$3>0),$C$3&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$4,TableBOM[Item ID],$A{R})>0)*($H$4>0),$C$4&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$5,TableBOM[Item ID],$A{R})>0)*($H$5>0),$C$5&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$6,TableBOM[Item ID],$A{R})>0)*($H$6>0),$C$6&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$7,TableBOM[Item ID],$A{R})>0)*($H$7>0),$C$7&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$8,TableBOM[Item ID],$A{R})>0)*($H$8>0),$C$8&", ",""))>1,LEFT(IF((COUNTIFS(TableBOM[Product ID],$D$3,TableBOM[Item ID],$A{R})>0)*($H$3>0),$C$3&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$4,TableBOM[Item ID],$A{R})>0)*($H$4>0),$C$4&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$5,TableBOM[Item ID],$A{R})>0)*($H$5>0),$C$5&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$6,TableBOM[Item ID],$A{R})>0)*($H$6>0),$C$6&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$7,TableBOM[Item ID],$A{R})>0)*($H$7>0),$C$7&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$8,TableBOM[Item ID],$A{R})>0)*($H$8>0),$C$8&", ",""),LEN(IF((COUNTIFS(TableBOM[Product ID],$D$3,TableBOM[Item ID],$A{R})>0)*($H$3>0),$C$3&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$4,TableBOM[Item ID],$A{R})>0)*($H$4>0),$C$4&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$5,TableBOM[Item ID],$A{R})>0)*($H$5>0),$C$5&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$6,TableBOM[Item ID],$A{R})>0)*($H$6>0),$C$6&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$7,TableBOM[Item ID],$A{R})>0)*($H$7>0),$C$7&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$8,TableBOM[Item ID],$A{R})>0)*($H$8>0),$C$8&", ",""))-2),"")
+    Pattern (1 rows, e.g. [104]): =SUM(H98:H103)
+    Pattern (42 rows, e.g. [107, 108, 109, 110, 111]): =IF(LEN(IF((COUNTIFS(TableBOM[Product ID],$D$98,TableBOM[Item ID],$A{R})>0)*($H$98>0),$C$98&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$99,TableBOM[Item ID],$A{R})>0)*($H$99>0),$C$99&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$100,TableBOM[Item ID],$A{R})>0)*($H$100>0),$C$100&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$101,TableBOM[Item ID],$A{R})>0)*($H$101>0),$C$101&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$102,TableBOM[Item ID],$A{R})>0)*($H$102>0),$C$102&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$103,TableBOM[Item ID],$A{R})>0)*($H$103>0),$C$103&", ",""))>1,LEFT(IF((COUNTIFS(TableBOM[Product ID],$D$98,TableBOM[Item ID],$A{R})>0)*($H$98>0),$C$98&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$99,TableBOM[Item ID],$A{R})>0)*($H$99>0),$C$99&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$100,TableBOM[Item ID],$A{R})>0)*($H$100>0),$C$100&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$101,TableBOM[Item ID],$A{R})>0)*($H$101>0),$C$101&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$102,TableBOM[Item ID],$A{R})>0)*($H$102>0),$C$102&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$103,TableBOM[Item ID],$A{R})>0)*($H$103>0),$C$103&", ",""),LEN(IF((COUNTIFS(TableBOM[Product ID],$D$98,TableBOM[Item ID],$A{R})>0)*($H$98>0),$C$98&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$99,TableBOM[Item ID],$A{R})>0)*($H$99>0),$C$99&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$100,TableBOM[Item ID],$A{R})>0)*($H$100>0),$C$100&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$101,TableBOM[Item ID],$A{R})>0)*($H$101>0),$C$101&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$102,TableBOM[Item ID],$A{R})>0)*($H$102>0),$C$102&", ","") & IF((COUNTIFS(TableBOM[Product ID],$D$103,TableBOM[Item ID],$A{R})>0)*($H$103>0),$C$103&", ",""))-2),"")
+  [NUMERIC STORED AS TEXT] Sheet 'MRP': 1 instances (e.g. [('E101', 'Job Order #', '339')])
+  [FORMULA PATTERN ANOMALY] Sheet 'Inventory' Col J: 3 distinct formula patterns:
+    Pattern (2 rows, e.g. [1, 12]): =TODAY()
+    Pattern (102 rows, e.g. [3, 4, 5, 6, 7]): =IFERROR(IF(AVERAGEIF(TableBOM[Item ID],A{R},TableBOM[Per 1000 Units])=0,"-",ROUND((H{R}+I{R})/(AVERAGEIF(TableBOM[Item ID],A{R},TableBOM[Per 1000 Units])/1000),0)),"-")
+    Pattern (1 rows, e.g. [63]): =IFERROR(IF(AVERAGEIF(TableBOM[Item ID],A62,TableBOM[Per 1000 Units])=0,"-",ROUND((H{R}+I{R})/(AVERAGEIF(TableBOM[Item ID],A62,TableBOM[Per 1000 Units])/1000),0)),"-")
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col J: 5 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [51]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [52]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="SLUG")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col K: 5 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [51]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [52]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="BASE COAT")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col L: 5 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [51]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [52]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="LACQUER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col M: 5 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [51]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [52]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="LATEX")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col N: 5 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [51]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [52]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="ZINC POWDER")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col O: 5 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [51]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [52]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="CAP")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+  [FORMULA PATTERN ANOMALY] Sheet 'Product_Catalog' Col P: 5 distinct formula patterns:
+    Pattern (47 rows, e.g. [3, 4, 5, 6, 7]): =IF(I{R}="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A{R})*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I{R}/1000,0))
+    Pattern (1 rows, e.g. [51]): =IF(I50="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A50)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I50/1000,0))
+    Pattern (1 rows, e.g. [52]): =IF(I51="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A51)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I51/1000,0))
+    Pattern (1 rows, e.g. [53]): =IF(I52="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A52)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I52/1000,0))
+    Pattern (1 rows, e.g. [54]): =IF(I53="","",IFERROR(SUMPRODUCT((TableBOM[Product ID]=A53)*(TableBOM[Material Category]="CARTON")*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))*I53/1000,0))
+
+==================================================
+FILE: PET_SKUs.xlsx
+==================================================
+
+==================================================
+FILE: Pet Format.xlsx
+==================================================

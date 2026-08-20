@@ -58,7 +58,7 @@ NAME_FIXES:
 
 import os
 import glob
-from datetime import datetime
+from datetime import datetime, date
 
 import warnings
 warnings.filterwarnings("ignore", message=".*Data Validation.*")
@@ -159,9 +159,10 @@ def resolve_pid(erp_name, catalog):
 def parse_dispatch_file(path):
     """
     Parse one ERP dispatch .xls (Date Wise format).
-    Ignores any dispatch rows matching the current day.
+    Ignores any dispatch rows matching the current day (Rule R1-06 / AUDIT_NOTES.md).
     Returns {product_name: total_dispatched_qty}.
     """
+    import xlrd
     df = pd.read_excel(path, sheet_name=0, engine='xlrd', header=None)
 
     SKIP_PREFIXES = ('dispatch report', 'month :', 'no.')
@@ -185,9 +186,20 @@ def parse_dispatch_file(path):
         today.strftime("%d/%m/%y").lower()
     ]
 
+    # Dynamically detect dispatch quantity column (Rule R1-07)
+    col_disp_idx = 7
+    for idx, r in df.iterrows():
+        row_str = [str(x).lower().strip() for x in r.values if pd.notna(x)]
+        if any('disp' in s and 'qty' in s for s in row_str):
+            for i, s in enumerate(r.values):
+                if pd.notna(s) and 'disp' in str(s).lower() and 'qty' in str(s).lower():
+                    col_disp_idx = i
+                    break
+            break
+
     for _, row in df.iterrows():
         col0 = row[0]
-        col7 = row[7]
+        col_disp = row[col_disp_idx] if col_disp_idx < len(row) else (row[7] if len(row) > 7 else None)
 
         if isinstance(col0, str) and str(col0).strip():
             c0       = col0.strip()
@@ -198,23 +210,38 @@ def parse_dispatch_file(path):
                 continue
             if 'grand total' in c0_lower:
                 continue
-            if pd.isna(row[1]):
+            if len(row) > 1 and pd.isna(row[1]):
                 current_product = c0
                 continue
 
         try:
             int(float(col0))
-            if pd.isna(col7):
+            if pd.isna(col_disp):
                 continue
 
+            # Robust date check including xlrd serial floats (Rule R1-06)
             skip_row = False
             for val in row:
-                if pd.isna(val):
+                if pd.isna(val) or val is None:
                     continue
                 if hasattr(val, 'date') and callable(getattr(val, 'date')):
                     if val.date() == today_date:
                         skip_row = True
                         break
+                elif isinstance(val, (datetime, date)):
+                    d = val.date() if isinstance(val, datetime) else val
+                    if d == today_date:
+                        skip_row = True
+                        break
+                elif isinstance(val, (int, float)):
+                    if 40000 <= val <= 55000:
+                        try:
+                            d = xlrd.xldate_as_datetime(val, 0).date()
+                            if d == today_date:
+                                skip_row = True
+                                break
+                        except Exception:
+                            pass
                 elif isinstance(val, str):
                     v_str = val.strip().lower()
                     if v_str in today_strs:
@@ -224,12 +251,19 @@ def parse_dispatch_file(path):
                         if v_str.startswith(ts + ' ') or v_str.startswith(ts + 't'):
                             skip_row = True
                             break
+                    try:
+                        ts = pd.to_datetime(val, dayfirst=True, errors='coerce')
+                        if pd.notna(ts) and ts.date() == today_date:
+                            skip_row = True
+                            break
+                    except Exception:
+                        pass
 
             if skip_row:
                 ignored_today += 1
                 continue
 
-            disp_qty = float(col7)
+            disp_qty = float(col_disp)
             if current_product is not None:
                 result[current_product] = result.get(current_product, 0) + disp_qty
         except (ValueError, TypeError):

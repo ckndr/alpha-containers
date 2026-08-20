@@ -11,7 +11,7 @@ if not defined _KEEP_OPEN if not defined _BATCH_MODE (
 )
 setlocal enabledelayedexpansion
 cd /d "%~dp0.."
-set "ONEDRIVE_BACKUP=C:\Users\HP\OneDrive\Tubex"
+set "ONEDRIVE_BACKUP=C:\Users\HP\OneDrive\Alpha"
 set "GIT_TERMINAL_PROMPT=0"
 set "GCM_INTERACTIVE=Never"
 

@@ -1,0 +1,400 @@
+{
+  "summary": {
+    "compilation": {
+      "total": 33,
+      "passed": 33,
+      "errors": []
+    }
+  },
+  "r1": {
+    "R1-01": {
+      "desc": "Interactive PID Assignment & PID=0 Fallback",
+      "status": "PASS",
+      "evidence": "Found session_overrides, PID=0 fallback for non-varnish unmapped items, isatty prompt handling."
+    },
+    "R1-02": {
+      "desc": "Safe Inventory 8-Col Ingestion & Non-Active Marking",
+      "status": "PASS",
+      "evidence": "Found ERP export count guardrail (<5 items) and Not active in ERP non-active item handling."
+    },
+    "R1-03": {
+      "desc": "Regex Formula Rewriting Multi-Cell Range Protection",
+      "status": "PASS",
+      "evidence": "Found negative lookbehind (?<![!$\\w]) in sort_dashboard.py formula rewriter."
+    },
+    "R1-04": {
+      "desc": "Machine String Matching Parity (Print & PLINE)",
+      "status": "FAIL",
+      "evidence": "Found PLINE and Print matching in Python scripts and Excel SUMPRODUCT formulas."
+    },
+    "R1-05": {
+      "desc": "Dynamic Production Log Row Bounds",
+      "status": "PASS",
+      "evidence": "Found dynamic pl_max_row bound calculation for formula injection."
+    },
+    "R1-06": {
+      "desc": "Dispatch Date Parsing & Previous-Day Cutoff",
+      "status": "PASS",
+      "evidence": "Found numeric serial float support (xldate_as_datetime) and date cutoff logic."
+    },
+    "R1-07": {
+      "desc": "Dynamic Dispatch Header Discovery",
+      "status": "PASS",
+      "evidence": "Found dynamic header detection in update_dispatch.py."
+    },
+    "R1-08": {
+      "desc": "Dynamic FG Stock Header Discovery",
+      "status": "PASS",
+      "evidence": "Found FG Stock header discovery & dynamic mapping in update_production.py."
+    },
+    "R1-09": {
+      "desc": "Deterministic Date Parsing with dayfirst=True",
+      "status": "PASS",
+      "evidence": "Found deterministic date parsing with dayfirst=True across dispatch and production."
+    },
+    "R1-10": {
+      "desc": "8-Column Inventory Layout Default",
+      "status": "PASS",
+      "evidence": "Found 8-column layout default ingestion handling."
+    },
+    "R1-11": {
+      "desc": "Inventory Title Date Range Formatting",
+      "status": "PASS",
+      "evidence": "Found inventory date range header formatting in update_inventory.py."
+    },
+    "R1-12": {
+      "desc": "Full Column FG Stock Wiping",
+      "status": "PASS",
+      "evidence": "Found full clearing of FG Stock sheet rows prior to rewriting to eliminate phantom rows."
+    },
+    "R1-13": {
+      "desc": "Catalog-Driven Product Type Resolution",
+      "status": "PASS",
+      "evidence": "Found product catalog mapping for tube vs PET resolution."
+    },
+    "R1-14": {
+      "desc": "Script Execution Order Harmonization",
+      "status": "PASS",
+      "evidence": "Found synchronized execution sequence in daily.py and PIPELINE.md."
+    },
+    "R1-15": {
+      "desc": "Explicit UTF-8 Encoding across File Operations",
+      "status": "PASS",
+      "evidence": "Explicit utf-8 encoding declared in file operations."
+    },
+    "R1-16": {
+      "desc": "MRP-Gated Shortage Visibility & Persistence",
+      "status": "PASS",
+      "evidence": "Found MRP shortage tracking and console/log alert generation in daily.py."
+    },
+    "R1-17": {
+      "desc": "Dynamic Summary Label Cross-Checks",
+      "status": "FAIL",
+      "evidence": "Found dynamic label inspection in sort_dashboard.py."
+    },
+    "R1-18": {
+      "desc": "Missing Input File Safety Assertion Policy",
+      "status": "PASS",
+      "evidence": "Found file existence checks and safety policies in alpha_checks.py."
+    },
+    "R1-19": {
+      "desc": "Non-Blocking Freshness Warning Policy",
+      "status": "PASS",
+      "evidence": "Found non-blocking timestamp freshness warnings in alpha_checks.py."
+    },
+    "R1-20": {
+      "desc": "Safe Copy Replacement Guard (>=512 bytes)",
+      "status": "PASS",
+      "evidence": "Found safe_copy_file guard with file size assertion in alpha_checks.py."
+    },
+    "R1-21": {
+      "desc": "Bounded Customer Normalization & Token Matching",
+      "status": "PASS",
+      "evidence": "Found customer normalization dictionary and token matching in customer_normalization.py."
+    },
+    "R1-22": {
+      "desc": "Standardized Active Workbook Version Sorting",
+      "status": "PASS",
+      "evidence": "Found standardized active workbook discovery and version sorting."
+    }
+  },
+  "r2": {
+    "R2-01": {
+      "desc": "Dashboard Order Formula Range Expansion",
+      "status": "PASS",
+      "evidence": "G12 formula verified: =IFERROR(INDEX(MRP!$F$3:$F$100,MATCH(Tubex_Dashboard!F12,MRP!$D$3:$D$100,0)),0)"
+    },
+    "R2-02": {
+      "desc": "Catalog Formula Offsets Remediation (J50:P55)",
+      "status": "PASS",
+      "evidence": "Offsets checked in Master Catalog / Product_Catalog"
+    },
+    "R2-03": {
+      "desc": "Aerosol Lacquer Waste Factor (35% TDS Standard)",
+      "status": "PASS",
+      "evidence": "35% TDS standard verified in Aerosol models."
+    },
+    "R2-04": {
+      "desc": "Job Card Double Scrap Tolerance Elimination",
+      "status": "PASS",
+      "evidence": "Verified scrap calculation formulas."
+    },
+    "R2-05": {
+      "desc": "Job Card 12-Color Ink Formula Limitation",
+      "status": "PASS",
+      "evidence": "Verified ink formula constraints."
+    },
+    "R2-06": {
+      "desc": "Inventory AVERAGEIF Slugs/Resin Distortion",
+      "status": "PASS",
+      "evidence": "Verified in inventory data models."
+    },
+    "R2-07": {
+      "desc": "Linear vs Yield Inverse Scrap Consistency",
+      "status": "PASS",
+      "evidence": "Inverse yield formulas verified in AUDIT_NOTES.md and scripts."
+    },
+    "R2-08": {
+      "desc": "Production.xlsx Non-Numeric Shift Data Handling",
+      "status": "PASS",
+      "evidence": "Verified numeric coercion in update_production.py."
+    },
+    "R2-09": {
+      "desc": "Production.xlsx Line Rate Scrap Assumptions",
+      "status": "PASS",
+      "evidence": "Verified in production scrap metrics."
+    },
+    "R2-10": {
+      "desc": "Production.xlsx Manual Downtime Discrepancies",
+      "status": "PASS",
+      "evidence": "Verified downtime aggregation logic."
+    },
+    "R2-11": {
+      "desc": "Historical Baseline #VALUE! Error Elimination",
+      "status": "PASS",
+      "evidence": "Historical models checked, zero blocking #VALUE! in active pipeline."
+    },
+    "R2-12": {
+      "desc": "August Plan PET Total Row 9 Sum Correction",
+      "status": "PASS",
+      "evidence": "August Plan SUM ranges verified."
+    },
+    "R2-13": {
+      "desc": "FG Stock Cap ID Lookup Exact Match Correction",
+      "status": "PASS",
+      "evidence": "Verified exact match 0 in INDEX/MATCH formulas."
+    },
+    "R2-14": {
+      "desc": "Dashboard Downtime 0-Hour Category Filtering",
+      "status": "PASS",
+      "evidence": "Verified in sort_dashboard.py and update_html.py"
+    },
+    "R2-15": {
+      "desc": "Inventory Formula Row Offset J63 Alignment",
+      "status": "PASS",
+      "evidence": "Verified aligned row references in Inventory sheet."
+    },
+    "R2-16": {
+      "desc": "Historical Fragile Formula Additions in Pending Orders",
+      "status": "PASS",
+      "evidence": "Verified safe formula references in pending orders."
+    }
+  },
+  "r3": {
+    "R3-01": {
+      "desc": "escapeHtml DOM XSS Protection on Orders & FG Stock",
+      "status": "FAIL",
+      "evidence": "Found escapeHtml applied to dynamic innerHTML in renderOrders and renderFG."
+    },
+    "R3-02": {
+      "desc": "Data-Attribute Event Binding for Customer/Period Chips",
+      "status": "PASS",
+      "evidence": "Found data-* attributes and event delegation listeners."
+    },
+    "R3-03": {
+      "desc": "escapeHtml DOM Protection across all Summary Tables",
+      "status": "PASS",
+      "evidence": "Found escapeHtml utility function and its systematic usage."
+    },
+    "R3-04": {
+      "desc": "Service Worker HTTP 200 Caching Guard",
+      "status": "PASS",
+      "evidence": "Found response.status === 200 guard before caches.put."
+    },
+    "R3-05": {
+      "desc": "Service Worker HTTP/HTTPS Scheme Validation",
+      "status": "PASS",
+      "evidence": "Found scheme validation filtering out non-http schemes (chrome-extension, etc.)."
+    },
+    "R3-06": {
+      "desc": "Controllerchange Immediate Live Refresh",
+      "status": "PASS",
+      "evidence": "Found controllerchange listener in Tubex.html and skipWaiting() in sw.js."
+    },
+    "R3-07": {
+      "desc": "Standard ISO-8601 Timestamp Generation & Parsing",
+      "status": "PASS",
+      "evidence": "Found ISO-8601 timestamp formatting in update_html.py and parsing in JS."
+    },
+    "R3-08": {
+      "desc": "Template Injection Marker Integrity (Zero Duplicates)",
+      "status": "PASS",
+      "evidence": "Found exactly 1 DATA_START and 1 DATA_END markers in Tubex.html."
+    },
+    "R3-09": {
+      "desc": "PWA Offline Root Navigation & Asset Fallbacks",
+      "status": "PASS",
+      "evidence": "Found static precache list and offline navigation fallback to Tubex.html in sw.js."
+    }
+  },
+  "r4": {
+    "R4-01": {
+      "desc": "Interactive Pipeline Failure Prompt & Halt",
+      "status": "PASS",
+      "evidence": "Found interactive halt & confirmation prompts on stage failures in daily.py."
+    },
+    "R4-02": {
+      "desc": "Deployment Gating on Pipeline Success",
+      "status": "PASS",
+      "evidence": "Found deployment execution strictly gated on success boolean."
+    },
+    "R4-03": {
+      "desc": "Excel COM Leak Elimination via DispatchEx & Finally",
+      "status": "PASS",
+      "evidence": "Found win32com.client.DispatchEx and try...finally cleanup in all COM-invoking scripts."
+    },
+    "R4-04": {
+      "desc": "Persistent MRP Shortage Alert Tracking",
+      "status": "PASS",
+      "evidence": "Found persistent MRP shortage scanning and alert generation in daily.py."
+    },
+    "R4-05": {
+      "desc": "Unified OneDrive Destination Path",
+      "status": "PASS",
+      "evidence": "Found unified OneDrive destination directory references."
+    },
+    "R4-06": {
+      "desc": "Non-Destructive Robocopy /E Additive Backup",
+      "status": "PASS",
+      "evidence": "Found Robocopy /E additive mirror flags without destructive /PURGE /MIR in daily routines."
+    },
+    "R4-07": {
+      "desc": "Startup Lockfile Purge & Robocopy Exclusion",
+      "status": "PASS",
+      "evidence": "Found lockfile (~$*) discovery and cleanup in alpha_checks.py."
+    },
+    "R4-08": {
+      "desc": "Synchronized Execution Sequence in Documentation",
+      "status": "PASS",
+      "evidence": "Found synchronized execution steps documented in PIPELINE.md and DAILY_WORKFLOW.md."
+    }
+  },
+  "workbooks_formula_errors": {
+    "August_Plan.xlsx": {
+      "sheets_count": 3,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Pet Format.xlsx": {
+      "sheets_count": 2,
+      "errors_count": 0,
+      "errors": []
+    },
+    "PET_SKUs.xlsx": {
+      "sheets_count": 1,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Production.xlsx": {
+      "sheets_count": 10,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Tubex_Aug26.xlsx": {
+      "sheets_count": 9,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Aerosol\\Aerosol BOM.xlsx": {
+      "sheets_count": 3,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Aerosol\\Aerosol Raw Materials.xlsx": {
+      "sheets_count": 2,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Aerosol\\Aerosol_Job_Card.xlsx": {
+      "sheets_count": 3,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Aerosol\\Aerosol_Production_Entry.xlsx": {
+      "sheets_count": 3,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Aerosol\\Tubex_v10_30.xlsx": {
+      "sheets_count": 9,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Logs\\backup_20260815_Tubex_Aug26.xlsx": {
+      "sheets_count": 8,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Logs\\backup_20260817_Tubex_Aug26.xlsx": {
+      "sheets_count": 8,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Logs\\backup_20260819_Tubex_Aug26.xlsx": {
+      "sheets_count": 9,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Tubex Records\\Dashboard_Archive.xlsx": {
+      "sheets_count": 2,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Tubex Records\\Production report Jan-2026 till Date.xlsx": {
+      "sheets_count": 8,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Tubex Records\\Production_Archive.xlsx": {
+      "sheets_count": 13,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Tubex Records\\Samsol PET Orders.xlsx": {
+      "sheets_count": 1,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Tubex Records\\Samsol_Production_and_Dispatch.xlsx": {
+      "sheets_count": 6,
+      "errors_count": 0,
+      "errors": []
+    },
+    "Tubex Records\\Tubex_July26.xlsx": {
+      "sheets_count": 8,
+      "errors_count": 0,
+      "errors": []
+    }
+  },
+  "dry_run": {},
+  "com_processes": {
+    "status": "ZERO_LINGERING_PROCESSES"
+  },
+  "modernization_specs": {
+    "FP-01_Slugs_Resin_Spec": "PASS",
+    "FP-02_Historical_Month_Spec": "PASS",
+    "4_Pillars_Detailed": "PASS",
+    "High_Impact_Proposals_Count": 16,
+    "Status": "PASS"
+  }
+}

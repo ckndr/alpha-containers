@@ -71,13 +71,14 @@ Inside the Remote Desktop session:
 - Double-click `d:\Alpha\Scripts\Run_All_Updates.bat`
 - Wait for all 5 steps to complete
 - Check that all steps say "OK" (no red `!!` errors)
-- The batch file:
+- The batch / daily pipeline:
   1. Backs up Excel to `Logs/`
-  2. Updates Dispatch from dispatch.xls + dispatch_pet.xls
-  3. Updates Production_Log + FG Stock from Production.xlsx
-  4. Updates Inventory from inventory.xls
+  2. Updates Production_Log + FG Stock from `Production.xlsx`
+  3. Updates Inventory from `inventory.xls`
+  4. Updates Dispatch from `dispatch.xls` + `dispatch_pet.xls`
   5. Sorts Dashboard (active products to top)
-  6. Generates Tubex.html + pushes to GitHub
+  6. Rebuilds historical archives (`build_archives.py`)
+  7. Generates `Tubex.html` + bumps PWA service worker cache (`sw.js`)
 
 ---
 

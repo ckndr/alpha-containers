@@ -184,8 +184,15 @@ def setup_logging():
 # STEP 1: PRE-RUN BACKUP
 # ═══════════════════════════════════════════════════════════════════════════
 def step_backup():
-    header(1, "Pre-run backup...")
+    header(1, "Pre-run backup & workspace cleanup...")
     os.makedirs(LOGS_DIR, exist_ok=True)
+
+    # Clean orphaned Excel lockfiles (Rule R4-07)
+    try:
+        from alpha_checks import cleanup_stale_lockfiles
+        cleanup_stale_lockfiles(ALPHA_DIR)
+    except Exception:
+        pass
 
     date_str = datetime.now().strftime('%Y%m%d')
     excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
@@ -457,6 +464,18 @@ def step_pipeline():
         if result.returncode != 0:
             fail(f"{label} FAILED (exit code {result.returncode})")
             failures.append(label)
+            # R4-01: Interactive prompt to ask operator whether to continue or stop
+            if sys.stdin and sys.stdin.isatty():
+                try:
+                    ans = input(f"\n    [?] {label} failed (exit code {result.returncode}). Do you want to continue anyway? (y/N): ").strip().lower()
+                    if ans not in ('y', 'yes'):
+                        print(f"    Pipeline stopped by user after {label} failure.")
+                        return False
+                except (EOFError, KeyboardInterrupt):
+                    return False
+            else:
+                print(f"    Non-interactive execution: stopping pipeline after {label} failure.")
+                return False
         else:
             ok(label)
 
@@ -467,7 +486,7 @@ def step_pipeline():
         except UnicodeEncodeError:
             print(f"\n    {YELLOW}{'-'*50}")
         print(f"    {BOLD}MISMATCHES DETECTED:{RESET}")
-        with open(mismatch_log, 'r') as f:
+        with open(mismatch_log, 'r', encoding='utf-8', errors='replace') as f:
             for line in f:
                 print(f"    {line.rstrip()}")
         try:
@@ -635,20 +654,34 @@ def step_crosscheck():
                     try: return int(float(str(v).replace(',', '').strip()))
                     except Exception: return 0
 
-                # Define the checks: (Label, Imran Cell, Dash Cell)
+                # Build dynamic label map from Column A of Imran's summary sheet (Rule R1-17)
+                imran_labels = {}
+                for r_idx in range(1, ws_sum.max_row + 1):
+                    val_a = str(ws_sum.cell(row=r_idx, column=1).value or '').strip().lower()
+                    if val_a:
+                        imran_labels[val_a] = r_idx
+
+                def get_imran_cell_and_val(keywords_list, fallback_cell):
+                    for kw_group in keywords_list:
+                        for lbl_text, r_idx in imran_labels.items():
+                            if all(k in lbl_text for k in kw_group):
+                                return f"B{r_idx}", _to_int(ws_sum.cell(row=r_idx, column=2).value)
+                    return fallback_cell, _to_int(ws_sum[fallback_cell].value)
+
+                # Define checks: (Label, Keyword Groups, Fallback Cell, Dash Cell)
                 checks = [
-                    ("Printing Production (Today)", "B14", "B6"),
-                    ("Printing Production (MTD)",   "B15", "D6"),
-                    ("PET Production (Today)",      "B3",  "B8"),
-                    ("PET Production (MTD)",        "B4",  "D8"),
-                    ("Tube Dispatch (MTD)",         "B22", "J6"),
-                    ("PET Dispatch (MTD)",          "B11", "J8"),
+                    ("Printing Production (Today)", [["print", "today"], ["print", "day"]], "B14", "B6"),
+                    ("Printing Production (MTD)",   [["print", "mtd"], ["print", "month"]], "B15", "D6"),
+                    ("PET Production (Today)",      [["pet", "today"], ["pet", "day"]], "B3",  "B8"),
+                    ("PET Production (MTD)",        [["pet", "mtd"], ["pet", "month"]], "B4",  "D8"),
+                    ("Tube Dispatch (MTD)",         [["tube", "disp"], ["dispatch", "tube"]], "B22", "J6"),
+                    ("PET Dispatch (MTD)",          [["pet", "disp"], ["dispatch", "pet"]], "B11", "J8"),
                 ]
 
                 print(f"\n    {DIM}── Summary Sheet ({summary_sheet_name}) vs Dashboard ──{RESET}")
                 summary_mismatches = 0
-                for label, imran_cell, dash_cell in checks:
-                    imran_val = _to_int(ws_sum[imran_cell].value)
+                for label, kw_list, fallback_cell, dash_cell in checks:
+                    imran_cell, imran_val = get_imran_cell_and_val(kw_list, fallback_cell)
                     dash_val = _to_int(ws_dash[dash_cell].value)
                     
                     if imran_val == dash_val:
@@ -835,7 +868,7 @@ def step_onedrive_backup(skip=False):
     onedrive_dir = r"C:\Users\HP\OneDrive\Alpha"
     
     try:
-        cmd = ["robocopy", ALPHA_DIR, onedrive_dir, "/MIR", "/XD", ".git", "Logs", "__pycache__", "/R:1", "/W:1"]
+        cmd = ["robocopy", ALPHA_DIR, onedrive_dir, "/E", "/COPY:DAT", "/DCOPY:DAT", "/XD", ".git", "Logs", "__pycache__", "/XF", "~$*", "/R:1", "/W:1"]
         result = subprocess.run(cmd, capture_output=True)
         if result.returncode < 8:
             ok("Copied to OneDrive ✓")
@@ -932,6 +965,30 @@ def read_mismatches_log(log_path):
 
     current_missing = set()
 
+    # Load required item IDs from active MRP sheet (Rule R1-16 / AUDIT_NOTES.md)
+    mrp_required_items = set()
+    try:
+        from alpha_checks import get_active_tubex_file
+        active_tb = get_active_tubex_file(ALPHA_DIR)
+        if active_tb and os.path.exists(active_tb):
+            wb_mrp = load_workbook(active_tb, data_only=True)
+            if 'MRP' in wb_mrp.sheetnames:
+                ws_m = wb_mrp['MRP']
+                for r_m in range(7, ws_m.max_row + 1):
+                    item_id_val = ws_m.cell(row=r_m, column=1).value
+                    req_qty_val = ws_m.cell(row=r_m, column=5).value
+                    if item_id_val is not None and req_qty_val is not None:
+                        try:
+                            iid = int(float(str(item_id_val).strip()))
+                            rqty = float(str(req_qty_val).replace(',', '').strip())
+                            if rqty > 0:
+                                mrp_required_items.add(str(iid))
+                        except Exception:
+                            pass
+            wb_mrp.close()
+    except Exception:
+        pass
+
     if os.path.exists(log_path):
         with open(log_path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -951,13 +1008,14 @@ def read_mismatches_log(log_path):
                     item_id = m.group(1) if m else None
                     if item_id:
                         current_missing.add(item_id)
+                        # Rule R1-16: Alert only if item is actively required by MRP (> 0)
+                        if mrp_required_items and item_id not in mrp_required_items:
+                            continue
                         
-                    # 2. Hide if already missing yesterday, except exceptions
-                    is_exception = re.search(r'\b(pet resin|master batch|slugs?)\b', lower_clean)
-                    if item_id and item_id in prev_missing and not is_exception:
-                        continue
-                        
-                    inventory_warnings.append(clean)
+                        # Rule R4-04 / Rule R1-16:
+                        # Required items (>0 demand) are ALWAYS alerted without suppression
+                        tag = "[PERSISTENT]" if (item_id in prev_missing) else "[NEW]"
+                        inventory_warnings.append(f"{tag} {clean}")
                 else:
                     mapping_warnings.append(l)
 
@@ -1009,11 +1067,11 @@ def main():
     crosscheck_errors = []
     if success:
         crosscheck_errors = step_crosscheck()  # 6. Cross-check
-        
-    step_screenshot()          # 7. Screenshot
-    step_onedrive_backup()     # 8. OneDrive backup
-    step_git_push(             # 9. Git push
-        skip=skip_git)
+        step_screenshot()                      # 7. Screenshot
+        step_onedrive_backup()                 # 8. OneDrive backup
+        step_git_push(skip=skip_git)           # 9. Git push
+    else:
+        fail("CRITICAL: Core pipeline experienced failure. Skipping OneDrive cloud backup and Git push to protect production integrity.")
 
     elapsed = time.time() - start
 

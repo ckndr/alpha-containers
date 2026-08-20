@@ -27,6 +27,7 @@ from openpyxl.utils import get_column_letter
 
 from parse_legacy_xls import get_legacy_production_records
 from parse_legacy_dispatch import parse_dispatch_xls
+from alpha_checks import get_active_tubex_file
 
 # ============================================================
 #  CONFIGURATION
@@ -36,12 +37,9 @@ MONTH_FILES = [
     ("July 2026",      r"d:\Alpha\Tubex Records\Tubex_July26.xlsx",   7),
 ]
 
-# Dynamically find the active month file in d:\Alpha and append to MONTH_FILES
-import glob
-active_files = sorted(glob.glob(r"d:\Alpha\Tubex_*.xlsx"), key=os.path.getmtime)
-if active_files:
-    latest = active_files[-1]
-    # Simple extraction of month name from filename if possible, else default to current month
+# Dynamically find the active month file in d:\Alpha using standard resolution (Rule R1-22)
+latest = get_active_tubex_file(r"d:\Alpha")
+if latest:
     month_name = datetime.datetime.now().strftime("%B %Y")
     month_num = datetime.datetime.now().month
     if "Aug" in os.path.basename(latest):
@@ -103,14 +101,15 @@ EXCEL_XLSX = 51
 
 def build_dashboard_archive(available_months):
     print("\n[1/5] Building Dashboard_Archive via Excel COM...")
-    xl = win32com.client.Dispatch("Excel.Application")
-    xl.Visible          = False
-    xl.DisplayAlerts    = False
-    xl.AskToUpdateLinks = False
-
+    xl = None
     kpi_data = {}
 
     try:
+        xl = win32com.client.DispatchEx("Excel.Application")
+        xl.Visible          = False
+        xl.DisplayAlerts    = False
+        xl.AskToUpdateLinks = False
+
         if os.path.exists(DASHBOARD_ARCHIVE):
             os.remove(DASHBOARD_ARCHIVE)
         os.makedirs(TEMP_DIR, exist_ok=True)
@@ -177,11 +176,15 @@ def build_dashboard_archive(available_months):
         if archive_wb is not None:
             dest = os.path.abspath(DASHBOARD_ARCHIVE)
             archive_wb.SaveAs(dest, FileFormat=EXCEL_XLSX)
-            archive_wb.Close(SaveChanges=False)
             print(f"\n       [OK] Dashboard_Archive.xlsx saved  ({os.path.getsize(dest)//1024} KB)")
 
     finally:
-        xl.Quit()
+        if xl is not None:
+            try:
+                xl.Quit()
+            except Exception:
+                pass
+        del xl
 
     # Fill KPI data for legacy months from parse_legacy_xls & parse_legacy_dispatch
     legacy_recs = get_legacy_production_records()

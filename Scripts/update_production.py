@@ -514,22 +514,35 @@ def detect_header_row(prod_path):
 
 def parse_date(date_raw):
     import pandas as pd
+    from datetime import datetime, date
+    if date_raw is None:
+        return None
     try:
         if pd.isna(date_raw):
             return None
     except Exception:
         pass
-    try:
-        ts = pd.Timestamp(date_raw)
-        d  = ts.date()
-        if not (2020 <= d.year <= 2035):
-            print("  WARNING: Skipping row -- date out of range (got '%s' -> %s). "
-                  "Check source file for corrupted date values." % (date_raw, d))
+
+    if isinstance(date_raw, datetime):
+        d = date_raw.date()
+    elif isinstance(date_raw, date):
+        d = date_raw
+    else:
+        try:
+            ts = pd.to_datetime(date_raw, dayfirst=True, errors='coerce')
+            if pd.isna(ts):
+                print("  WARNING: Skipping row -- cannot parse date value '%s'." % date_raw)
+                return None
+            d = ts.date()
+        except Exception:
+            print("  WARNING: Skipping row -- cannot parse date value '%s'." % date_raw)
             return None
-        return d
-    except Exception:
-        print("  WARNING: Skipping row -- cannot parse date value '%s'." % date_raw)
+
+    if not (2020 <= d.year <= 2035):
+        print("  WARNING: Skipping row -- date out of range (got '%s' -> %s). "
+              "Check source file for corrupted date values." % (date_raw, d))
         return None
+    return d
 
 
 def read_production_source(prod_path):
@@ -556,6 +569,7 @@ def read_production_source(prod_path):
     rows      = []
     no_pid    = []
     bad_dates = 0
+    session_overrides = {}
 
     for _, r in df.iterrows():
         date_raw    = get_val(r, col_map, 'Date')
@@ -590,6 +604,38 @@ def read_production_source(prod_path):
 
         cust_norm = CUSTOMER_MAP.get(cust_raw.lower().strip(), cust_raw)
 
+        is_varnish = ("(varnish)" in catalog_name.lower() or "(varnish)" in name_raw.lower())
+        if pid is None and not is_varnish:
+            alias_key = (name_raw.lower().strip(), dia_raw)
+            if alias_key in session_overrides:
+                pid = session_overrides[alias_key]
+            else:
+                import sys
+                print("\n" + "="*68)
+                print(f"  [!] UNMAPPED PRODUCT ALIAS DETECTED in Production.xlsx:")
+                print(f"      Product:  '{name_raw}'")
+                print(f"      Diameter: '{dia_raw}'")
+                print(f"      Customer: '{cust_norm}'")
+                print("  Options:")
+                print("    - Enter PID # (e.g. 6515, 8010) to map this product")
+                print("    - Enter 0 (or press Enter) to assign PID=0 (unassigned) and fix later")
+                print("="*68)
+
+                if sys.stdin.isatty():
+                    try:
+                        resp = input(f"  Enter PID for '{name_raw}' [{dia_raw}mm] (default 0): ").strip()
+                        if resp and resp.isdigit():
+                            pid = int(resp)
+                        else:
+                            pid = 0
+                    except (EOFError, KeyboardInterrupt):
+                        pid = 0
+                else:
+                    pid = 0
+                    print(f"  [AUTOMATED RUN] Assigned PID=0 to '{name_raw}' [{dia_raw}mm]")
+
+                session_overrides[alias_key] = pid
+
         if pid is not None and pid in PID_TO_CUSTOMER:
             cust_norm = PID_TO_CUSTOMER[pid]
 
@@ -609,9 +655,8 @@ def read_production_source(prod_path):
             except Exception:
                 return default
 
-        if pid is None:
-            # Varnish passes are supposed to be not counted and do not require a PID
-            if not ("(varnish)" in catalog_name.lower() or "(varnish)" in name_raw.lower()):
+        if pid is None or pid == 0:
+            if not is_varnish:
                 no_pid.append((catalog_name, dia_raw, cust_norm))
 
         rows.append({
@@ -740,7 +785,14 @@ def read_fg_stock(prod_path):
     import pandas as pd
 
     try:
-        df = pd.read_excel(prod_path, sheet_name='FG Stock In hand', header=1)
+        raw_head = pd.read_excel(prod_path, sheet_name='FG Stock In hand', header=None, nrows=5)
+        header_row = 1
+        for i, row in raw_head.iterrows():
+            vals = [str(v).strip().lower() for v in row if pd.notna(v)]
+            if any('product' in v for v in vals) and (any('customer' in v for v in vals) or any('date' in v for v in vals)):
+                header_row = i
+                break
+        df = pd.read_excel(prod_path, sheet_name='FG Stock In hand', skiprows=header_row)
     except Exception as e:
         print(f"  ERROR reading FG Stock In hand sheet: {e}")
         return [], None, []
@@ -750,7 +802,7 @@ def read_fg_stock(prod_path):
         'FG_Qty', 'Prod_Remarks', 'Dispatch_Remarks'
     ] + list(df.columns[8:])
 
-    df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+    df['Date'] = pd.to_datetime(df['Date'], dayfirst=True, errors='coerce')
     df = df[df['Date'].notna()].copy()
     if df.empty:
         print("  WARNING: FG Stock In hand sheet has no valid dates.")
@@ -867,8 +919,9 @@ def write_fg_stock(ac_path, fg_rows, latest_date):
             pass
 
     max_r = ws.max_row
+    max_c = max(ws.max_column or 8, 12)
     for r in range(4, max_r + 1):
-        for c in range(1, 9):
+        for c in range(1, max_c + 1):
             cell = ws.cell(row=r, column=c)
             cell.value  = None
             cell.font   = _font()

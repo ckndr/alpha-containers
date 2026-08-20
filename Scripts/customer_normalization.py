@@ -74,11 +74,18 @@ def normalize_customer_name(raw_name, alpha_dir):
         if raw_upper == mc.upper():
             return mc
             
-    # Partial match check (e.g., "Al-Rehman" in "Al-Rehman Group")
+    # Partial match check (e.g., "Al-Rehman" in "Al-Rehman Group") (Rule R1-21)
+    import re
     for mc in master_list:
-        # Prevent very short matches from overriding
-        if len(raw_upper) > 3 and (mc.upper() in raw_upper or raw_upper in mc.upper()):
-            return mc
+        mc_up = mc.upper()
+        if len(raw_upper) >= 4 and len(mc_up) >= 4:
+            if mc_up in raw_upper:
+                return mc
+            # Check for distinct word match if raw_upper is contained in mc_up
+            mc_words = set(re.findall(r'\b\w+\b', mc_up))
+            raw_words = set(re.findall(r'\b\w+\b', raw_upper))
+            if raw_words and raw_words.issubset(mc_words):
+                return mc
             
     return raw_str
 
