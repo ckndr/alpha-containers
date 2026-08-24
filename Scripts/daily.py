@@ -58,29 +58,33 @@ RESET  = '\033[0m'
 
 TOTAL_STEPS = 9
 
-def ok(msg):
+def safe_print(msg=""):
     try:
-        print(f"    {GREEN}✓{RESET} {msg}")
+        print(msg)
     except UnicodeEncodeError:
-        safe_msg = msg.replace('✓', '[OK]').replace('─', '-').replace('⚠', '[WARN]').replace('✗', '[FAIL]')
-        print(f"    [OK] {safe_msg}")
+        clean = msg.replace('✓', '[OK]').replace('─', '-').replace('⚠', '[WARN]').replace('✗', '[FAIL]')
+        clean = clean.replace('╔', '+').replace('═', '-').replace('╗', '+').replace('║', '|').replace('╚', '+').replace('╝', '+')
+        try:
+            print(clean)
+        except UnicodeEncodeError:
+            enc = getattr(sys.stdout, 'encoding', 'ascii') or 'ascii'
+            print(clean.encode(enc, errors='replace').decode(enc))
+
+def ok(msg):
+    safe_print(f"    {GREEN}✓{RESET} {msg}")
 
 def warn(msg):
-    try:
-        print(f"    {YELLOW}⚠{RESET} {msg}")
-    except UnicodeEncodeError:
-        safe_msg = msg.replace('✓', '[OK]').replace('─', '-').replace('⚠', '[WARN]').replace('✗', '[FAIL]')
-        print(f"    [WARN] {safe_msg}")
+    safe_print(f"    {YELLOW}⚠{RESET} {msg}")
 
 def fail(msg):
-    try:
-        print(f"    {RED}✗{RESET} {msg}")
-    except UnicodeEncodeError:
-        safe_msg = msg.replace('✓', '[OK]').replace('─', '-').replace('⚠', '[WARN]').replace('✗', '[FAIL]')
-        print(f"    [FAIL] {safe_msg}")
+    safe_print(f"    {RED}✗{RESET} {msg}")
 
 def timed_input(prompt, timeout=2.0):
     print(prompt, end='', flush=True)
+    if not sys.stdin or not hasattr(sys.stdin, 'isatty') or not sys.stdin.isatty():
+        print()
+        return None
+
     if sys.platform != 'win32':
         try:
             import select
@@ -96,17 +100,19 @@ def timed_input(prompt, timeout=2.0):
     import msvcrt
     start_time = time.time()
     input_str = ""
-    has_started = False
 
     while True:
-        if not has_started and (time.time() - start_time >= timeout):
+        elapsed = time.time() - start_time
+        if not input_str and elapsed >= timeout:
             print()
             return None
+        if input_str and elapsed >= (timeout + 10.0):
+            print()
+            return input_str.strip()
 
         if msvcrt.kbhit():
-            has_started = True
             ch = msvcrt.getwch()
-            if ch == '\r' or ch == '\n':
+            if ch in ('\r', '\n'):
                 print()
                 return input_str.strip()
             elif ch == '\b':  # Backspace
@@ -114,6 +120,9 @@ def timed_input(prompt, timeout=2.0):
                     input_str = input_str[:-1]
                     sys.stdout.write('\b \b')
                     sys.stdout.flush()
+            elif ch in ('\x00', '\xe0'):  # Special keys
+                if msvcrt.kbhit():
+                    msvcrt.getwch()
             elif ord(ch) >= 32:  # Printable
                 input_str += ch
                 sys.stdout.write(ch)
@@ -315,9 +324,7 @@ def step_find_production(skip=False):
             source_mtime = os.path.getmtime(best_path)
             if target_mtime >= source_mtime:
                 ok(f"Existing {PROD_TARGET_NAME} is already up-to-date")
-                resp = input(f"    {DIM}Replace anyway? [y/N]: {RESET}").strip().lower()
-                if resp not in ('y', 'yes'):
-                    return True
+                return True
 
         # Copy (not move — keep original in Downloads as backup)
         shutil.copy2(best_path, target)
@@ -609,10 +616,7 @@ def step_crosscheck():
 
                     it = int(imran_totals.sum())
                     dt = int(dash_totals.sum())
-                    try:
-                        print(f"    {'─'*52}")
-                    except UnicodeEncodeError:
-                        print(f"    {'-'*52}")
+                    safe_print(f"    {'─'*52}")
 
                     if it == dt:
                         ok(f"{'TOTAL':14s} Imran={it:>8,}  Dashboard={dt:>8,}")
@@ -633,9 +637,16 @@ def step_crosscheck():
         wb_imran = load_workbook(prod_path, data_only=True)
         summary_sheet_name = None
         for name in wb_imran.sheetnames:
-            if name.lower().startswith("summary"):
+            n_low = name.lower().strip()
+            if n_low.startswith("summary") and "downtime" not in n_low:
                 summary_sheet_name = name
                 break
+        if not summary_sheet_name:
+            for name in wb_imran.sheetnames:
+                n_low = name.lower().strip()
+                if "summary" in n_low and "downtime" not in n_low:
+                    summary_sheet_name = name
+                    break
         
         if not summary_sheet_name:
             warn("No Summary sheet found in Production.xlsx")
@@ -654,34 +665,101 @@ def step_crosscheck():
                     try: return int(float(str(v).replace(',', '').strip()))
                     except Exception: return 0
 
-                # Build dynamic label map from Column A of Imran's summary sheet (Rule R1-17)
-                imran_labels = {}
-                for r_idx in range(1, ws_sum.max_row + 1):
-                    val_a = str(ws_sum.cell(row=r_idx, column=1).value or '').strip().lower()
-                    if val_a:
-                        imran_labels[val_a] = r_idx
+                from openpyxl.utils import get_column_letter
 
-                def get_imran_cell_and_val(keywords_list, fallback_cell):
-                    for kw_group in keywords_list:
-                        for lbl_text, r_idx in imran_labels.items():
-                            if all(k in lbl_text for k in kw_group):
-                                return f"B{r_idx}", _to_int(ws_sum.cell(row=r_idx, column=2).value)
-                    return fallback_cell, _to_int(ws_sum[fallback_cell].value)
+                # Dynamic rule-based metric finder in Imran's summary sheet (Rule R1-17)
+                def find_imran_metric(ws, metric_key, fallback_cell):
+                    rules = {
+                        'tube_prod_today': {
+                            'any_type': ['print', 'tube'],
+                            'any_time': ['today', 'day', 'daily'],
+                            'exclude': ['target', 'plan', 'pending', 'average', 'avg', 'require', 'compliance', '%', 'disp', 'dispatch']
+                        },
+                        'tube_prod_mtd': {
+                            'any_type': ['print', 'tube'],
+                            'any_time': ['month', 'monthly', 'mtd', 'total'],
+                            'exclude': ['target', 'plan', 'pending', 'average', 'avg', 'require', 'compliance', '%', 'today', 'day', 'disp', 'dispatch']
+                        },
+                        'pet_prod_today': {
+                            'any_type': ['pet'],
+                            'any_time': ['today', 'day', 'daily'],
+                            'exclude': ['target', 'plan', 'pending', 'average', 'avg', 'require', 'compliance', '%', 'disp', 'dispatch']
+                        },
+                        'pet_prod_mtd': {
+                            'any_type': ['pet'],
+                            'any_time': ['month', 'monthly', 'mtd', 'total'],
+                            'exclude': ['target', 'plan', 'pending', 'average', 'avg', 'require', 'compliance', '%', 'today', 'day', 'disp', 'dispatch']
+                        },
+                        'tube_disp_mtd': {
+                            'any_type': ['disp', 'dispatch'],
+                            'any_time': ['month', 'monthly', 'mtd', 'total'],
+                            'exclude': ['pet', 'target', 'plan', 'pending', 'average', 'avg', 'require', 'compliance', '%', 'today', 'day']
+                        },
+                        'pet_disp_mtd': {
+                            'any_type': ['pet'],
+                            'any_time': ['disp', 'dispatch'],
+                            'any_extra': ['month', 'monthly', 'mtd', 'total'],
+                            'exclude': ['target', 'plan', 'pending', 'average', 'avg', 'require', 'compliance', '%', 'today', 'day']
+                        },
+                    }
+                    cfg = rules.get(metric_key, {})
+                    for r in range(1, ws.max_row + 1):
+                        for c in range(1, min(ws.max_column + 1, 10)):
+                            val = ws.cell(r, c).value
+                            if not val or not isinstance(val, str):
+                                continue
+                            txt = val.strip().lower()
+                            if any(ex in txt for ex in cfg.get('exclude', [])):
+                                continue
+                            if not any(t in txt for t in cfg.get('any_type', [])):
+                                continue
+                            if not any(t in txt for t in cfg.get('any_time', [])):
+                                continue
+                            if 'any_extra' in cfg and not any(t in txt for t in cfg['any_extra']):
+                                continue
+                            
+                            # Found matching label row! Find numeric value across subsequent columns
+                            for val_col in range(c + 1, ws.max_column + 1):
+                                num_val = ws.cell(r, val_col).value
+                                if num_val is not None and not isinstance(num_val, str):
+                                    col_let = get_column_letter(val_col)
+                                    return f"{col_let}{r}", _to_int(num_val)
+                                elif isinstance(num_val, str):
+                                    clean_str = num_val.replace(',', '').strip()
+                                    try:
+                                        int_v = int(float(clean_str))
+                                        col_let = get_column_letter(val_col)
+                                        return f"{col_let}{r}", int_v
+                                    except ValueError:
+                                        pass
+                    # Fallback if no dynamic row matched
+                    return fallback_cell, _to_int(ws[fallback_cell].value)
 
-                # Define checks: (Label, Keyword Groups, Fallback Cell, Dash Cell)
+                # Dynamically locate KPI card rows on Tubex_Dashboard (in top header section before row 10)
+                tube_dash_row = 6
+                pet_dash_row = 8
+                for r_d in range(1, 10):
+                    c_b = str(ws_dash.cell(r_d, 2).value or '').strip().upper()
+                    c_d = str(ws_dash.cell(r_d, 4).value or '').strip().upper()
+                    if 'TUBE' in c_b and ('MTD' in c_d or 'TUBE' in c_d):
+                        tube_dash_row = r_d + 1
+                    elif 'PET' in c_b and ('MTD' in c_d or 'PET' in c_d):
+                        pet_dash_row = r_d + 1
+
+                # Define checks: (Label, Metric Key, Fallback Imran Cell, Dash Cell)
                 checks = [
-                    ("Printing Production (Today)", [["print", "today"], ["print", "day"]], "B14", "B6"),
-                    ("Printing Production (MTD)",   [["print", "mtd"], ["print", "month"]], "B15", "D6"),
-                    ("PET Production (Today)",      [["pet", "today"], ["pet", "day"]], "B3",  "B8"),
-                    ("PET Production (MTD)",        [["pet", "mtd"], ["pet", "month"]], "B4",  "D8"),
-                    ("Tube Dispatch (MTD)",         [["tube", "disp"], ["dispatch", "tube"]], "B22", "J6"),
-                    ("PET Dispatch (MTD)",          [["pet", "disp"], ["dispatch", "pet"]], "B11", "J8"),
+                    ("Printing Production (Today)", "tube_prod_today", "B14", f"B{tube_dash_row}"),
+                    ("Printing Production (MTD)",   "tube_prod_mtd",   "B15", f"D{tube_dash_row}"),
+                    ("PET Production (Today)",      "pet_prod_today",  "B3",  f"B{pet_dash_row}"),
+                    ("PET Production (MTD)",        "pet_prod_mtd",    "B4",  f"D{pet_dash_row}"),
+                    ("Tube Dispatch (MTD)",         "tube_disp_mtd",   "B22", f"J{tube_dash_row}"),
+                    ("PET Dispatch (MTD)",          "pet_disp_mtd",    "B11", f"J{pet_dash_row}"),
                 ]
 
-                print(f"\n    {DIM}── Summary Sheet ({summary_sheet_name}) vs Dashboard ──{RESET}")
+                safe_print(f"\n    {DIM}── Summary Sheet ({summary_sheet_name}) vs Dashboard ──{RESET}")
                 summary_mismatches = 0
-                for label, kw_list, fallback_cell, dash_cell in checks:
-                    imran_cell, imran_val = get_imran_cell_and_val(kw_list, fallback_cell)
+                for label, metric_key, fallback_cell, dash_cell in checks:
+                    imran_cell, imran_val = find_imran_metric(ws_sum, metric_key, fallback_cell)
                     dash_val = _to_int(ws_dash[dash_cell].value)
                     
                     if imran_val == dash_val:
@@ -705,7 +783,7 @@ def step_crosscheck():
 
     # --- Part C: Pending Tube Orders comparison ---
     try:
-        print(f"\n    {DIM}── Pending Tube Orders: MRP vs PENDING ORDER file ──{RESET}")
+        safe_print(f"\n    {DIM}── Pending Tube Orders: MRP vs PENDING ORDER file ──{RESET}")
         pending_files = []
         if os.path.exists(DOWNLOADS_DIR):
             for f in os.listdir(DOWNLOADS_DIR):
@@ -1133,8 +1211,11 @@ def main():
     print(f"  {DIM}  Log: {os.path.basename(log_path)}{RESET}")
     print(f"  {DIM}  Error Summary: {os.path.basename(error_summary_path)}{RESET}")
     print(f"  {'='*52}\n")
-
-    input("  Press Enter to close...")
+    if sys.stdin and sys.stdin.isatty():
+        try:
+            input("  Press Enter to close...")
+        except (EOFError, KeyboardInterrupt):
+            pass
 
 
 if __name__ == '__main__':

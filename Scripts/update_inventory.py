@@ -189,14 +189,8 @@ def update_excel(excel_path, xls_items, date_range):
     wb = load_workbook(excel_path)
     ws = wb['Inventory']
 
-    # Update date range in cell A1 if present (Rule R1-11)
-    if date_range:
-        cell = ws.cell(row=1, column=1)
-        orig_title = str(cell.value or 'Slugs & Raw Materials Inventory').strip()
-        base_title = re.sub(r'[\s\u2014\-\(]+(From|To|\d{1,2}[\-\/]\w+[\-\/]\d{2,4}).*$', '', orig_title).strip()
-        if not base_title:
-            base_title = "Slugs & Raw Materials Inventory"
-        cell.value = f"{base_title} — ({date_range})"
+    # Cell A1 is left static — date is handled by formula in J1 (=TODAY())
+
 
     # Build map of item ID -> row number from Inventory sheet (col A)
     excel_ids = {}

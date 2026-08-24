@@ -85,22 +85,32 @@ NAME_FIXES = {
     # Entries below are safety anchors to make intent explicit.
     "S-43 DIA 19MM":  "S-43 DIA 19MM",   # PID 6623 — identity mapping, safety anchor
     "S-45 DIA 19MM":  "S-45 DIA 19MM",   # PID 6624 — identity mapping, safety anchor
+    "HELLO HAIR":     "HELLO HAIR COLOR", # PID 6206
+    "H.H 100GM":      "H.H 100GM",        # PID 6515
 
     # PET products -- ERP uses a different naming convention than catalog
-    "BT-120 ML YELLOW":                                       "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — ERP name
-    "BT-120ML YELLOW":                                        "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — ERP name without space
-    "PET BOTTLE SMALL (120 ML) YELLOW":                       "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — ERP space: "120 ML" vs "120ML"
-    "YELLOW SMALL BOTTLE 120ML":                              "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — old catalog name synonym
-    "BT-200 ML YELLOW":                                       "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — ERP name synonym
-    "BT-200ML YELLOW":                                        "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — ERP name synonym without space
-    "PET BOTTLE LARGE 200ML YELLOW":                          "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — variant name
-    "YELLOW LARGE BOTTLE 200ML":                              "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — old catalog name synonym
-    "YELLOW BOTTLE 200ML":                                    "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — variant name
-    "PET BOTTLE SMALL (120ML) COMPACT BLACK":                 "BLACK SMALL BOTTLE 120ML",
-    # Added v8 — ERP names confirmed from dispatch mismatch log
-    "PET BOTTLE (150ML)TRANSPARENT BODY MIST":                "TRANSPARENT BOTTLE 150ML",          # PID 8001 — ERP appends "Body Mist" suffix
-    "PET BOTTLE SMALL (130 ML) (TRANSPARENT) (WITHOUT CAP)":  "PET BOTTLE SMALL (130ML) TRANSPARENT",  # PID 8010 — ERP adds "(WITHOUT CAP)"
-    "PET BOTTLE 130 ML WHITE":                                "PET BOTTLE 130ML WHITE",              # PID 8015 — ERP space: "130 ML" vs "130ML"
+    "BT-120 ML YELLOW":                                       "Samsol Yellow 120ml",   # PID 8005 — ERP name
+    "BT-120ML YELLOW":                                        "Samsol Yellow 120ml",   # PID 8005 — ERP name without space
+    "PET BOTTLE SMALL (120 ML) YELLOW":                       "Samsol Yellow 120ml",   # PID 8005 — ERP space: "120 ML" vs "120ML"
+    "YELLOW SMALL BOTTLE 120ML":                              "Samsol Yellow 120ml",   # PID 8005 — old catalog name synonym
+    "BT-200 ML YELLOW":                                       "Samsol Yellow 200ml",   # PID 8006 — ERP name synonym
+    "BT-200ML YELLOW":                                        "Samsol Yellow 200ml",   # PID 8006 — ERP name synonym without space
+    "PET BOTTLE LARGE 200ML YELLOW":                          "Samsol Yellow 200ml",   # PID 8006 — variant name
+    "PET BOTTLE LARGE (200 ML) YELLOW":                       "Samsol Yellow 200ml",   # PID 8006 — variant name
+    "YELLOW LARGE BOTTLE 200ML":                              "Samsol Yellow 200ml",   # PID 8006 — old catalog name synonym
+    "YELLOW BOTTLE 200ML":                                    "Samsol Yellow 200ml",   # PID 8006 — variant name
+    "PET BOTTLE SMALL (120ML) COMPACT BLACK":                 "Samsol Black 120ml",
+    "BLACK SMALL BOTTLE 120ML":                               "Samsol Black 120ml",
+    "WHITE SMALL BOTTLE 120ML":                               "Samsol White 120ml",
+    "TRANSPARENT BOTTLE 150ML":                               "Alpha 150ml TRP",
+    "PET BOTTLE (150ML)TRANSPARENT BODY MIST":                "Alpha 150ml TRP",       # PID 8001
+    "PET BOTTLE SMALL (130 ML) (TRANSPARENT) (WITHOUT CAP)":  "Mablay 130ml TRP",      # PID 8010 — ERP adds "(WITHOUT CAP)"
+    "PET BOTTLE SMALL (130ML) TRANSPARENT":                   "Mablay 130ml TRP",
+    "TRANSPARENT BOTTLE 130ML":                               "Mablay 130ml TRP",
+    "PET BOTTLE 130 ML WHITE":                                "Mablay 130ml White",    # PID 8015 — ERP space: "130 ML" vs "130ML"
+    "PET BOTTLE 130ML WHITE":                                 "Mablay 130ml White",
+    "TRANSPARENT BOTTLE 300ML":                               "Mablay 300ml TRP",
+    "TRANSPARENT JAR 500ML":                                  "Mablay 500ml Jar TRP",
 }
 
 
@@ -145,14 +155,31 @@ def load_catalog(wb):
     return catalog
 
 
-def resolve_pid(erp_name, catalog):
+def resolve_pid(product_entry, catalog):
     """
-    Given an ERP dispatch product name, return (catalog_name, pid) or (erp_name, None).
-    1. Check NAME_FIXES for a known ERP->catalog name translation.
-    2. Use the resulting name for case-insensitive catalog lookup.
+    Given an ERP dispatch product entry (either string or (product_name, party_name)),
+    return (catalog_name, pid) or (erp_name, None).
     """
+    party_name = ""
+    if isinstance(product_entry, tuple):
+        erp_name, party_name = product_entry
+    else:
+        erp_name = str(product_entry)
+
+    party_upper = party_name.upper()
+    erp_upper = erp_name.upper()
+
+    # 1. Party-specific disambiguation (e.g. Horizon vs Alpha for 150ml body mist)
+    if "HORIZON" in party_upper and ("150" in erp_upper or "BODY MIST" in erp_upper):
+        return "Horizon 150ml TRP", 8017
+    if "ALPHA" in party_upper and ("150" in erp_upper or "BODY MIST" in erp_upper):
+        return "Alpha 150ml TRP", 8001
+
+    # 2. Check NAME_FIXES
     catalog_name = NAME_FIXES.get(erp_name, erp_name)
     pid = catalog.get(catalog_name.upper())
+    if pid is None:
+        pid = catalog.get(erp_upper)
     return catalog_name, pid
 
 
@@ -160,7 +187,7 @@ def parse_dispatch_file(path):
     """
     Parse one ERP dispatch .xls (Date Wise format).
     Ignores any dispatch rows matching the current day (Rule R1-06 / AUDIT_NOTES.md).
-    Returns {product_name: total_dispatched_qty}.
+    Returns {(product_name, party_name): total_dispatched_qty}.
     """
     import xlrd
     df = pd.read_excel(path, sheet_name=0, engine='xlrd', header=None)
@@ -186,15 +213,17 @@ def parse_dispatch_file(path):
         today.strftime("%d/%m/%y").lower()
     ]
 
-    # Dynamically detect dispatch quantity column (Rule R1-07)
+    # Dynamically detect dispatch quantity and party columns (Rule R1-07)
     col_disp_idx = 7
+    col_party_idx = 12
     for idx, r in df.iterrows():
         row_str = [str(x).lower().strip() for x in r.values if pd.notna(x)]
         if any('disp' in s and 'qty' in s for s in row_str):
             for i, s in enumerate(r.values):
                 if pd.notna(s) and 'disp' in str(s).lower() and 'qty' in str(s).lower():
                     col_disp_idx = i
-                    break
+                elif pd.notna(s) and 'party' in str(s).lower():
+                    col_party_idx = i
             break
 
     for _, row in df.iterrows():
@@ -263,9 +292,11 @@ def parse_dispatch_file(path):
                 ignored_today += 1
                 continue
 
+            party_name = str(row[col_party_idx]).strip() if col_party_idx < len(row) and pd.notna(row[col_party_idx]) else ""
             disp_qty = float(col_disp)
             if current_product is not None:
-                result[current_product] = result.get(current_product, 0) + disp_qty
+                key = (current_product, party_name) if party_name else current_product
+                result[key] = result.get(key, 0) + disp_qty
         except (ValueError, TypeError):
             pass
 
@@ -373,22 +404,24 @@ def main():
     print("")
     print("  TUBE dispatches (TUBEX-ALUM):")
     tube_total = 0
-    for product in sorted(tube_dispatch):
+    for product in sorted(tube_dispatch, key=lambda x: str(x)):
         qty           = tube_dispatch[product]
         cat_name, pid = resolve_pid(product, catalog)
+        disp_name     = f"{product[0]} ({product[1]})" if isinstance(product, tuple) else str(product)
         flag = ("-> matched: %s (PID %s)" % (cat_name, pid)) if pid else "-> !! NOT IN CATALOG"
-        print("    %-45s %9d  %s" % (product, int(qty), flag))
+        print("    %-45s %9d  %s" % (disp_name[:45], int(qty), flag))
         tube_total += qty
     print("    %-45s %9d" % ("GRAND TOTAL", int(tube_total)))
 
     print("")
     print("  PET dispatches (TUBEX-PET):")
     pet_total = 0
-    for product in sorted(pet_dispatch):
+    for product in sorted(pet_dispatch, key=lambda x: str(x)):
         qty           = pet_dispatch[product]
         cat_name, pid = resolve_pid(product, catalog)
+        disp_name     = f"{product[0]} ({product[1]})" if isinstance(product, tuple) else str(product)
         flag = ("-> matched: %s (PID %s)" % (cat_name, pid)) if pid else "-> !! NOT IN CATALOG"
-        print("    %-45s %9d  %s" % (product, int(qty), flag))
+        print("    %-45s %9d  %s" % (disp_name[:45], int(qty), flag))
         pet_total += qty
     print("    %-45s %9d" % ("GRAND TOTAL", int(pet_total)))
 

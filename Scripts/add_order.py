@@ -91,6 +91,24 @@ def backup_workbook(filepath):
     return backup_path
 
 
+PET_SHORT_NAMES = {
+    8001: "Alpha 150ml TRP",
+    8005: "Samsol Yellow 120ml",
+    8006: "Samsol Yellow 200ml",
+    8007: "Samsol White 200ml",
+    8008: "Samsol Black 200ml",
+    8009: "Mablay 300ml TRP",
+    8010: "Mablay 130ml TRP",
+    8011: "Samsol Black 120ml",
+    8012: "Samsol White 120ml",
+    8013: "Mablay 500ml Jar TRP",
+    8014: "Samsol Mustard Oil 200ml TRP",
+    8015: "Mablay 130ml White",
+    8016: "Samsol Coconut Oil 200ml White",
+    8017: "Horizon 150ml TRP",
+}
+
+
 def load_product_catalog(wb):
     """Reads Product_Catalog to map PIDs, Names, Customers, Dia, Category."""
     catalog = {}
@@ -110,12 +128,14 @@ def load_product_catalog(wb):
         dia      = ws_cat.cell(r, 5).value
 
         p_type = 'PET' if (8000 <= pid_int <= 8999 or 'PET' in pname.upper() or 'BOTTLE' in pname.upper() or (isinstance(dia, str) and 'ML' in dia.upper())) else 'TUBE'
+        display_name = PET_SHORT_NAMES.get(pid_int, pname) if p_type == 'PET' else pname
 
         catalog[pid_int] = {
             'pid': pid_int,
             'bom_id': bom_id,
             'customer': customer,
-            'product_name': pname,
+            'product_name': display_name,
+            'raw_product_name': pname,
             'dia': dia,
             'type': p_type
         }
@@ -136,11 +156,16 @@ def resolve_product(catalog, search_term):
 
     # 2. Exact name match (case-insensitive)
     for prod in catalog.values():
-        if prod['product_name'].upper() == search_str.upper():
+        if prod['product_name'].upper() == search_str.upper() or prod.get('raw_product_name', '').upper() == search_str.upper():
             return prod
 
     # 3. Substring match
-    matches = [prod for prod in catalog.values() if search_str.upper() in prod['product_name'].upper() or search_str.upper() in prod['customer'].upper()]
+    matches = [
+        prod for prod in catalog.values()
+        if search_str.upper() in prod['product_name'].upper()
+        or search_str.upper() in prod.get('raw_product_name', '').upper()
+        or search_str.upper() in prod['customer'].upper()
+    ]
     if len(matches) == 1:
         return matches[0]
     elif len(matches) > 1:
@@ -156,17 +181,24 @@ def resolve_product(catalog, search_term):
         return None
 
     # 4. Fuzzy match
-    names = [p['product_name'] for p in catalog.values()]
+    names = [p['product_name'] for p in catalog.values()] + [p.get('raw_product_name', '') for p in catalog.values() if p.get('raw_product_name')]
     close = difflib.get_close_matches(search_str, names, n=3, cutoff=0.4)
     if close:
-        matched_prods = [p for p in catalog.values() if p['product_name'] in close]
+        matched_prods = [p for p in catalog.values() if p['product_name'] in close or p.get('raw_product_name') in close]
+        # Remove duplicates
+        seen_pids = set()
+        unique_matched = []
+        for p in matched_prods:
+            if p['pid'] not in seen_pids:
+                seen_pids.add(p['pid'])
+                unique_matched.append(p)
         print(f"\n[SEARCH] Close matches found for '{search_str}':")
-        for idx, m in enumerate(matched_prods, 1):
+        for idx, m in enumerate(unique_matched, 1):
             print(f"  [{idx}] PID: {m['pid']} | {m['product_name']} ({m['customer']}) - {m['type']} {m['dia']}")
         try:
-            choice = input(f"Select product [1-{len(matched_prods)}] (or Enter to cancel): ").strip()
-            if choice.isdigit() and 1 <= int(choice) <= len(matched_prods):
-                return matched_prods[int(choice) - 1]
+            choice = input(f"Select product [1-{len(unique_matched)}] (or Enter to cancel): ").strip()
+            if choice.isdigit() and 1 <= int(choice) <= len(unique_matched):
+                return unique_matched[int(choice) - 1]
         except (EOFError, KeyboardInterrupt):
             pass
 

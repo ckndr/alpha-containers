@@ -21,9 +21,9 @@
     • [PERSISTENT] Item ID 6971 (M-9 S/M SPR WHITE DIA 20.5MM) [Cap] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
 
   [CROSS-CHECK MISMATCHES]
-    • Summary mismatch - Printing Production (MTD): Imran=259,160, Dashboard=212,464 (diff=-46,696)
-    • Summary mismatch - PET Production (MTD): Imran=767,377, Dashboard=61,640 (diff=-705,737)
-    • Summary mismatch - Tube Dispatch (MTD): Imran=0, Dashboard=164,682 (diff=+164,682)
-    • Summary mismatch - PET Dispatch (MTD): Imran=22,080, Dashboard=53,360 (diff=+31,280)
-    • Pending Tube Orders mismatch: PENDING ORDER AUGUST 2026 (8).xlsx (13-08-2026)=131,840, MRP Sheet=107,458 (diff=+24,382)
+    • Pending Tube Orders mismatch: PENDING ORDER AUGUST 2026 (9).xlsx (20-08-2026)=124,938, MRP Sheet=125,736 (diff=-798)
+
+  [MAPPING MISMATCHES]
+    (Unmapped products found during production/dispatch/FG processing)
+    • PET BOTTLE (150ML)TRANSPARENT BODY MIST | TRANSPARENT BOTTLE 150ML | 53360.0
 
