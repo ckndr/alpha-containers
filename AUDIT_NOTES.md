@@ -44,12 +44,12 @@ This document serves as a permanent reference explaining intentional design deci
 
 ---
 
-## 5. MRP-Gated Missing Item Alerts (Rule R1-16)
+## 5. Critical Material-Gated Missing Item Alerts (Rule R1-16)
 
-- **Behavior**: When reviewing inventory discrepancies in `daily.py`, missing raw material items are only flagged as alerts if the item is **actively required by the Material Requirement Plan** (`MRP Required Qty > 0`).
+- **Behavior**: When reviewing inventory discrepancies in `daily.py` and `update_inventory.py`, missing raw material items are only flagged as alerts if the item is a critical core raw material (**Slugs** or **Resin**). All other inactive items are quietly zeroed out (`0.0`), styled in RED, and marked with `"Not active in ERP"` in Column K of the Excel sheet without cluttering daily console output or error summaries.
 - **Operational Rationale**:
-  - Many historical or inactive raw materials exist in catalog master records with zero current demand. Alerting on unneeded missing items causes alert fatigue and obscures genuine shortages.
-  - If an item has `Required Qty == 0` (or "Not needed" status in MRP), the alert is kept silent. Only items with actual open order demand trigger warnings.
+  - Many auxiliary or non-urgent raw materials (cartons, caps, lacquers, inks) exist in catalog master records that are not active in daily ERP exports. Alerting on all unneeded missing items causes alert fatigue and obscures genuine critical material shortages.
+  - Slugs and Resin represent the primary core constraints and are alerted immediately if missing. All other items can be reviewed directly in the Inventory sheet.
 
 ---
 

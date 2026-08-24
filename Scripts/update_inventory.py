@@ -258,15 +258,18 @@ def update_excel(excel_path, xls_items, date_range):
 
     # Find missing items (present in Inventory sheet but missing from new inventory.xls)
     missing_items = []
-    missing_slugs = []
+    missing_critical = []
     for item_id, row in sorted(excel_ids.items()):
         if item_id not in xls_items:
-            name_val = ws.cell(row=row, column=3).value
-            cat_val = ws.cell(row=row, column=2).value
-            missing_items.append((item_id, str(name_val or '').strip(), str(cat_val or '').strip()))
+            name_val = str(ws.cell(row=row, column=3).value or '').strip()
+            cat_val = str(ws.cell(row=row, column=2).value or '').strip()
+            missing_items.append((item_id, name_val, cat_val))
             
-            if str(cat_val or '').strip().lower() == 'slug':
-                missing_slugs.append((item_id, str(name_val or '').strip()))
+            # Identify Slugs or Resin as critical items for warnings
+            c_low = cat_val.lower()
+            n_low = name_val.lower()
+            if 'slug' in c_low or 'resin' in c_low or 'slug' in n_low or 'resin' in n_low:
+                missing_critical.append((item_id, name_val, cat_val))
 
             # ZERO OUT VALUES TO PREVENT PHANTOM STOCK (Rule R1-02 / AUDIT_NOTES.md:
             # ERP drops inactive items with 0 balance; setting to 0 ensures accurate stock status)
@@ -295,7 +298,7 @@ def update_excel(excel_path, xls_items, date_range):
 
     # Overwrite same file
     wb.save(excel_path)
-    return updated, not_in_excel, missing_slugs, missing_items
+    return updated, not_in_excel, missing_critical, missing_items
 
 
 def main():
@@ -323,7 +326,7 @@ def main():
 
     print("")
     print("[3/3] Updating Excel...")
-    updated, not_in_excel, missing_slugs, missing_items = update_excel(excel_path, xls_items, date_range)
+    updated, not_in_excel, missing_critical, missing_items = update_excel(excel_path, xls_items, date_range)
     print("  Saved: " + os.path.basename(excel_path))
 
     # ── Post-write validation ────────────────────────────────────────────
@@ -344,18 +347,23 @@ def main():
     except Exception as e:
         print(f"  !! Validation error: {e}")
 
-    if missing_items:
+    # Highlight only critical missing items (Slugs / Resin) to the operator
+    if missing_critical:
         print("")
-        print("  !! WARNING: %d item(s) missing from inventory.xls (ZEROED OUT and highlighted RED):" % len(missing_items))
-        for item_id, name, cat in sorted(missing_items, key=lambda x: x[0]):
+        print("  !! WARNING: %d critical item(s) (Slug/Resin) missing from inventory.xls (ZEROED OUT and highlighted RED):" % len(missing_critical))
+        for item_id, name, cat in sorted(missing_critical, key=lambda x: x[0]):
             print("     - ID %5d [%s]: %s" % (item_id, cat, name))
         print("  !! Please take a look.")
 
-        # Log to mismatches.log so that Run_All_Updates.bat prints it at the end
+        # Log to mismatches.log so that daily.py prints it at the end
         mismatch_entries = []
-        for item_id, name, cat in sorted(missing_items, key=lambda x: x[0]):
+        for item_id, name, cat in sorted(missing_critical, key=lambda x: x[0]):
             mismatch_entries.append((f"WARNING: Item ID {item_id} ({name}) [{cat}] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED",))
         log_mismatches("inventory", mismatch_entries)
+
+    non_critical_count = len(missing_items) - len(missing_critical)
+    if non_critical_count > 0:
+        print(f"  Note: {non_critical_count} non-urgent inactive item(s) zeroed in Excel with 'Not active in ERP' remarks.")
 
     print("")
     print(SEP)

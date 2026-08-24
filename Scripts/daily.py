@@ -1077,8 +1077,9 @@ def read_mismatches_log(log_path):
                     clean = l.replace('WARNING:', '').strip()
                     lower_clean = clean.lower()
                     
-                    # 1. Ignore INKs completely in daily summary
-                    if re.search(r'\binks?\b', lower_clean):
+                    # Only highlight Slugs or Resin in daily summary
+                    is_slug_or_resin = 'slug' in lower_clean or 'resin' in lower_clean
+                    if not is_slug_or_resin:
                         continue
                         
                     # Extract ID
@@ -1086,12 +1087,6 @@ def read_mismatches_log(log_path):
                     item_id = m.group(1) if m else None
                     if item_id:
                         current_missing.add(item_id)
-                        # Rule R1-16: Alert only if item is actively required by MRP (> 0)
-                        if mrp_required_items and item_id not in mrp_required_items:
-                            continue
-                        
-                        # Rule R4-04 / Rule R1-16:
-                        # Required items (>0 demand) are ALWAYS alerted without suppression
                         tag = "[PERSISTENT]" if (item_id in prev_missing) else "[NEW]"
                         inventory_warnings.append(f"{tag} {clean}")
                 else:
@@ -1180,7 +1175,7 @@ def main():
                 print_both()
                 
             if inv_warns:
-                print_both(f"  {RED}{BOLD}[INVENTORY: ITEMS MISSING FROM ERP]{RESET}")
+                print_both(f"  {RED}{BOLD}[INVENTORY: CRITICAL ITEMS (SLUG/RESIN) MISSING FROM ERP]{RESET}")
                 print_both(f"  {DIM}  (These rows are highlighted in RED in Excel and zeroed out){RESET}")
                 for err in inv_warns:
                     print_both(f"    • {err}")
