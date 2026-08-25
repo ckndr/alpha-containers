@@ -128,14 +128,12 @@ def load_product_catalog(wb):
         dia      = ws_cat.cell(r, 5).value
 
         p_type = 'PET' if (8000 <= pid_int <= 8999 or 'PET' in pname.upper() or 'BOTTLE' in pname.upper() or (isinstance(dia, str) and 'ML' in dia.upper())) else 'TUBE'
-        display_name = PET_SHORT_NAMES.get(pid_int, pname) if p_type == 'PET' else pname
 
         catalog[pid_int] = {
             'pid': pid_int,
             'bom_id': bom_id,
             'customer': customer,
-            'product_name': display_name,
-            'raw_product_name': pname,
+            'product_name': pname,
             'dia': dia,
             'type': p_type
         }
@@ -322,7 +320,17 @@ def update_pet_material_formulas(ws_mrp, pet_start, pet_end, pet_items_start, pe
         f_stat = f'=IF(E{r}=0,"Not needed",IF(G{r}<0,"SHORTAGE",IF(G{r}<F{r}*0.1,"LOW","OK")))'
         ws_mrp.cell(r, 9, f_stat)
 
-        pname_conds = ' & '.join([f'IF((COUNTIFS(TableBOM[Product ID],$D${pr},TableBOM[Item ID],$A{r})>0)*($H${pr}>0),$C${pr}&", ","")' for pr in range(pet_start, pet_end + 1)])
+        pet_order_names = []
+        for pr in range(pet_start, pet_end + 1):
+            pid_val = ws_mrp.cell(pr, 4).value
+            try:
+                pid_int = int(pid_val)
+                sname = PET_SHORT_NAMES.get(pid_int, str(ws_mrp.cell(pr, 3).value or ''))
+            except (ValueError, TypeError):
+                sname = str(ws_mrp.cell(pr, 3).value or '')
+            pet_order_names.append((pr, sname))
+
+        pname_conds = ' & '.join([f'IF((COUNTIFS(TableBOM[Product ID],$D${pr},TableBOM[Item ID],$A{r})>0)*($H${pr}>0),"{sname}, ","")' for pr, sname in pet_order_names])
         f_pnames = f'=IF(LEN({pname_conds})>1,LEFT({pname_conds},LEN({pname_conds})-2),"")'
         ws_mrp.cell(r, 10, f_pnames)
 

@@ -89,28 +89,25 @@ NAME_FIXES = {
     "H.H 100GM":      "H.H 100GM",        # PID 6515
 
     # PET products -- ERP uses a different naming convention than catalog
-    "BT-120 ML YELLOW":                                       "Samsol Yellow 120ml",   # PID 8005 — ERP name
-    "BT-120ML YELLOW":                                        "Samsol Yellow 120ml",   # PID 8005 — ERP name without space
-    "PET BOTTLE SMALL (120 ML) YELLOW":                       "Samsol Yellow 120ml",   # PID 8005 — ERP space: "120 ML" vs "120ML"
-    "YELLOW SMALL BOTTLE 120ML":                              "Samsol Yellow 120ml",   # PID 8005 — old catalog name synonym
-    "BT-200 ML YELLOW":                                       "Samsol Yellow 200ml",   # PID 8006 — ERP name synonym
-    "BT-200ML YELLOW":                                        "Samsol Yellow 200ml",   # PID 8006 — ERP name synonym without space
-    "PET BOTTLE LARGE 200ML YELLOW":                          "Samsol Yellow 200ml",   # PID 8006 — variant name
-    "PET BOTTLE LARGE (200 ML) YELLOW":                       "Samsol Yellow 200ml",   # PID 8006 — variant name
-    "YELLOW LARGE BOTTLE 200ML":                              "Samsol Yellow 200ml",   # PID 8006 — old catalog name synonym
-    "YELLOW BOTTLE 200ML":                                    "Samsol Yellow 200ml",   # PID 8006 — variant name
-    "PET BOTTLE SMALL (120ML) COMPACT BLACK":                 "Samsol Black 120ml",
-    "BLACK SMALL BOTTLE 120ML":                               "Samsol Black 120ml",
-    "WHITE SMALL BOTTLE 120ML":                               "Samsol White 120ml",
-    "TRANSPARENT BOTTLE 150ML":                               "Alpha 150ml TRP",
-    "PET BOTTLE (150ML)TRANSPARENT BODY MIST":                "Alpha 150ml TRP",       # PID 8001
-    "PET BOTTLE SMALL (130 ML) (TRANSPARENT) (WITHOUT CAP)":  "Mablay 130ml TRP",      # PID 8010 — ERP adds "(WITHOUT CAP)"
-    "PET BOTTLE SMALL (130ML) TRANSPARENT":                   "Mablay 130ml TRP",
-    "TRANSPARENT BOTTLE 130ML":                               "Mablay 130ml TRP",
-    "PET BOTTLE 130 ML WHITE":                                "Mablay 130ml White",    # PID 8015 — ERP space: "130 ML" vs "130ML"
-    "PET BOTTLE 130ML WHITE":                                 "Mablay 130ml White",
-    "TRANSPARENT BOTTLE 300ML":                               "Mablay 300ml TRP",
-    "TRANSPARENT JAR 500ML":                                  "Mablay 500ml Jar TRP",
+    "BT-120 ML YELLOW":                                       "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — ERP name
+    "BT-120ML YELLOW":                                        "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — ERP name without space
+    "PET BOTTLE SMALL (120 ML) YELLOW":                       "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — ERP space: "120 ML" vs "120ML"
+    "YELLOW SMALL BOTTLE 120ML":                              "PET BOTTLE SMALL (120ML) YELLOW",   # PID 8005 — old catalog name synonym
+    "BT-200 ML YELLOW":                                       "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — ERP name synonym
+    "BT-200ML YELLOW":                                        "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — ERP name synonym without space
+    "PET BOTTLE LARGE 200ML YELLOW":                          "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — variant name
+    "PET BOTTLE LARGE (200 ML) YELLOW":                       "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — variant name
+    "YELLOW LARGE BOTTLE 200ML":                              "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — old catalog name synonym
+    "YELLOW BOTTLE 200ML":                                    "PET BOTTLE LARGE (200 ML) YELLOW",  # PID 8006 — variant name
+    "PET BOTTLE SMALL (120ML) COMPACT BLACK":                 "BLACK SMALL BOTTLE 120ML",
+    "BLACK SMALL BOTTLE 120ML":                               "BLACK SMALL BOTTLE 120ML",
+    "WHITE SMALL BOTTLE 120ML":                               "WHITE SMALL BOTTLE 120ML",
+    "TRANSPARENT BOTTLE 150ML":                               "TRANSPARENT BOTTLE 150ML",
+    "PET BOTTLE (150ML)TRANSPARENT BODY MIST":                "TRANSPARENT BOTTLE 150ML",          # PID 8001 fallback
+    "PET BOTTLE SMALL (130 ML) (TRANSPARENT) (WITHOUT CAP)":  "PET BOTTLE SMALL (130ML) TRANSPARENT",  # PID 8010 — ERP adds "(WITHOUT CAP)"
+    "PET BOTTLE SMALL (130ML) TRANSPARENT":                   "PET BOTTLE SMALL (130ML) TRANSPARENT",
+    "PET BOTTLE 130 ML WHITE":                                "PET BOTTLE 130ML WHITE",              # PID 8015 — ERP space: "130 ML" vs "130ML"
+    "PET BOTTLE 130ML WHITE":                                 "PET BOTTLE 130ML WHITE",
 }
 
 
@@ -171,9 +168,9 @@ def resolve_pid(product_entry, catalog):
 
     # 1. Party-specific disambiguation (e.g. Horizon vs Alpha for 150ml body mist)
     if "HORIZON" in party_upper and ("150" in erp_upper or "BODY MIST" in erp_upper):
-        return "Horizon 150ml TRP", 8017
+        return "PET BOTTLE (150ML)TRANSPARENT BODY MIST", 8017
     if "ALPHA" in party_upper and ("150" in erp_upper or "BODY MIST" in erp_upper):
-        return "Alpha 150ml TRP", 8001
+        return "TRANSPARENT BOTTLE 150ML", 8001
 
     # 2. Check NAME_FIXES
     catalog_name = NAME_FIXES.get(erp_name, erp_name)
