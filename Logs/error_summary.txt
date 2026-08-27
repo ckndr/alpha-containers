@@ -4,5 +4,5 @@
   ╚══════════════════════════════════════════════════════════╝
 
   [CROSS-CHECK MISMATCHES]
-    • Pending Tube Orders mismatch: PENDING ORDER AUGUST 2026 (11).xlsx (22-08-2026)=77,814, MRP Sheet=78,612 (diff=-798)
+    • Pending Tube Orders mismatch: PENDING ORDER AUGUST 2026 (12).xlsx (24-08-2026)=60,678, MRP Sheet=61,476 (diff=-798)
 
