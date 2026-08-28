@@ -4,5 +4,9 @@
   ╚══════════════════════════════════════════════════════════╝
 
   [CROSS-CHECK MISMATCHES]
-    • Pending Tube Orders mismatch: PENDING ORDER AUGUST 2026 (12).xlsx (24-08-2026)=60,678, MRP Sheet=61,476 (diff=-798)
+    • Pending Tube Orders mismatch: PENDING ORDER AUGUST 2026 (12).xlsx (24-08-2026)=60,678, MRP Sheet=43,668 (diff=+17,010)
+
+  [MAPPING MISMATCHES]
+    (Unmapped products found during production/dispatch/FG processing)
+    • Samsol 43 | dia 25 | Samsol
 
