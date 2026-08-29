@@ -3,6 +3,10 @@
   ║  ⚠ DAILY WORKFLOW ERROR SUMMARY                          ║
   ╚══════════════════════════════════════════════════════════╝
 
-  [SYSTEM / FILE CHECK ISSUES]
-    • Pipeline execution had failures (one or more scripts failed)
+  [CROSS-CHECK MISMATCHES]
+    • Pending Tube Orders mismatch: PENDING ORDER AUGUST 2026 (13).xlsx (27-08-2026)=49,968, MRP Sheet=32,958 (diff=+17,010)
+
+  [MAPPING MISMATCHES]
+    (Unmapped products found during production/dispatch/FG processing)
+    • Samsol 43 | dia 25 | Samsol
 

@@ -138,6 +138,7 @@ KEY BUSINESS RULES:
 """
 
 import os
+import json
 import openpyxl
 import re
 import glob
@@ -223,6 +224,7 @@ ALIASES = {
     # ── PET (PF Machine — all placeholder BOMs) ─────────────────────────────
     ("transparent bottle",        "150 ml"): ("TRANSPARENT BOTTLE 150ML",          8001),
     ("transparent bottle",        "300 ml"): ("TRANSPARENT BOTTLE 300ML",          8009),
+    ("yellow small",              "120 ml"): ("PET BOTTLE SMALL (120ML) YELLOW",   8005),
     ("yellow small bottle",       "120 ml"): ("PET BOTTLE SMALL (120ML) YELLOW",   8005),
     ("yellow bottle",             "120 ml"): ("PET BOTTLE SMALL (120ML) YELLOW",   8005),
     ("bt-120 ml yellow",          "120 ml"): ("PET BOTTLE SMALL (120ML) YELLOW",   8005),
@@ -312,7 +314,9 @@ FG_ALIASES = {
     ("trp bottle",       "150ml","alpha lab"):       ("TRANSPARENT BOTTLE 150ML",           8001),
     ("trp bottle",      "150ml", "alpha labs pvt ltd"): ("TRANSPARENT BOTTLE 150ML",        8001),
     ("yellow bottle",   "120ml", "samsol"):          ("PET BOTTLE SMALL (120ML) YELLOW",    8005),
+    ("yellow small",    "120ml", "samsol"):          ("PET BOTTLE SMALL (120ML) YELLOW",    8005),
     ("yellow small bottle", "120ml", "samsol"):      ("PET BOTTLE SMALL (120ML) YELLOW",    8005),
+    ("yellow small",    "120ml", "abid masood khan"): ("PET BOTTLE SMALL (120ML) YELLOW",    8005),
     ("bt-120 ml yellow","120ml", "samsol"):          ("PET BOTTLE SMALL (120ML) YELLOW",    8005),
     ("bt-120ml yellow", "120ml", "samsol"):          ("PET BOTTLE SMALL (120ML) YELLOW",    8005),
     ("bt-120 ml yellow","120ml", "abid masood khan"): ("PET BOTTLE SMALL (120ML) YELLOW",    8005),
@@ -417,6 +421,152 @@ PID_TO_CUSTOMER = {
     8013: "Mablay Beauty PVT LTD.",
     8015: "Mablay Beauty PVT LTD.",
 }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CUSTOM ALIAS MANAGEMENT (Persistent JSON storage)
+# ─────────────────────────────────────────────────────────────────────────────
+CUSTOM_ALIASES_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "custom_aliases.json")
+
+
+def _norm_dia(raw):
+    s = str(raw).strip().lower()
+    s = re.sub(r'\bdia\b', '', s)
+    s = re.sub(r'\s+ml$', 'ml', s)
+    return re.sub(r'\s+', ' ', s).strip()
+
+
+def build_pid_to_catalog():
+    """Build a mapping of PID -> catalog_name from ALIASES and FG_ALIASES."""
+    mapping = {}
+    for (name, dia), (cat_name, pid) in ALIASES.items():
+        if pid and cat_name and pid not in mapping:
+            mapping[pid] = cat_name
+    for (name, dia, cust), (cat_name, pid) in FG_ALIASES.items():
+        if pid and cat_name and pid not in mapping:
+            mapping[pid] = cat_name
+    return mapping
+
+
+def load_custom_aliases(filepath=None):
+    """
+    Load custom aliases from custom_aliases.json and merge into ALIASES and FG_ALIASES.
+    Returns (loaded_prod_count, loaded_fg_count).
+    """
+    path = filepath or CUSTOM_ALIASES_FILE
+    if not os.path.exists(path):
+        return 0, 0
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        print(f"  [!] Warning: Could not read custom_aliases.json: {e}")
+        return 0, 0
+
+    prod_count = 0
+    for entry in data.get("production_aliases", []):
+        raw_name = str(entry.get("raw_name", "")).lower().strip()
+        dia = str(entry.get("dia", "")).strip()
+        cat_name = entry.get("catalog_name")
+        pid = entry.get("pid")
+        if raw_name and dia:
+            ALIASES[(raw_name, dia)] = (cat_name, pid)
+            prod_count += 1
+
+    fg_count = 0
+    for entry in data.get("fg_aliases", []):
+        raw_name = str(entry.get("raw_name", "")).lower().strip()
+        dia = _norm_dia(str(entry.get("dia", "")))
+        cust = str(entry.get("customer", "")).lower().strip()
+        cat_name = entry.get("catalog_name")
+        pid = entry.get("pid")
+        if raw_name and dia and cust:
+            FG_ALIASES[(raw_name, dia, cust)] = (cat_name, pid)
+            fg_count += 1
+
+    return prod_count, fg_count
+
+
+def save_custom_alias(raw_name, dia, pid, catalog_name=None, customer=None, filepath=None):
+    """
+    Persistently saves a new alias mapping to custom_aliases.json.
+    """
+    path = filepath or CUSTOM_ALIASES_FILE
+    data = {
+        "_comment": "Custom product aliases for Tubex logs. Add or edit entries here.",
+        "production_aliases": [],
+        "fg_aliases": []
+    }
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                loaded = json.load(f)
+                if isinstance(loaded, dict):
+                    data = loaded
+        except Exception:
+            pass
+
+    if "production_aliases" not in data or not isinstance(data["production_aliases"], list):
+        data["production_aliases"] = []
+    if "fg_aliases" not in data or not isinstance(data["fg_aliases"], list):
+        data["fg_aliases"] = []
+
+    if catalog_name is None:
+        pid_map = build_pid_to_catalog()
+        catalog_name = pid_map.get(pid, raw_name.upper())
+
+    # Update or append in production_aliases
+    norm_name = raw_name.lower().strip()
+    norm_dia = str(dia).strip()
+    updated = False
+    for item in data["production_aliases"]:
+        if item.get("raw_name", "").lower().strip() == norm_name and str(item.get("dia", "")).strip() == norm_dia:
+            item["pid"] = pid
+            item["catalog_name"] = catalog_name
+            updated = True
+            break
+    if not updated:
+        data["production_aliases"].append({
+            "raw_name": norm_name,
+            "dia": norm_dia,
+            "catalog_name": catalog_name,
+            "pid": pid
+        })
+
+    # If customer is provided (or known from PID_TO_CUSTOMER), also add to fg_aliases
+    fg_cust = None
+    if customer:
+        fg_cust = customer.lower().strip()
+    elif pid in PID_TO_CUSTOMER:
+        fg_cust = PID_TO_CUSTOMER[pid].lower().strip()
+
+    if fg_cust:
+        fg_dia = _norm_dia(dia)
+        fg_updated = False
+        for item in data["fg_aliases"]:
+            if (item.get("raw_name", "").lower().strip() == norm_name and 
+                _norm_dia(str(item.get("dia", ""))) == fg_dia and 
+                item.get("customer", "").lower().strip() == fg_cust):
+                item["pid"] = pid
+                item["catalog_name"] = catalog_name
+                fg_updated = True
+                break
+        if not fg_updated:
+            data["fg_aliases"].append({
+                "raw_name": norm_name,
+                "dia": fg_dia,
+                "customer": fg_cust,
+                "catalog_name": catalog_name,
+                "pid": pid
+            })
+
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+        return True
+    except Exception as e:
+        print(f"  [!] Warning: Could not save to custom_aliases.json: {e}")
+        return False
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -635,6 +785,19 @@ def read_production_source(prod_path):
                     print(f"  [AUTOMATED RUN] Assigned PID=0 to '{name_raw}' [{dia_raw}mm]")
 
                 session_overrides[alias_key] = pid
+                if pid > 0:
+                    pid_to_cat = build_pid_to_catalog()
+                    resolved_cat_name = pid_to_cat.get(pid, name_raw.upper())
+                    catalog_name = resolved_cat_name
+                    ALIASES[alias_key] = (resolved_cat_name, pid)
+                    saved = save_custom_alias(name_raw, dia_raw, pid, resolved_cat_name, customer=cust_raw)
+                    if saved:
+                        print(f"  [✓] Saved mapping to custom_aliases.json: '{name_raw}' [{dia_raw}] -> PID {pid} ('{resolved_cat_name}')")
+
+        if pid is not None and pid > 0 and catalog_name == name_raw:
+            pid_to_cat = build_pid_to_catalog()
+            if pid in pid_to_cat:
+                catalog_name = pid_to_cat[pid]
 
         if pid is not None and pid in PID_TO_CUSTOMER:
             cust_norm = PID_TO_CUSTOMER[pid]
@@ -974,6 +1137,10 @@ def main():
     print("\n" + "="*60)
     print("  Tubex -- Production Log Updater v21")
     print("="*60 + "\n")
+
+    prod_loaded, fg_loaded = load_custom_aliases()
+    if prod_loaded > 0 or fg_loaded > 0:
+        print(f"  [i] Loaded custom aliases: {prod_loaded} Production + {fg_loaded} FG Stock from custom_aliases.json\n")
 
     print("[1/4] Finding files...")
     ac_path, prod_path = find_files()
