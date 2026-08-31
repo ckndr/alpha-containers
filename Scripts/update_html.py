@@ -517,10 +517,257 @@ DOWNTIME_ICONS = {
     'Operations':        '⚙️',
 }
 
-dash_data = {
+def format_date_dict(dt):
+    if not dt:
+        return {'long': '—', 'short': '—', 'iso': None}
+    if isinstance(dt, str):
+        try:
+            dt = datetime.strptime(dt[:10], '%Y-%m-%d')
+        except Exception:
+            return {'long': str(dt), 'short': str(dt), 'iso': str(dt)}
+    day = dt.day
+    suffix = 'th'
+    if day % 10 == 1 and day != 11: suffix = 'st'
+    elif day % 10 == 2 and day != 12: suffix = 'nd'
+    elif day % 10 == 3 and day != 13: suffix = 'rd'
+    
+    month_long = dt.strftime('%B')
+    month_short = dt.strftime('%b')
+    year = dt.year
+    
+    return {
+        'long': f'{day}{suffix} {month_long} {year}',
+        'short': f'{day} {month_short}',
+        'iso': dt.strftime('%Y-%m-%d')
+    }
+
+latest_date_dict = format_date_dict(latest_date)
+
+cur_month_data = {
     'month':         month_name,
-    'lastUpdated':   f"Updated {now.strftime('%d-%b-%Y %H:%M')} from {os.path.basename(EXCEL_PATH)}",
-    'timestamp_iso': now.isoformat(),
+    'latestDate':     latest_date_dict,
+    'tubeLatestDate': latest_date_dict,
+    'petLatestDate':  latest_date_dict,
+    'kpi': {
+        'tubeYest':         yest_tube,
+        'tubeMTD':          tube_mtd,
+        'petYest':          yest_pet,
+        'petMTD':           pet_mtd,
+        'tubeMTDDispatch':  tube_mtd_dispatch,
+        'petMTDDispatch':   pet_mtd_dispatch,
+    },
+    'downtime': [
+        {'cat': cat, 'icon': DOWNTIME_ICONS.get(cat, '⏱'), 'hrs': round(tube_dt_totals[cat] / 60, 2)}
+        for cat in downtime_cols
+    ],
+    'downtimePet': [
+        {'cat': cat, 'icon': DOWNTIME_ICONS.get(cat, '⏱'), 'hrs': round(pet_dt_totals[cat] / 60, 2)}
+        for cat in downtime_cols
+    ],
+    'tubeOrders': tube_orders,
+    'petOrders':  pet_orders,
+}
+
+def extract_all_months_dash_data(active_mname, active_mdata):
+    all_m = {}
+    month_order = ['November 2025', 'December 2025', 'January 2026', 'February 2026', 'March 2026', 'April 2026', 'May 2026', 'June 2026', 'July 2026', 'August 2026']
+    
+    records_dir = os.path.join(DIR, 'Tubex Records')
+    pa_path = os.path.join(records_dir, 'Production_Archive.xlsx')
+    
+    # 1. Historical extraction from Production_Archive
+    if os.path.exists(pa_path):
+        try:
+            wb_pa_local = openpyxl.load_workbook(pa_path, data_only=True)
+            ws_d_local = wb_pa_local['Dispatch_Log'] if 'Dispatch_Log' in wb_pa_local.sheetnames else None
+            
+            disp_by_m = {}
+            if ws_d_local:
+                for r_d in range(4, ws_d_local.max_row + 1):
+                    m_val = ws_d_local.cell(r_d, 1).value
+                    if not m_val: continue
+                    m_key = str(m_val).strip()
+                    if m_key not in disp_by_m: disp_by_m[m_key] = []
+                    disp_by_m[m_key].append({
+                        'type': str(ws_d_local.cell(r_d, 3).value or 'TUBE').upper().strip(),
+                        'customer': str(ws_d_local.cell(r_d, 4).value or '').strip(),
+                        'product': str(ws_d_local.cell(r_d, 5).value or '').strip(),
+                        'dia': str(ws_d_local.cell(r_d, 6).value or '').strip(),
+                        'ordered': int(ws_d_local.cell(r_d, 7).value or 0) if isinstance(ws_d_local.cell(r_d, 7).value, (int, float)) else 0,
+                        'dispatch': int(ws_d_local.cell(r_d, 8).value or 0) if isinstance(ws_d_local.cell(r_d, 8).value, (int, float)) else 0,
+                    })
+                    
+            for m_target in month_order:
+                if m_target == active_mname:
+                    continue
+                if m_target not in wb_pa_local.sheetnames:
+                    continue
+                    
+                ws_p_local = wb_pa_local[m_target]
+                p_by_prod = {}
+                d_tube = {}
+                d_pet = {}
+                t_mtd = 0
+                p_mtd = 0
+                has_dt = ws_p_local.max_column >= 18
+                t_dt = {k: 0.0 for k in downtime_cols}
+                p_dt = {k: 0.0 for k in downtime_cols}
+                
+                for r_p in range(3, ws_p_local.max_row + 1):
+                    dt_v = ws_p_local.cell(r_p, 1).value
+                    mach_v = str(ws_p_local.cell(r_p, 2).value or '')
+                    cust_v = str(ws_p_local.cell(r_p, 3).value or '')
+                    prod_v = str(ws_p_local.cell(r_p, 4).value or '')
+                    dia_v = str(ws_p_local.cell(r_p, 5).value or '')
+                    pid_v = ws_p_local.cell(r_p, 6).value
+                    good_v = ws_p_local.cell(r_p, 8).value or 0
+                    try: good_int = int(good_v)
+                    except Exception: good_int = 0
+                    
+                    if not dt_v or not mach_v: continue
+                    
+                    if has_dt:
+                        mach_u = mach_v.upper()
+                        is_pp_m = mach_u.startswith('PRESS') or mach_u.startswith('PRINT') or mach_u.startswith('PLINE')
+                        is_pf_m = mach_u.startswith('PF') or mach_u.startswith('PET')
+                        if is_pp_m:
+                            for cat_name, c_idx in downtime_cols.items():
+                                val_dt = ws_p_local.cell(r_p, c_idx).value
+                                if val_dt and isinstance(val_dt, (int, float)): t_dt[cat_name] += float(val_dt)
+                        elif is_pf_m:
+                            for cat_name, c_idx in downtime_cols.items():
+                                val_dt = ws_p_local.cell(r_p, c_idx).value
+                                if val_dt and isinstance(val_dt, (int, float)): p_dt[cat_name] += float(val_dt)
+                    
+                    if not prod_v: continue
+                    dt_s = dt_v.strftime('%Y-%m-%d') if isinstance(dt_v, (date, datetime)) else str(dt_v)[:10]
+                    is_varn_p = '(VARNISH)' in prod_v.upper()
+                    mach_u = mach_v.upper()
+                    is_print_m = mach_u.startswith('PRINT') or mach_u.startswith('PLINE')
+                    is_pet_m = mach_u.startswith('PF') or mach_u.startswith('PET') or 'PET' in prod_v.upper() or 'BOTTLE' in prod_v.upper()
+                    
+                    if is_print_m and not is_varn_p:
+                        t_mtd += good_int
+                        d_tube[dt_s] = d_tube.get(dt_s, 0) + good_int
+                        prod_type_str = 'TUBE'
+                    elif is_pet_m:
+                        p_mtd += good_int
+                        d_pet[dt_s] = d_pet.get(dt_s, 0) + good_int
+                        prod_type_str = 'PET'
+                    else:
+                        continue
+                        
+                    k_prod = (cust_v, prod_v, prod_type_str, dia_v, pid_v)
+                    if k_prod not in p_by_prod:
+                        p_by_prod[k_prod] = {'produced': 0, 'dispatch': 0, 'ordered': 0}
+                    p_by_prod[k_prod]['produced'] += good_int
+
+                t_disp_tot = 0
+                p_disp_tot = 0
+                for d_item in disp_by_m.get(m_target, []):
+                    pt_d = d_item['type']
+                    c_d = d_item['customer']
+                    pr_d = d_item['product']
+                    dia_d = d_item['dia']
+                    ord_d = d_item['ordered']
+                    disp_d = d_item['dispatch']
+                    
+                    if pt_d == 'TUBE': t_disp_tot += disp_d
+                    else: p_disp_tot += disp_d
+                    
+                    matched = False
+                    for k_p in p_by_prod:
+                        if k_p[0].lower() == c_d.lower() and k_p[1].lower() == pr_d.lower():
+                            p_by_prod[k_p]['dispatch'] += disp_d
+                            p_by_prod[k_p]['ordered'] += ord_d
+                            matched = True
+                            break
+                    if not matched and (disp_d > 0 or ord_d > 0):
+                        k_p = (c_d, pr_d, pt_d, dia_d, None)
+                        if k_p not in p_by_prod:
+                            p_by_prod[k_p] = {'produced': 0, 'dispatch': 0, 'ordered': 0}
+                        p_by_prod[k_p]['dispatch'] += disp_d
+                        p_by_prod[k_p]['ordered'] += ord_d
+
+                all_d_keys = sorted(set(list(d_tube.keys()) + list(d_pet.keys())))
+                latest_d_s = all_d_keys[-1] if all_d_keys else None
+                t_latest_d_s = sorted(d_tube.keys())[-1] if d_tube else latest_d_s
+                p_latest_d_s = sorted(d_pet.keys())[-1] if d_pet else latest_d_s
+                
+                t_latest_q = d_tube.get(t_latest_d_s, 0) if t_latest_d_s else 0
+                p_latest_q = d_pet.get(p_latest_d_s, 0) if p_latest_d_s else 0
+                
+                t_orders_list = []
+                p_orders_list = []
+                for (c_k, pr_k, pt_k, dia_k, pid_k), v_k in sorted(p_by_prod.items(), key=lambda x: x[1]['produced'], reverse=True):
+                    dia_raw_s = str(dia_k).replace(' ml','').replace('ml','').replace(' mm','').replace('mm','').strip()
+                    dia_out_s = (dia_raw_s + ('ml' if pt_k == 'PET' else 'mm')) if dia_raw_s else '—'
+                    order_obj = {
+                        'pid': int(pid_k) if pid_k else None,
+                        'customer': c_k or '—',
+                        'product': pr_k,
+                        'dia': dia_out_s,
+                        'ordered': v_k['ordered'],
+                        'produced': v_k['produced'],
+                        'dispatch': v_k['dispatch']
+                    }
+                    if pt_k == 'TUBE': t_orders_list.append(order_obj)
+                    else: p_orders_list.append(order_obj)
+                    
+                all_m[m_target] = {
+                    'month': m_target,
+                    'latestDate': format_date_dict(latest_d_s),
+                    'tubeLatestDate': format_date_dict(t_latest_d_s),
+                    'petLatestDate': format_date_dict(p_latest_d_s),
+                    'kpi': {
+                        'tubeYest': t_latest_q,
+                        'tubeMTD': t_mtd,
+                        'petYest': p_latest_q,
+                        'petMTD': p_mtd,
+                        'tubeMTDDispatch': t_disp_tot,
+                        'petMTDDispatch': p_disp_tot,
+                    },
+                    'downtime': [
+                        {'cat': c_name, 'icon': DOWNTIME_ICONS.get(c_name, '⏱'), 'hrs': round(t_dt[c_name] / 60, 2)}
+                        for c_name in downtime_cols
+                    ],
+                    'downtimePet': [
+                        {'cat': c_name, 'icon': DOWNTIME_ICONS.get(c_name, '⏱'), 'hrs': round(p_dt[c_name] / 60, 2)}
+                        for c_name in downtime_cols
+                    ],
+                    'tubeOrders': t_orders_list,
+                    'petOrders': p_orders_list,
+                }
+            wb_pa_local.close()
+        except Exception as e_pa:
+            print(f"  Warning loading Production_Archive: {e_pa}")
+            
+    # 2. Add current active month data
+    all_m[active_mname] = active_mdata
+    
+    # 3. Sort months reverse chronologically
+    sorted_m = {}
+    for m_item in reversed(month_order):
+        if m_item in all_m:
+            sorted_m[m_item] = all_m[m_item]
+    # Add any other extra months
+    for m_item, data_item in all_m.items():
+        if m_item not in sorted_m:
+            sorted_m[m_item] = data_item
+    return sorted_m
+
+all_months_dict = extract_all_months_dash_data(month_name, cur_month_data)
+available_month_names = list(all_months_dict.keys())
+
+dash_data = {
+    'month':           month_name,
+    'availableMonths': available_month_names,
+    'months':          all_months_dict,
+    'lastUpdated':     f"Updated {now.strftime('%d-%b-%Y %H:%M')} from {os.path.basename(EXCEL_PATH)}",
+    'timestamp_iso':   now.isoformat(),
+    'latestDate':      latest_date_dict,
+    'tubeLatestDate':  latest_date_dict,
+    'petLatestDate':   latest_date_dict,
     'kpi': {
         'tubeYest':         yest_tube,
         'tubeMTD':          tube_mtd,
