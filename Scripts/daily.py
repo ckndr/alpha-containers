@@ -32,6 +32,16 @@ from datetime import datetime
 # ── PATH SETUP ──────────────────────────────────────────────────────────────
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 ALPHA_DIR   = os.path.dirname(SCRIPTS_DIR)
+
+# Guard: If invoked from OneDrive mirror, redirect to master repository at D:\Alpha
+if "onedrive" in ALPHA_DIR.lower() and os.path.exists(r"D:\Alpha"):
+    print("[NOTICE] Detected execution from OneDrive mirror folder.")
+    print("[NOTICE] Switching workspace root to master repository at D:\\Alpha...")
+    ALPHA_DIR = r"D:\Alpha"
+    SCRIPTS_DIR = os.path.join(ALPHA_DIR, "Scripts")
+    if SCRIPTS_DIR not in sys.path:
+        sys.path.insert(0, SCRIPTS_DIR)
+
 LOGS_DIR    = os.path.join(ALPHA_DIR, "Logs")
 
 # ── CONFIGURABLE ────────────────────────────────────────────────────────────
@@ -946,7 +956,7 @@ def step_onedrive_backup(skip=False):
     onedrive_dir = r"C:\Users\HP\OneDrive\Alpha"
     
     try:
-        cmd = ["robocopy", ALPHA_DIR, onedrive_dir, "/E", "/COPY:DAT", "/DCOPY:DAT", "/XD", ".git", "Logs", "__pycache__", "/XF", "~$*", "/R:1", "/W:1"]
+        cmd = ["robocopy", ALPHA_DIR, onedrive_dir, "/E", "/PURGE", "/COPY:DAT", "/DCOPY:DAT", "/XD", ".git", "Logs", "__pycache__", "/XF", "~$*", "/R:1", "/W:1"]
         result = subprocess.run(cmd, capture_output=True)
         if result.returncode < 8:
             ok("Copied to OneDrive ✓")

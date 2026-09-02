@@ -180,7 +180,7 @@ def resolve_pid(product_entry, catalog):
     return catalog_name, pid
 
 
-def parse_dispatch_file(path):
+def parse_dispatch_file(path, target_month_abbr=None):
     """
     Parse one ERP dispatch .xls (Date Wise format).
     Ignores any dispatch rows matching the current day (Rule R1-06 / AUDIT_NOTES.md).
@@ -188,6 +188,21 @@ def parse_dispatch_file(path):
     """
     import xlrd
     df = pd.read_excel(path, sheet_name=0, engine='xlrd', header=None)
+
+    # Check file month header against active workbook month
+    if target_month_abbr:
+        file_month = None
+        for idx in range(min(15, len(df))):
+            row_vals = [str(x).strip() for x in df.iloc[idx].values if pd.notna(x)]
+            for v in row_vals:
+                if v.lower().startswith("month :") or v.lower().startswith("month:"):
+                    file_month = v.upper()
+                    break
+            if file_month:
+                break
+        if file_month and target_month_abbr.upper() not in file_month:
+            print(f"  [WARN] {os.path.basename(path)} header is '{file_month}', but active file is '{target_month_abbr}'. Stale previous-month dispatch ignored.")
+            return {}
 
     SKIP_PREFIXES = ('dispatch report', 'month :', 'no.')
     SKIP_EXACT    = {'end of file'}
@@ -395,8 +410,15 @@ def main():
 
     print("")
     print("[2/4] Parsing dispatch files...")
-    tube_dispatch = parse_dispatch_file(tube_path)
-    pet_dispatch  = parse_dispatch_file(pet_path)
+    base = os.path.basename(ac_path)
+    target_month = None
+    for m in ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]:
+        if m in base.upper():
+            target_month = m
+            break
+
+    tube_dispatch = parse_dispatch_file(tube_path, target_month_abbr=target_month)
+    pet_dispatch  = parse_dispatch_file(pet_path, target_month_abbr=target_month)
 
     print("")
     print("  TUBE dispatches (TUBEX-ALUM):")
