@@ -66,7 +66,7 @@ BOLD   = '\033[1m'
 DIM    = '\033[2m'
 RESET  = '\033[0m'
 
-TOTAL_STEPS = 9
+TOTAL_STEPS = 8
 
 def safe_print(msg=""):
     try:
@@ -960,33 +960,10 @@ def step_screenshot():
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# STEP 8: ONEDRIVE BACKUP
-# ═══════════════════════════════════════════════════════════════════════════
-def step_onedrive_backup(skip=False):
-    header(8, "Copying to OneDrive...")
-
-    if skip:
-        warn("Skipped (--skip-onedrive)")
-        return
-
-    onedrive_dir = r"C:\Users\HP\OneDrive\Alpha"
-    
-    try:
-        cmd = ["robocopy", ALPHA_DIR, onedrive_dir, "/E", "/PURGE", "/COPY:DAT", "/DCOPY:DAT", "/XD", ".git", "Logs", "__pycache__", "/XF", "~$*", "/R:1", "/W:1"]
-        result = subprocess.run(cmd, capture_output=True)
-        if result.returncode < 8:
-            ok("Copied to OneDrive ✓")
-        else:
-            fail(f"OneDrive copy failed (exit code {result.returncode})")
-    except Exception as e:
-        fail(f"Error copying to OneDrive: {e}")
-
-
-# ═══════════════════════════════════════════════════════════════════════════
-# STEP 9: GIT PUSH
+# STEP 8: GIT PUSH
 # ═══════════════════════════════════════════════════════════════════════════
 def step_git_push(skip=False):
-    header(9, "Pushing to GitHub...")
+    header(8, "Pushing to GitHub...")
 
     if skip:
         warn("Skipped (--skip-git)")
@@ -1167,10 +1144,9 @@ def main():
     if success:
         crosscheck_errors = step_crosscheck()  # 6. Cross-check
         step_screenshot()                      # 7. Screenshot
-        step_onedrive_backup()                 # 8. OneDrive backup
-        step_git_push(skip=skip_git)           # 9. Git push
+        step_git_push(skip=skip_git)           # 8. Git push
     else:
-        fail("CRITICAL: Core pipeline experienced failure. Skipping OneDrive cloud backup and Git push to protect production integrity.")
+        fail("CRITICAL: Core pipeline experienced failure. Skipping Git push to protect production integrity.")
 
     elapsed = time.time() - start
 
