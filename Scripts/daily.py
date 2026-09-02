@@ -220,11 +220,27 @@ def step_backup():
         warn("No Tubex*.xlsx found — nothing to back up")
         return
 
+    import zipfile
+
     for src in excel_files:
         name = os.path.basename(src)
-        dst = os.path.join(LOGS_DIR, f"backup_{date_str}_{name}")
-        shutil.copy2(src, dst)
-        ok(f"Backed up: {name}")
+        
+        # Verify file integrity before backing up or operating on it
+        if not zipfile.is_zipfile(src):
+            warn(f"Corrupted or truncated workbook detected: {name} ({os.path.getsize(src)} bytes)!")
+            try:
+                subprocess.run(["git", "-C", ALPHA_DIR, "checkout", "HEAD", "--", name], check=True, capture_output=True)
+                if zipfile.is_zipfile(src):
+                    ok(f"Auto-recovered {name} from git repository (clean state) ✓")
+                else:
+                    fail(f"Could not recover {name} from git.")
+            except Exception as ge:
+                warn(f"Git auto-recovery failed: {ge}")
+
+        if zipfile.is_zipfile(src):
+            dst = os.path.join(LOGS_DIR, f"backup_{date_str}_{name}")
+            shutil.copy2(src, dst)
+            ok(f"Backed up: {name}")
 
     # Clean old backups — keep only the last MAX_BACKUPS
     backups = sorted(glob.glob(os.path.join(LOGS_DIR, "backup_*.xlsx")),

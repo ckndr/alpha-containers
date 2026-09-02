@@ -232,8 +232,27 @@ def cleanup_stale_lockfiles(folder):
             cleaned += 1
             print("  Cleaned stale lockfile: %s" % os.path.basename(lf))
         except Exception:
-            # File is actively held by an open application — leave intact
             pass
     return cleaned
+
+
+def atomic_save(wb, target_path):
+    """
+    Safely save an openpyxl workbook using an atomic write.
+    Writes to a temporary file first, then replaces the target.
+    Prevents corrupting/truncating the workbook if interrupted (e.g. Ctrl+C).
+    """
+    temp_path = target_path + ".tmp"
+    try:
+        wb.save(temp_path)
+        os.replace(temp_path, target_path)
+    except Exception:
+        if os.path.exists(temp_path):
+            try:
+                os.remove(temp_path)
+            except Exception:
+                pass
+        raise
+
 
 
