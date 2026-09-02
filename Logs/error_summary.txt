@@ -4,7 +4,5 @@
   ╚══════════════════════════════════════════════════════════╝
 
   [CROSS-CHECK MISMATCHES]
-    • Summary mismatch - Tube Dispatch (MTD): Imran=0, Dashboard=337,232 (diff=+337,232)
-    • Summary mismatch - PET Dispatch (MTD): Imran=0, Dashboard=134,590 (diff=+134,590)
     • Pending Tube Orders mismatch: PENDING ORDER SEPTEMBER 2026.xlsx (01-09-2026)=-466, MRP Sheet=0 (diff=-466)
 
