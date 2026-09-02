@@ -284,7 +284,7 @@ def update_tube_material_formulas(ws_mrp, tube_end, tube_items_start, tube_items
         f_req = f'=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end})/1000)'
         ws_mrp.cell(r, 5, f_req)
 
-        f_stk = f'=IFERROR(INDEX(TableInventory[Store Balance],MATCH(A{r},TableInventory[Item ID],0)),0)+IFERROR(INDEX(TableInventory[Work In Process],MATCH(A{r},TableInventory[Item ID],0)),0)'
+        f_stk = f'=IFERROR(INDEX(TableInventory[Store Balance],MATCH(A{r},TableInventory[Item ID],0)),0)+IFERROR(INDEX(TableInventory[WIP],MATCH(A{r},TableInventory[Item ID],0)),0)'
         ws_mrp.cell(r, 6, f_stk)
 
         f_surp = f'=F{r}-E{r}'
@@ -308,7 +308,7 @@ def update_pet_material_formulas(ws_mrp, pet_start, pet_end, pet_items_start, pe
         f_req = f'=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end})/1000)'
         ws_mrp.cell(r, 5, f_req)
 
-        f_stk = f'=IFERROR(INDEX(TableInventory[Store Balance],MATCH(A{r},TableInventory[Item ID],0)),0)+IFERROR(INDEX(TableInventory[Work In Process],MATCH(A{r},TableInventory[Item ID],0)),0)'
+        f_stk = f'=IFERROR(INDEX(TableInventory[Store Balance],MATCH(A{r},TableInventory[Item ID],0)),0)+IFERROR(INDEX(TableInventory[WIP],MATCH(A{r},TableInventory[Item ID],0)),0)'
         ws_mrp.cell(r, 6, f_stk)
 
         f_surp = f'=F{r}-E{r}'

@@ -35,6 +35,7 @@ from alpha_checks import get_active_tubex_file
 
 MONTH_FILES = [
     ("July 2026",      r"d:\Alpha\Tubex Records\Tubex_July26.xlsx",   7),
+    ("August 2026",    r"d:\Alpha\Tubex Records\Tubex_Aug26.xlsx",    8),
 ]
 
 # Dynamically find the active month file in d:\Alpha using standard resolution (Rule R1-22)
@@ -48,8 +49,16 @@ if latest:
         month_name, month_num = "September 2026", 9
     
     # Check if already added
-    if not any(f[1] == latest for f in MONTH_FILES):
-        MONTH_FILES.append((month_name, latest, month_num))
+    if not any(f[1] == latest or f[0] == month_name for f in MONTH_FILES):
+        try:
+            wb_test = openpyxl.load_workbook(latest, data_only=True)
+            if "Production_Log" in wb_test.sheetnames:
+                has_data = any(wb_test["Production_Log"].cell(r, 1).value is not None for r in range(3, 10))
+                if has_data:
+                    MONTH_FILES.append((month_name, latest, month_num))
+            wb_test.close()
+        except Exception:
+            pass
 
 DASHBOARD_SHEET    = "Tubex_Dashboard"
 PRODUCTION_SHEET   = "Production_Log"
@@ -156,9 +165,7 @@ def build_dashboard_archive(available_months):
                     temp_ws.Name = tab
                     archive_wb = temp_wb
                 else:
-                    placeholder = temp_wb.Sheets.Add()
-                    placeholder.Name = "_tmp"
-                    temp_ws.Move(After=archive_wb.Sheets(archive_wb.Sheets.Count))
+                    temp_ws.Copy(None, archive_wb.Sheets(archive_wb.Sheets.Count))
                     archive_wb.Sheets(archive_wb.Sheets.Count).Name = tab
                     try:
                         temp_wb.Close(SaveChanges=False)
@@ -373,12 +380,16 @@ def add_dashboard_summary(kpi_data, year=2026):
 
         if mi in lookup:
             k    = lookup[mi]
-            t_m  = k.get("TUBE_MTD")      or 0
-            t_d  = k.get("TUBE_DISPATCH") or 0
-            t_r  = k.get("TUBE_REJECT")   or 0
-            p_m  = k.get("PET_MTD")       or 0
-            p_d  = k.get("PET_DISPATCH")  or 0
-            p_r  = k.get("PET_REJECT")    or 0
+            def _num(v):
+                if v is None or v == "" or v == "-": return 0.0
+                try: return float(v)
+                except Exception: return 0.0
+            t_m  = _num(k.get("TUBE_MTD"))
+            t_d  = _num(k.get("TUBE_DISPATCH"))
+            t_r  = _num(k.get("TUBE_REJECT"))
+            p_m  = _num(k.get("PET_MTD"))
+            p_d  = _num(k.get("PET_DISPATCH"))
+            p_r  = _num(k.get("PET_REJECT"))
             tot  = t_m + p_m
             status = "Archived"
         else:
@@ -415,7 +426,7 @@ def add_dashboard_summary(kpi_data, year=2026):
     for ci, (fmt, fn) in agg_cols.items():
         vals = [ws.cell(row=HDR_ROW + mi, column=ci).value
                 for mi in range(1, 13)
-                if ws.cell(row=HDR_ROW + mi, column=ci).value not in (None, "")]
+                if isinstance(ws.cell(row=HDR_ROW + mi, column=ci).value, (int, float))]
         result = fn(vals) if vals else None
         c = ws.cell(row=TOT_ROW, column=ci, value=result)
         c.font      = Font(bold=True, size=10, color=C_WHITE, name="Calibri")
