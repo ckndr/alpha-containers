@@ -3,6 +3,6 @@
   ║  ⚠ DAILY WORKFLOW ERROR SUMMARY                          ║
   ╚══════════════════════════════════════════════════════════╝
 
-  [CROSS-CHECK MISMATCHES]
-    • Pending Tube Orders mismatch: PENDING ORDER SEPTEMBER 2026.xlsx (01-09-2026)=-466, MRP Sheet=0 (diff=-466)
+  [SYSTEM / FILE CHECK ISSUES]
+    • Pipeline execution had failures (one or more scripts failed)
 
