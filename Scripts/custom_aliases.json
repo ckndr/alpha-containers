@@ -6,6 +6,18 @@
       "dia": "120 ml",
       "catalog_name": "PET BOTTLE SMALL (120ML) YELLOW",
       "pid": 8005
+    },
+    {
+      "raw_name": "common red",
+      "dia": "25",
+      "catalog_name": "TUBES COMMON RED",
+      "pid": 6470
+    },
+    {
+      "raw_name": "common red tube",
+      "dia": "25",
+      "catalog_name": "TUBES COMMON RED",
+      "pid": 6470
     }
   ],
   "fg_aliases": [
@@ -29,6 +41,20 @@
       "customer": "samsol",
       "catalog_name": "S 43 25MM",
       "pid": 3447
+    },
+    {
+      "raw_name": "common red",
+      "dia": "25",
+      "customer": "samsol",
+      "catalog_name": "TUBES COMMON RED",
+      "pid": 6470
+    },
+    {
+      "raw_name": "common red tube",
+      "dia": "25",
+      "customer": "samsol",
+      "catalog_name": "TUBES COMMON RED",
+      "pid": 6470
     }
   ]
 }

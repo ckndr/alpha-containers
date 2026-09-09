@@ -1,8 +1,8 @@
 @echo off
-if not defined _KEEP_OPEN (
+if "%~1"=="" if not defined _KEEP_OPEN (
     set _KEEP_OPEN=1
-    cmd /k "%~f0"
-    exit
+    cmd /k ""%~f0""
+    exit /b
 )
 cd /d "%~dp0"
 :: If running from OneDrive mirror, redirect to master repository on D:\Alpha

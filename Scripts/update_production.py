@@ -190,6 +190,8 @@ ALIASES = {
     ("samsol men blue",            "25"): ("TUBES MEN BLUE",                       6506),  # Added v12
     ("samsol common purple",       "25"): ("TUBE COMMON PURPLE",                   6532),
     ("tube common purple",         "25"): ("TUBE COMMON PURPLE",                   6532),
+    ("common red",                 "25"): ("TUBES COMMON RED",                     6470),
+    ("common red tube",            "25"): ("TUBES COMMON RED",                     6470),
     ("samsol red",                 "25"): ("SAMSOL RED 25MM",                      9006),
     ("vince his",                  "25"): ("HIS ONLY HAIR COLOR CREAM 40GM",      6228),  # BUGFIX v16: 25mm = PID 6228, not 6077 (6077 is 20.5mm)
     ("vincehis",                   "25"): ("HIS ONLY HAIR COLOR CREAM 40GM",      6228),  # BUGFIX v16
@@ -278,7 +280,11 @@ FG_ALIASES = {
     ("samsol 45",          "25", "samsol international"): ("TUBES",                     3726),
     ("samsol 45",          "25", "samsol international private limited"): ("TUBES",      3726),
     ("common purple tube", "25", "samsol"):          ("TUBE COMMON PURPLE",                 6532),
+    ("common red",         "25", "samsol"):          ("TUBES COMMON RED",                   6470),
     ("common red tube",    "25", "samsol"):          ("TUBES COMMON RED",                   6470),
+    ("common red",         "25", "samsol international"): ("TUBES COMMON RED",              6470),
+    ("common red tube",    "25", "samsol international"): ("TUBES COMMON RED",              6470),
+    ("common red",         "25", "samsol international private limited"): ("TUBES COMMON RED", 6470),
     ("men blue",           "25", "samsol"):          ("TUBES MEN BLUE",                     6506),
     ("vince his",          "25", "mabley beauty"):   ("HIS ONLY HAIR COLOR CREAM 40GM",    6228),
 
@@ -384,7 +390,7 @@ PID_TO_CUSTOMER = {
     6021: "Adore",
     6338: "DTM",
     6470: "Samsol International Private Limited",
-    6515: "Samsol International Private Limited",
+    6515: "Hola Hair",
     6530: "Adore",
     6531: "Adore",
     3726: "Samsol International Private Limited",
@@ -485,6 +491,10 @@ def load_custom_aliases(filepath=None):
             fg_count += 1
 
     return prod_count, fg_count
+
+
+# Initialize custom aliases into ALIASES and FG_ALIASES at import/module load time
+load_custom_aliases()
 
 
 def save_custom_alias(raw_name, dia, pid, catalog_name=None, customer=None, filepath=None):

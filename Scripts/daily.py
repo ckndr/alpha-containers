@@ -22,6 +22,7 @@ Author: Sikander
 
 import os
 import sys
+import re
 import glob
 import shutil
 import time
@@ -383,14 +384,18 @@ def step_find_production(skip=False):
 # ═══════════════════════════════════════════════════════════════════════════
 # STEP 4: WIP UPDATE
 # ═══════════════════════════════════════════════════════════════════════════
-def step_wip(skip=False):
+def step_wip(skip=False, wip_text=None):
     header(4, "WIP Update (Mehmood's message)...")
 
     if skip:
         warn("Skipped (--skip-wip)")
         return True
 
-    msg = timed_input(f"    Paste WIP message (2s timeout, or Enter/timeout to skip):\n    {CYAN}>{RESET} ", timeout=2.0)
+    if wip_text:
+        msg = wip_text.strip()
+        print(f"    Using CLI WIP input: {msg}")
+    else:
+        msg = timed_input(f"    Paste WIP message (15s timeout, or Enter/timeout to skip):\n    {CYAN}>{RESET} ", timeout=15.0)
 
     if not msg:
         warn("No WIP message — skipped")
@@ -662,17 +667,27 @@ def step_crosscheck():
     try:
         wb_imran = load_workbook(prod_path, data_only=True)
         summary_sheet_name = None
+        candidate_summary_sheets = []
         for name in wb_imran.sheetnames:
             n_low = name.lower().strip()
-            if n_low.startswith("summary") and "downtime" not in n_low:
-                summary_sheet_name = name
-                break
-        if not summary_sheet_name:
-            for name in wb_imran.sheetnames:
-                n_low = name.lower().strip()
-                if "summary" in n_low and "downtime" not in n_low:
-                    summary_sheet_name = name
-                    break
+            if "summary" in n_low and "downtime" not in n_low:
+                parsed_dt = None
+                date_match = re.search(r'(\d{2}[-_/]\d{2}[-_/]\d{4})', name)
+                if date_match:
+                    raw_dt = date_match.group(1).replace('/', '-').replace('_', '-')
+                    try:
+                        parsed_dt = datetime.strptime(raw_dt, "%d-%m-%Y")
+                    except ValueError:
+                        pass
+                candidate_summary_sheets.append((name, parsed_dt))
+
+        if candidate_summary_sheets:
+            with_dates = [c for c in candidate_summary_sheets if c[1] is not None]
+            if with_dates:
+                with_dates.sort(key=lambda x: x[1], reverse=True)
+                summary_sheet_name = with_dates[0][0]
+            else:
+                summary_sheet_name = candidate_summary_sheets[0][0]
         
         if not summary_sheet_name:
             warn("No Summary sheet found in Production.xlsx")
@@ -908,6 +923,29 @@ def step_crosscheck():
         warn(f"Pending Tube Orders cross-check error: {e}")
         errors.append(f"Pending Tube Orders cross-check error: {e}")
 
+    # --- Part D: Check for unassigned PIDs (PID=0) in Production_Log ---
+    try:
+        excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
+        if excel_files:
+            wb_check = load_workbook(excel_files[-1], data_only=True)
+            if 'Production_Log' in wb_check.sheetnames:
+                ws_plog = wb_check['Production_Log']
+                pid_zeros = []
+                for r in range(3, ws_plog.max_row + 1):
+                    val_pid = ws_plog.cell(r, 6).value
+                    val_name = ws_plog.cell(r, 4).value
+                    if val_pid == 0 or str(val_pid).strip() == '0':
+                        pid_zeros.append(f"Row {r}: {val_name}")
+                if pid_zeros:
+                    fail(f"Found {len(pid_zeros)} unassigned PID=0 entry/entries in Production_Log: {', '.join(pid_zeros[:3])}")
+                    errors.append(f"Unassigned PID=0 in Production_Log: {len(pid_zeros)} entries ({', '.join(pid_zeros[:3])})")
+                else:
+                    ok("All Production_Log entries have valid assigned PIDs (0 unassigned PID=0)")
+            wb_check.close()
+    except Exception as e:
+        warn(f"PID check error: {e}")
+        errors.append(f"PID check error: {e}")
+
     return errors
 
 
@@ -943,7 +981,8 @@ def step_screenshot():
             browser.close()
 
         ok(f"Saved: Logs/dashboard_{date_str}.png")
-        if sys.platform == 'win32':
+        headless_mode = '--headless' in sys.argv or '--no-open' in sys.argv or not (sys.stdin and hasattr(sys.stdin, 'isatty') and sys.stdin.isatty())
+        if sys.platform == 'win32' and not headless_mode:
             os.startfile(ss_path)
             print(f"    {DIM}Image opened — share to WhatsApp{RESET}")
         return
@@ -955,7 +994,8 @@ def step_screenshot():
     # Fallback — just open in browser
     warn("Playwright not installed — opening in browser instead")
     print(f"    {DIM}To enable: pip install playwright && playwright install chromium{RESET}")
-    if sys.platform == 'win32':
+    headless_mode = '--headless' in sys.argv or '--no-open' in sys.argv or not (sys.stdin and hasattr(sys.stdin, 'isatty') and sys.stdin.isatty())
+    if sys.platform == 'win32' and not headless_mode:
         os.startfile(html_path)
 
 
@@ -1116,6 +1156,15 @@ def main():
     skip_prod = '--skip-prod' in sys.argv
     skip_git  = '--skip-git'  in sys.argv
 
+    cli_wip = None
+    for idx, arg in enumerate(sys.argv):
+        if arg == '--wip' and idx + 1 < len(sys.argv):
+            cli_wip = sys.argv[idx + 1]
+            break
+        elif arg.startswith('--wip='):
+            cli_wip = arg.split('=', 1)[1]
+            break
+
     # Start logging
     log_path = setup_logging()
 
@@ -1130,7 +1179,7 @@ def main():
     
     step_find_production(      # 3. Find Production file
         skip=skip_prod)
-    step_wip(skip=skip_wip)    # 4. WIP update
+    step_wip(skip=skip_wip, wip_text=cli_wip)    # 4. WIP update
     
     success = step_pipeline()  # 5. Run all 5 scripts
     if not success:
@@ -1144,7 +1193,11 @@ def main():
     if success:
         crosscheck_errors = step_crosscheck()  # 6. Cross-check
         step_screenshot()                      # 7. Screenshot
-        step_git_push(skip=skip_git)           # 8. Git push
+        # R4-02: Deployment gating - gate git push if critical cross-check errors exist
+        if crosscheck_errors:
+            fail(f"CRITICAL: Cross-check found {len(crosscheck_errors)} discrepancy/discrepancies. Gating deployment — skipping Git push to protect production integrity.")
+        else:
+            step_git_push(skip=skip_git)       # 8. Git push
     else:
         fail("CRITICAL: Core pipeline experienced failure. Skipping Git push to protect production integrity.")
 
