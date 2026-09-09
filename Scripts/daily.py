@@ -1159,7 +1159,12 @@ def main():
     cli_wip = None
     for idx, arg in enumerate(sys.argv):
         if arg == '--wip' and idx + 1 < len(sys.argv):
-            cli_wip = sys.argv[idx + 1]
+            wip_parts = []
+            for next_arg in sys.argv[idx + 1:]:
+                if next_arg.startswith('--'):
+                    break
+                wip_parts.append(next_arg)
+            cli_wip = " ".join(wip_parts)
             break
         elif arg.startswith('--wip='):
             cli_wip = arg.split('=', 1)[1]
