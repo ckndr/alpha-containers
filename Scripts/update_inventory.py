@@ -296,8 +296,12 @@ def update_excel(excel_path, xls_items, date_range):
     ws.cell(row=2, column=11).value = "Status / Remarks"
     ws.cell(row=2, column=11).font = Font(name="Segoe UI", size=9.5, bold=True, color="FF1A1A2E")
 
-    # Overwrite same file
-    wb.save(excel_path)
+    # Overwrite same file atomically
+    try:
+        from alpha_checks import atomic_save
+        atomic_save(wb, excel_path)
+    except Exception:
+        wb.save(excel_path)
     return updated, not_in_excel, missing_critical, missing_items
 
 

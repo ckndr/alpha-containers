@@ -758,6 +758,11 @@ def read_production_source(prod_path):
         catalog_name, pid = ALIASES.get((name_raw.lower().strip(), dia_raw), (None, None))
         if catalog_name is None:
             catalog_name, pid = ALIASES.get((name_raw.lower().rstrip(), dia_raw), (None, None))
+        if catalog_name is None and cust_raw:
+            cust_first = cust_raw.lower().strip().split()[0]
+            catalog_name, pid = ALIASES.get((f"{cust_first} {name_raw.lower().strip()}", dia_raw), (None, None))
+            if catalog_name is None:
+                catalog_name, pid = ALIASES.get((f"{cust_raw.lower().strip()} {name_raw.lower().strip()}", dia_raw), (None, None))
         if catalog_name is None:
             catalog_name = name_raw
             pid = None
@@ -939,7 +944,11 @@ def write_production_log(ac_path, source_rows):
                 cell.alignment     = copy(s['alignment'])
                 cell.number_format = s['number_format']
 
-    wb.save(ac_path)
+    try:
+        from alpha_checks import atomic_save
+        atomic_save(wb, ac_path)
+    except Exception:
+        wb.save(ac_path)
     return len(source_rows)
 
 
@@ -1010,6 +1019,15 @@ def read_fg_stock(prod_path):
             dia_norm = "30"
 
         result = FG_ALIASES.get((prod_key, dia_norm, cust_key))
+        if not result and not prod_key.endswith(" tube"):
+            result = FG_ALIASES.get((f"{prod_key} tube", dia_norm, cust_key))
+        if not result and cust_key:
+            cust_first = cust_key.split()[0]
+            result = FG_ALIASES.get((prod_key, dia_norm, cust_first))
+        if not result:
+            prod_alias = ALIASES.get((prod_key, dia_norm))
+            if prod_alias and prod_alias[1]:
+                result = prod_alias
 
         catalog_name = result[0] if result else raw_product
         pid          = result[1] if result else None
@@ -1137,7 +1155,11 @@ def write_fg_stock(ac_path, fg_rows, latest_date):
 
         ws.cell(row=r, column=6).number_format = '#,##0'
 
-    wb.save(ac_path)
+    try:
+        from alpha_checks import atomic_save
+        atomic_save(wb, ac_path)
+    except Exception:
+        wb.save(ac_path)
     return len(fg_rows)
 
 

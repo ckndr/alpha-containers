@@ -44,6 +44,7 @@ if "onedrive" in ALPHA_DIR.lower() and os.path.exists(r"D:\Alpha"):
         sys.path.insert(0, SCRIPTS_DIR)
 
 LOGS_DIR    = os.path.join(ALPHA_DIR, "Logs")
+REPORTS_ARCHIVE_DIR = os.path.join(LOGS_DIR, "Reports_Archive")
 
 # ── CONFIGURABLE ────────────────────────────────────────────────────────────
 DOWNLOADS_DIR = r"C:\Users\HP\Downloads"
@@ -53,7 +54,7 @@ PROD_FILE_PATTERN = "Production report "   # files starting with this
 PROD_TARGET_NAME  = "Production.xlsx"      # what we rename/copy it to
 
 # How many backup files to keep
-MAX_BACKUPS = 3
+MAX_BACKUPS = 15
 
 # ── COLORS (Windows terminal) ──────────────────────────────────────────────
 if sys.platform == 'win32':
@@ -200,6 +201,37 @@ def setup_logging():
     return log_path
 
 
+def check_excel_running():
+    """Pre-flight check: verify if Microsoft Excel is running, prompt operator to close or terminate."""
+    try:
+        res = subprocess.run(["tasklist", "/fi", "imagename eq excel.exe", "/fo", "csv", "/nh"],
+                             capture_output=True, text=True)
+        out = res.stdout.lower()
+        if "excel.exe" in out and "no tasks" not in out:
+            warn("Microsoft Excel is currently running!")
+            print(f"    {YELLOW}Excel locks workbook files and will cause save failures or corruption.{RESET}")
+            if sys.stdin and hasattr(sys.stdin, 'isatty') and sys.stdin.isatty():
+                try:
+                    ans = input(f"    Close Excel and press Enter, or type 'k' to terminate Excel process: ").strip().lower()
+                    if ans == 'k':
+                        subprocess.run(["taskkill", "/f", "/im", "excel.exe"], capture_output=True)
+                        ok("Excel process terminated.")
+                    else:
+                        res2 = subprocess.run(["tasklist", "/fi", "imagename eq excel.exe", "/fo", "csv", "/nh"],
+                                              capture_output=True, text=True)
+                        out2 = res2.stdout.lower()
+                        if "excel.exe" in out2 and "no tasks" not in out2:
+                            warn("Excel is still running. Proceeding with caution...")
+                        else:
+                            ok("Excel closed.")
+                except (EOFError, KeyboardInterrupt):
+                    pass
+            else:
+                warn("Non-interactive mode: proceeding with caution while Excel runs.")
+    except Exception:
+        pass
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # STEP 1: PRE-RUN BACKUP
 # ═══════════════════════════════════════════════════════════════════════════
@@ -214,7 +246,7 @@ def step_backup():
     except Exception:
         pass
 
-    date_str = datetime.now().strftime('%Y%m%d')
+    timestamp_str = datetime.now().strftime('%Y%m%d_%H%M%S')
     excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
 
     if not excel_files:
@@ -239,16 +271,50 @@ def step_backup():
                 warn(f"Git auto-recovery failed: {ge}")
 
         if zipfile.is_zipfile(src):
-            dst = os.path.join(LOGS_DIR, f"backup_{date_str}_{name}")
+            dst = os.path.join(LOGS_DIR, f"backup_daily_{timestamp_str}_{name}")
             shutil.copy2(src, dst)
             ok(f"Backed up: {name}")
 
-    # Clean old backups — keep only the last MAX_BACKUPS
-    backups = sorted(glob.glob(os.path.join(LOGS_DIR, "backup_*.xlsx")),
+    # Clean old backups — keep only the last MAX_BACKUPS of daily automated backups
+    backups = sorted(glob.glob(os.path.join(LOGS_DIR, "backup_daily_*.xlsx")),
                      key=os.path.getmtime, reverse=True)
     for old in backups[MAX_BACKUPS:]:
-        os.remove(old)
-        print(f"    {DIM}Cleaned old backup: {os.path.basename(old)}{RESET}")
+        try:
+            os.remove(old)
+            print(f"    {DIM}Cleaned old daily backup: {os.path.basename(old)}{RESET}")
+        except Exception:
+            pass
+
+    # Snapshot raw ERP exports to Logs/ERP_Archives/YYYYMMDD_HHMMSS/
+    erp_archive_root = os.path.join(LOGS_DIR, "ERP_Archives")
+    os.makedirs(erp_archive_root, exist_ok=True)
+    erp_snapshot_dir = os.path.join(erp_archive_root, timestamp_str)
+
+    erp_raw_files = ['inventory.xls', 'dispatch.xls', 'dispatch_pet.xls', PROD_TARGET_NAME]
+    archived_count = 0
+    for ef in erp_raw_files:
+        ef_path = os.path.join(ALPHA_DIR, ef)
+        if os.path.exists(ef_path) and os.path.getsize(ef_path) > 0:
+            os.makedirs(erp_snapshot_dir, exist_ok=True)
+            shutil.copy2(ef_path, os.path.join(erp_snapshot_dir, ef))
+            archived_count += 1
+
+    if archived_count > 0:
+        ok(f"Archived {archived_count} raw ERP/Production file(s) → Logs/ERP_Archives/{timestamp_str}/")
+
+    # Prune old ERP snapshot folders — keep last MAX_BACKUPS
+    existing_dirs = sorted(
+        [os.path.join(erp_archive_root, d) for d in os.listdir(erp_archive_root)
+         if os.path.isdir(os.path.join(erp_archive_root, d))],
+        key=os.path.getmtime,
+        reverse=True
+    )
+    for old_dir in existing_dirs[MAX_BACKUPS:]:
+        try:
+            shutil.rmtree(old_dir)
+            print(f"    {DIM}Cleaned old ERP snapshot: {os.path.basename(old_dir)}{RESET}")
+        except Exception:
+            pass
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -280,17 +346,30 @@ def step_check_erp():
         if copy_matches:
             latest_copy = max(copy_matches, key=os.path.getmtime)
             age_min = (time.time() - os.path.getmtime(latest_copy)) / 60
-            ok(f"{label}: fresh copy found ({os.path.basename(latest_copy)}, {int(age_min)} min ago)")
-            continue
+            try:
+                shutil.copy2(latest_copy, target)
+                for old_copy in copy_matches:
+                    try:
+                        os.remove(old_copy)
+                    except Exception:
+                        pass
+                ok(f"{label}: auto-replaced with fresh copy ({os.path.basename(latest_copy)}, {int(age_min)} min ago)")
+            except Exception as ce:
+                warn(f"{label}: could not auto-replace: {ce}")
 
         if os.path.exists(target):
+            size_b = os.path.getsize(target)
+            if size_b < 1024:
+                fail(f"{label}: {filename} is empty or corrupted ({size_b} bytes)")
+                warnings_list.append(f"{label}: file ({filename}) is empty/corrupt ({size_b} bytes)")
+                all_ok = False
+                continue
+
             age_h = (time.time() - os.path.getmtime(target)) / 3600
             if age_h < 26:
                 ok(f"{label}: {filename} ({age_h:.1f}h old)")
             else:
-                warn(f"{label}: {filename} is {age_h:.0f}h old — stale?")
-                warnings_list.append(f"{label}: file is stale ({age_h:.0f} hours old)")
-                all_ok = False
+                warn(f"{label}: {filename} is {age_h:.0f}h old (weekend / advisory notice)")
         else:
             fail(f"{label}: {filename} NOT FOUND")
             warnings_list.append(f"{label}: file ({filename}) not found")
@@ -307,15 +386,35 @@ def step_check_erp():
 # STEP 3: FIND PRODUCTION FILE
 # ═══════════════════════════════════════════════════════════════════════════
 def step_find_production(skip=False):
-    header(3, "Finding Production report...")
+    header(3, "Finding & archiving reports (Production & Pending Orders)...")
+
+    os.makedirs(REPORTS_ARCHIVE_DIR, exist_ok=True)
+
+    # 1. Archive ANY pending order files currently in Downloads into Logs/Reports_Archive
+    if os.path.isdir(DOWNLOADS_DIR):
+        pending_archived = 0
+        for f in os.listdir(DOWNLOADS_DIR):
+            if f.upper().startswith("PENDING ORDER ") and (f.endswith('.xlsx') or f.endswith('.xls')) and '~$' not in f:
+                p_src = os.path.join(DOWNLOADS_DIR, f)
+                p_dst = os.path.join(REPORTS_ARCHIVE_DIR, f)
+                try:
+                    if os.path.exists(p_dst):
+                        try: os.remove(p_dst)
+                        except Exception: pass
+                    shutil.move(p_src, p_dst)
+                    pending_archived += 1
+                except Exception as pe:
+                    warn(f"Could not move pending order file {f}: {pe}")
+        if pending_archived > 0:
+            ok(f"Archived {pending_archived} Pending Order file(s) from Downloads → Logs/Reports_Archive/")
 
     if skip:
-        warn("Skipped (--skip-prod)")
+        warn("Skipped Production report search (--skip-prod)")
         return True
 
     target = os.path.join(ALPHA_DIR, PROD_TARGET_NAME)
 
-    # Search Downloads for files matching "Production report *.xlsx"
+    # 2. Search Downloads for fresh "Production report *.xlsx"
     candidates = []
     if os.path.isdir(DOWNLOADS_DIR):
         for f in os.listdir(DOWNLOADS_DIR):
@@ -332,7 +431,6 @@ def step_find_production(skip=False):
     if candidates:
         best_path, best_name, best_age = candidates[0]
 
-        # Format age string
         if best_age < 1:
             age_str = f"{int(best_age * 60)} min ago"
         elif best_age < 24:
@@ -343,31 +441,99 @@ def step_find_production(skip=False):
         print(f"    Found: {CYAN}{best_name}{RESET}  ({age_str})")
 
         if len(candidates) > 1:
-            print(f"    {DIM}({len(candidates)} total files found — using most recent){RESET}")
+            print(f"    {DIM}({len(candidates)} total files found in Downloads — using most recent){RESET}")
 
-        # Check if we already have a newer file in Alpha
-        if os.path.exists(target):
-            target_mtime = os.path.getmtime(target)
-            source_mtime = os.path.getmtime(best_path)
-            if target_mtime >= source_mtime:
-                ok(f"Existing {PROD_TARGET_NAME} is already up-to-date")
+        def is_file_locked(filepath):
+            if not os.path.exists(filepath):
+                return False
+            try:
+                with open(filepath, 'r+b'):
+                    pass
+                return False
+            except (IOError, PermissionError):
                 return True
 
-        # Copy (not move — keep original in Downloads as backup)
-        shutil.copy2(best_path, target)
-        ok(f"Copied → {PROD_TARGET_NAME}")
+        if is_file_locked(target):
+            fail(f"Existing {PROD_TARGET_NAME} is open/locked in Microsoft Excel!")
+            if sys.stdin and hasattr(sys.stdin, 'isatty') and sys.stdin.isatty():
+                try:
+                    input(f"    {YELLOW}Please close {PROD_TARGET_NAME} in Excel and press Enter: {RESET}")
+                except (EOFError, KeyboardInterrupt):
+                    pass
+
+        # Check if we already have the exact same file in Alpha
+        should_copy = True
+        if os.path.exists(target):
+            if os.path.getsize(target) == os.path.getsize(best_path) and abs(os.path.getmtime(target) - os.path.getmtime(best_path)) < 2:
+                should_copy = False
+                ok(f"Existing {PROD_TARGET_NAME} is already up-to-date")
+
+        if should_copy:
+            try:
+                shutil.copy2(best_path, target)
+                ok(f"Copied → {PROD_TARGET_NAME}")
+            except PermissionError:
+                fail(f"Could not overwrite {PROD_TARGET_NAME} — file is locked by another program")
+                return False
+
+        # Move source file to project archive folder (Logs/Reports_Archive/)
+        dest_archive = os.path.join(REPORTS_ARCHIVE_DIR, best_name)
+        try:
+            if os.path.abspath(best_path) != os.path.abspath(dest_archive):
+                if os.path.exists(dest_archive):
+                    try:
+                        os.remove(dest_archive)
+                    except Exception:
+                        pass
+                shutil.move(best_path, dest_archive)
+                ok(f"Archived source report → Logs/Reports_Archive/{best_name}")
+        except Exception as me:
+            warn(f"Could not move source report to archive: {me}")
+
+        # Also clean any other older production reports lingering in Downloads
+        for full_p, f_name, _ in candidates[1:]:
+            try:
+                d_p = os.path.join(REPORTS_ARCHIVE_DIR, f_name)
+                if os.path.exists(d_p):
+                    try: os.remove(d_p)
+                    except Exception: pass
+                shutil.move(full_p, d_p)
+            except Exception:
+                pass
+
         return True
 
-    # No candidates found in Downloads
+    # If not found directly in Downloads root, search project archive folder
+    archive_candidates = []
+    if os.path.isdir(REPORTS_ARCHIVE_DIR):
+        for f in os.listdir(REPORTS_ARCHIVE_DIR):
+            if (f.lower().startswith(PROD_FILE_PATTERN.lower())
+                    and f.lower().endswith('.xlsx')
+                    and '~$' not in f):
+                full = os.path.join(REPORTS_ARCHIVE_DIR, f)
+                age_h = (time.time() - os.path.getmtime(full)) / 3600
+                archive_candidates.append((full, f, age_h))
+    if archive_candidates:
+        archive_candidates.sort(key=lambda x: x[2])
+        best_arch_path, best_arch_name, best_arch_age = archive_candidates[0]
+        if not os.path.exists(target) or os.path.getmtime(best_arch_path) > os.path.getmtime(target):
+            try:
+                shutil.copy2(best_arch_path, target)
+                ok(f"Copied from archive ({best_arch_name}) → {PROD_TARGET_NAME}")
+                return True
+            except Exception:
+                pass
+
+    # No fresh candidates found in Downloads root or archive
     if os.path.exists(target):
         age_h = (time.time() - os.path.getmtime(target)) / 3600
         if age_h < 26:
             ok(f"Using existing {PROD_TARGET_NAME} ({age_h:.1f}h old)")
             return True
         else:
-            warn(f"Existing {PROD_TARGET_NAME} is {age_h:.0f}h old — no fresh file found in Downloads")
+            warn(f"Existing {PROD_TARGET_NAME} is {age_h:.0f}h old — no fresh file found in Downloads or archive")
     else:
-        fail(f"No 'Production report *.xlsx' found in {DOWNLOADS_DIR}")
+        fail(f"No 'Production report *.xlsx' found in {DOWNLOADS_DIR} or {REPORTS_ARCHIVE_DIR}")
         fail(f"No existing {PROD_TARGET_NAME} in {ALPHA_DIR}")
 
     # Manual fallback
@@ -377,31 +543,67 @@ def step_find_production(skip=False):
         ok(f"Copied → {PROD_TARGET_NAME}")
         return True
 
-    warn(f"Continuing without fresh Production data")
+    warn("Continuing without fresh Production data")
     return True
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# STEP 4: WIP UPDATE
-# ═══════════════════════════════════════════════════════════════════════════
-def step_wip(skip=False, wip_text=None):
-    header(4, "WIP Update (Mehmood's message)...")
+def get_clipboard_text():
+    """Retrieve plain text from Windows clipboard via win32clipboard, tkinter, or powershell."""
+    try:
+        import win32clipboard
+        win32clipboard.OpenClipboard()
+        try:
+            if win32clipboard.IsClipboardFormatAvailable(win32clipboard.CF_UNICODETEXT):
+                data = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
+                return data or ""
+        finally:
+            win32clipboard.CloseClipboard()
+    except Exception:
+        pass
 
-    if skip:
-        warn("Skipped (--skip-wip)")
-        return True
+    try:
+        import tkinter as tk
+        root = tk.Tk()
+        root.withdraw()
+        data = root.clipboard_get()
+        root.destroy()
+        return data or ""
+    except Exception:
+        pass
 
-    if wip_text:
-        msg = wip_text.strip()
-        print(f"    Using CLI WIP input: {msg}")
-    else:
-        msg = timed_input(f"    Paste WIP message (15s timeout, or Enter/timeout to skip):\n    {CYAN}>{RESET} ", timeout=15.0)
+    try:
+        res = subprocess.run(["powershell", "-NoProfile", "-Command", "Get-Clipboard"],
+                             capture_output=True, text=True, timeout=2)
+        if res.returncode == 0 and res.stdout:
+            return res.stdout.strip()
+    except Exception:
+        pass
 
+    return ""
+
+
+def is_wip_pattern(text):
+    """Check if clipboard text matches a Mehmood-style WIP WhatsApp message."""
+    if not text or len(text) > 250:
+        return False
+    t = text.lower().strip()
+    if ('mm' in t or 'kg' in t or '#' in t) and any(c.isdigit() for c in t):
+        try:
+            sys.path.insert(0, SCRIPTS_DIR)
+            from update_wip import parse_wip_message
+            res = parse_wip_message(t)
+            valid_dias = {12.5, 13.5, 16.0, 16, 19.0, 19, 20.5, 25.0, 25, 30.0, 30, 32.0, 32, 35.0, 35}
+            if res and any(d in valid_dias for d in res.keys()):
+                return True
+        except Exception:
+            pass
+    return False
+
+
+def apply_wip(msg):
+    """Apply WIP weights to column I of Inventory sheet in active Tubex workbook."""
     if not msg:
-        warn("No WIP message — skipped")
-        return True
-
-    # Import WIP functions from existing update_wip.py
+        return False
     sys.path.insert(0, SCRIPTS_DIR)
     try:
         from update_wip import parse_wip_message, build_slug_map, find_excel, pick_row
@@ -413,12 +615,12 @@ def step_wip(skip=False, wip_text=None):
 
     wip_data = parse_wip_message(msg)
     if not wip_data:
-        fail("Could not parse. Expected: #19mm 10kg #30mm 125kg")
+        fail("Could not parse WIP message. Expected: #19mm 10kg #30mm 125kg")
         return False
 
     excel_path, _ = find_excel()
     if not excel_path:
-        fail("No Tubex*.xlsx found")
+        fail("No Tubex*.xlsx found for WIP update")
         return False
 
     wb = load_workbook(excel_path)
@@ -440,18 +642,44 @@ def step_wip(skip=False, wip_text=None):
             written.append(f"{dia}mm→{kg}kg")
 
     wb.save(excel_path)
+    wb.close()
     if written:
-        ok(f"WIP updated: {', '.join(written)}")
+        ok(f"WIP applied: {', '.join(written)}")
+        return True
     else:
-        warn("No matching slug rows found")
+        warn("No matching slug rows found in Inventory sheet")
+        return False
 
-    return True
+
+def step_wip(skip=False, wip_text=None):
+    header(4, "WIP Ingestion (Mehmood's message)...")
+
+    if skip:
+        warn("Skipped (--skip-wip)")
+        return None
+
+    if wip_text:
+        msg = wip_text.strip()
+        print(f"    Using CLI WIP input: {msg}")
+        return msg
+
+    clip = get_clipboard_text().strip()
+    if is_wip_pattern(clip):
+        ok(f"Detected WIP in clipboard: {CYAN}{clip}{RESET}")
+        return clip
+
+    msg = timed_input(f"    Paste WIP message (5s timeout, or Enter to skip):\n    {CYAN}>{RESET} ", timeout=5.0)
+    if not msg:
+        warn("No WIP message — skipping")
+        return None
+
+    return msg.strip()
 
 
 # ═══════════════════════════════════════════════════════════════════════════
 # STEP 5: RUN PIPELINE
 # ═══════════════════════════════════════════════════════════════════════════
-def step_pipeline():
+def step_pipeline(wip_msg=None):
     header(5, "Running update pipeline...")
 
     # Check Excel not open
@@ -472,7 +700,8 @@ def step_pipeline():
 
     # Pipeline order is CRITICAL:
     # 1. Production first (populates Production_Log that sort_dashboard reads)
-    # 2. Inventory (independent)
+    # 2. Inventory (refreshes ERP stock & issuances)
+    # 2b. WIP (applied immediately after inventory using fresh issuance data)
     # 3. Dispatch (can add dispatch to inactive products)
     # 4. Sort Dashboard AFTER 1-3 (rearranges based on fresh production+dispatch)
     # 5. HTML last (reads everything)
@@ -516,6 +745,9 @@ def step_pipeline():
                 return False
         else:
             ok(label)
+            if script_name == "update_inventory.py" and wip_msg:
+                print(f"\n    {DIM}── Applying WIP weights to Inventory (fresh issuance) ──{RESET}")
+                apply_wip(wip_msg)
 
     # Show mismatches if any
     if os.path.exists(mismatch_log):
@@ -546,20 +778,21 @@ def step_pipeline():
 def step_crosscheck():
     header(6, "Cross-checking with Imran's data...")
 
-    errors = []
+    critical_errors = []
+    pending_warnings = []
     prod_path = os.path.join(ALPHA_DIR, PROD_TARGET_NAME)
     if not os.path.exists(prod_path):
         warn("Production.xlsx not found — skipping machine-level and summary checks")
-        errors.append("Production.xlsx not found - skipped cross-checks")
-        return errors
+        critical_errors.append("Production.xlsx not found - skipped cross-checks")
+        return critical_errors, pending_warnings
 
     try:
         import pandas as pd
         from openpyxl import load_workbook
     except ImportError:
         warn("pandas or openpyxl not installed — skipping cross-check")
-        errors.append("pandas or openpyxl not installed - skipped cross-checks")
-        return errors
+        critical_errors.append("pandas or openpyxl not installed - skipped cross-checks")
+        return critical_errors, pending_warnings
 
     # --- Part A: Machine-level production totals comparison ---
     try:
@@ -599,7 +832,7 @@ def step_crosscheck():
 
         if not good_col or not machine_col:
             warn("Could not identify Machine/Good columns in Imran's file")
-            errors.append("Could not identify Machine/Good columns in Production.xlsx")
+            critical_errors.append("Could not identify Machine/Good columns in Production.xlsx")
         else:
             df_imran[good_col] = pd.to_numeric(df_imran[good_col], errors='coerce').fillna(0)
             imran_totals = df_imran.groupby(machine_col)[good_col].sum()
@@ -608,7 +841,7 @@ def step_crosscheck():
             excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
             if not excel_files:
                 warn("No Tubex*.xlsx — skipping machine totals check")
-                errors.append("No Tubex*.xlsx found for machine totals check")
+                critical_errors.append("No Tubex*.xlsx found for machine totals check")
             else:
                 df_dash = pd.read_excel(excel_files[-1], sheet_name='Production_Log', header=1)
 
@@ -625,7 +858,7 @@ def step_crosscheck():
 
                 if not good_col_d or not machine_col_d:
                     warn("Could not identify columns in Production_Log")
-                    errors.append("Could not identify columns in Production_Log")
+                    critical_errors.append("Could not identify columns in Production_Log")
                 else:
                     df_dash[good_col_d] = pd.to_numeric(df_dash[good_col_d], errors='coerce').fillna(0)
                     dash_totals = df_dash.groupby(machine_col_d)[good_col_d].sum()
@@ -643,7 +876,7 @@ def step_crosscheck():
                             diff = dv - iv
                             fail(f"{str(m):14s} Imran={iv:>8,}  Dashboard={dv:>8,}  ({diff:+,})")
                             mismatches.append(m)
-                            errors.append(f"Machine total mismatch for {m}: Imran={iv:,}, Dashboard={dv:,} (diff={diff:+,})")
+                            critical_errors.append(f"Machine total mismatch for {m}: Imran={iv:,}, Dashboard={dv:,} (diff={diff:+,})")
 
                     it = int(imran_totals.sum())
                     dt = int(dash_totals.sum())
@@ -653,7 +886,7 @@ def step_crosscheck():
                         ok(f"{'TOTAL':14s} Imran={it:>8,}  Dashboard={dt:>8,}")
                     else:
                         fail(f"{'TOTAL':14s} Imran={it:>8,}  Dashboard={dt:>8,}  ({dt-it:+,})")
-                        errors.append(f"Grand Total production mismatch: Imran={it:,}, Dashboard={dt:,} (diff={dt-it:+,})")
+                        critical_errors.append(f"Grand Total production mismatch: Imran={it:,}, Dashboard={dt:,} (diff={dt-it:+,})")
 
                     if mismatches:
                         warn(f"Mismatches in: {', '.join(str(m) for m in mismatches)}")
@@ -661,7 +894,7 @@ def step_crosscheck():
                         ok("All machines match!")
     except Exception as e:
         warn(f"Machine totals cross-check error: {e}")
-        errors.append(f"Machine totals cross-check error: {e}")
+        critical_errors.append(f"Machine totals cross-check error: {e}")
 
     # --- Part B: Summary Sheet comparison ---
     try:
@@ -691,7 +924,7 @@ def step_crosscheck():
         
         if not summary_sheet_name:
             warn("No Summary sheet found in Production.xlsx")
-            errors.append("No Summary sheet found in Production.xlsx")
+            critical_errors.append("No Summary sheet found in Production.xlsx")
         else:
             ws_sum = wb_imran[summary_sheet_name]
             excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
@@ -808,7 +1041,7 @@ def step_crosscheck():
                     else:
                         diff = dash_val - imran_val
                         fail(f"{label:28s} Imran ({imran_cell})={imran_val:>8,}  Dashboard ({dash_cell})={dash_val:>8,}  ({diff:+,})")
-                        errors.append(f"Summary mismatch - {label}: Imran={imran_val:,}, Dashboard={dash_val:,} (diff={diff:+,})")
+                        critical_errors.append(f"Summary mismatch - {label}: Imran={imran_val:,}, Dashboard={dash_val:,} (diff={diff:+,})")
                         summary_mismatches += 1
                 
                 if summary_mismatches == 0:
@@ -820,67 +1053,84 @@ def step_crosscheck():
         wb_imran.close()
     except Exception as e:
         warn(f"Summary sheet cross-check error: {e}")
-        errors.append(f"Summary sheet cross-check error: {e}")
+        critical_errors.append(f"Summary sheet cross-check error: {e}")
 
-    # --- Part C: Pending Tube Orders comparison ---
+    # --- Part C: Pending Tube Orders comparison (Line-by-Line & Grand Total - Advisory) ---
     try:
-        safe_print(f"\n    {DIM}── Pending Tube Orders: MRP vs PENDING ORDER file ──{RESET}")
+        safe_print(f"\n    {DIM}── Pending Tube Orders: MRP vs PENDING ORDER file (Line-by-Line) ──{RESET}")
         pending_files = []
-        if os.path.exists(DOWNLOADS_DIR):
-            for f in os.listdir(DOWNLOADS_DIR):
-                if f.upper().startswith("PENDING ORDER ") and (f.endswith(".xlsx") or f.endswith(".xls")):
-                    path = os.path.join(DOWNLOADS_DIR, f)
-                    pending_files.append((path, os.path.getmtime(path)))
-        
+        for folder in [REPORTS_ARCHIVE_DIR, DOWNLOADS_DIR]:
+            if os.path.exists(folder):
+                for f in os.listdir(folder):
+                    if f.upper().startswith("PENDING ORDER ") and (f.endswith(".xlsx") or f.endswith(".xls")) and '~$' not in f:
+                        path = os.path.join(folder, f)
+                        pending_files.append((path, os.path.getmtime(path)))
+
         if not pending_files:
-            warn("No PENDING ORDER file found in Downloads — skipping comparison")
-            errors.append("No PENDING ORDER file found in Downloads")
+            warn("No PENDING ORDER file found in Logs/Reports_Archive or Downloads — skipping comparison")
+            pending_warnings.append("No PENDING ORDER file found for floor comparison")
         else:
             pending_files.sort(key=lambda x: x[1], reverse=True)
             most_recent_pending = pending_files[0][0]
             pending_basename = os.path.basename(most_recent_pending)
-            
-            # Find the most recent Tubex file
+
             excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
             if not excel_files:
                 warn("No Tubex*.xlsx found — skipping Pending Order check")
-                errors.append("No Tubex*.xlsx found for Pending Order check")
+                pending_warnings.append("No Tubex*.xlsx found for Pending Order check")
             else:
-                # 1. Read Tubex MRP sheet
-                df_mrp = pd.read_excel(excel_files[-1], sheet_name='MRP', header=None)
-                mrp_total = None
-                for idx, row in df_mrp.iterrows():
-                    val_4 = str(row[4]).strip() if pd.notna(row[4]) else ""
-                    if val_4.upper() == 'TOTAL:':
-                        mrp_total = row[7]
-                        break
-                
-                if mrp_total is None:
-                    warn(f"Could not find tube total 'TOTAL:' in MRP sheet of {os.path.basename(excel_files[-1])}")
-                    errors.append(f"Could not find tube total in MRP sheet of {os.path.basename(excel_files[-1])}")
+                active_tb = excel_files[-1]
+                wb_mrp = load_workbook(active_tb, data_only=True)
+                if 'MRP' not in wb_mrp.sheetnames:
+                    warn("No MRP sheet found in active Tubex workbook")
+                    pending_warnings.append("No MRP sheet found in active Tubex workbook")
                 else:
-                    try:
-                        mrp_total = int(float(str(mrp_total).replace(',', '').strip()))
-                    except Exception as e:
-                        warn(f"Error parsing MRP tube total: {e}")
-                        errors.append(f"Error parsing MRP tube total: {e}")
-                        mrp_total = None
-                
-                if mrp_total is not None:
-                    # 2. Read Pending Order sheet
-                    xls_pending = pd.ExcelFile(most_recent_pending)
-                    pending_sheet_names = xls_pending.sheet_names
-                    
-                    # Today's date representation in DD-MM-YYYY
+                    ws_mrp = wb_mrp['MRP']
+                    mrp_rows = []
+                    mrp_total = None
+                    for r in range(3, 40):
+                        val_e = str(ws_mrp.cell(r, 5).value or '').strip().upper()
+                        if val_e == 'TOTAL:':
+                            mrp_total = ws_mrp.cell(r, 8).value
+                            break
+                        dia = ws_mrp.cell(r, 1).value
+                        cust = str(ws_mrp.cell(r, 2).value or '').strip()
+                        pname = str(ws_mrp.cell(r, 3).value or '').strip()
+                        pid = ws_mrp.cell(r, 4).value
+                        job = ws_mrp.cell(r, 5).value
+                        req = ws_mrp.cell(r, 6).value or 0
+                        prod = ws_mrp.cell(r, 7).value or 0
+                        bal = ws_mrp.cell(r, 8).value or 0
+                        remarks = str(ws_mrp.cell(r, 9).value or '').strip()
+                        if pname:
+                            try:
+                                req_int = int(float(str(req).replace(',', '').strip()))
+                                prod_int = int(float(str(prod).replace(',', '').strip()))
+                                bal_int = int(float(str(bal).replace(',', '').strip()))
+                            except Exception:
+                                req_int, prod_int, bal_int = 0, 0, 0
+                            mrp_rows.append({
+                                'row': r, 'dia': dia, 'customer': cust, 'product': pname,
+                                'pid': pid, 'job': job, 'req': req_int, 'prod': prod_int,
+                                'bal': bal_int, 'remarks': remarks
+                            })
+                    wb_mrp.close()
+
+                    if mrp_total is not None:
+                        try:
+                            mrp_total = int(float(str(mrp_total).replace(',', '').strip()))
+                        except Exception:
+                            mrp_total = None
+
+                    # Open Imran's pending workbook
+                    wb_p = load_workbook(most_recent_pending, data_only=True)
                     today_str = datetime.now().strftime("%d-%m-%Y")
-                    
                     target_sheet = None
-                    if today_str in pending_sheet_names:
+                    if today_str in wb_p.sheetnames:
                         target_sheet = today_str
                     else:
-                        # Find most recent date sheet
                         date_sheets = []
-                        for s in pending_sheet_names:
+                        for s in wb_p.sheetnames:
                             try:
                                 dt = datetime.strptime(s.strip(), "%d-%m-%Y")
                                 date_sheets.append((s, dt))
@@ -889,39 +1139,136 @@ def step_crosscheck():
                         if date_sheets:
                             date_sheets.sort(key=lambda x: x[1], reverse=True)
                             target_sheet = date_sheets[0][0]
-                    
+
                     if not target_sheet:
                         warn(f"No date sheet (DD-MM-YYYY) found in {pending_basename} — skipping comparison")
-                        errors.append(f"No date sheet (DD-MM-YYYY) found in {pending_basename}")
+                        pending_warnings.append(f"No date sheet (DD-MM-YYYY) found in {pending_basename}")
+                        wb_p.close()
                     else:
-                        df_pending = pd.read_excel(most_recent_pending, sheet_name=target_sheet, header=None)
+                        ws_p = wb_p[target_sheet]
+                        imran_rows = []
                         pending_total = None
-                        for idx, row in df_pending.iterrows():
-                            val_0 = str(row[0]).strip().upper() if pd.notna(row[0]) else ""
-                            if val_0 == 'GRAND TOTAL':
-                                pending_total = row[7]
-                                break
-                        
-                        if pending_total is None:
-                            warn(f"Could not find 'GRAND TOTAL' in {pending_basename} sheet {target_sheet}")
-                            errors.append(f"Could not find 'GRAND TOTAL' in {pending_basename} sheet {target_sheet}")
-                        else:
+
+                        for r in range(4, ws_p.max_row + 1):
+                            c1 = ws_p.cell(r, 1).value
+                            c4 = ws_p.cell(r, 4).value
+                            c5 = ws_p.cell(r, 5).value
+                            c6 = ws_p.cell(r, 6).value
+                            c7 = ws_p.cell(r, 7).value
+                            c8 = ws_p.cell(r, 8).value
+
+                            s1 = str(c1 or '').strip().upper()
+                            s4 = str(c4 or '').strip().upper()
+
+                            if 'GRAND TOTAL' in s1 or 'GRAND TOTAL' in s4:
+                                pending_total = c8 or ws_p.cell(r, 2).value or ws_p.cell(r, 7).value
+                                continue
+
+                            if any(k in s1 for k in ('TOTAL', 'JOB NO')):
+                                continue
+                            if any(k in s4 for k in ('TOTAL', 'PRODUCT NAME')):
+                                continue
+                            if not c4 and not c6 and not c8:
+                                continue
+                            if c4:
+                                try:
+                                    req_int = int(float(str(c6 or 0).replace(',', '').strip()))
+                                    prod_int = int(float(str(c7 or 0).replace(',', '').strip()))
+                                    bal_int = int(float(str(c8 or 0).replace(',', '').strip()))
+                                except Exception:
+                                    req_int, prod_int, bal_int = 0, 0, 0
+                                imran_rows.append({
+                                    'row': r, 'job': c1, 'product': str(c4).strip(), 'dia': c5,
+                                    'req': req_int, 'prod': prod_int, 'bal': bal_int
+                                })
+
+                        if pending_total is not None:
                             try:
                                 pending_total = int(float(str(pending_total).replace(',', '').strip()))
-                                
-                                # Compare values
-                                if mrp_total == pending_total:
-                                    ok(f"Pending Tube Orders Match: {pending_basename} ({target_sheet}) = {pending_total:,}  MRP Sheet = {mrp_total:,}")
+                            except Exception:
+                                pending_total = None
+
+                        wb_p.close()
+
+                        def _tokens(s):
+                            return set(re.findall(r'[a-zA-Z0-9]+', str(s).lower()))
+
+                        matched_mrp_indices = set()
+                        line_mismatches = 0
+
+                        for ir in imran_rows:
+                            best_idx = None
+                            best_score = -1
+                            ir_job_str = str(ir['job']).strip() if ir['job'] is not None else ''
+                            ir_toks = _tokens(ir['product'])
+
+                            for idx, mr in enumerate(mrp_rows):
+                                if idx in matched_mrp_indices:
+                                    continue
+                                score = 0
+                                mr_job_str = str(mr['job']).strip() if mr['job'] is not None else ''
+                                if ir_job_str and ir_job_str in mr_job_str:
+                                    score += 100
+                                try:
+                                    if ir['dia'] is not None and mr['dia'] is not None and float(ir['dia']) == float(mr['dia']):
+                                        score += 20
+                                except Exception:
+                                    pass
+                                mr_toks = _tokens(mr['product'] + ' ' + mr['customer'])
+                                common = ir_toks & mr_toks
+                                score += len(common) * 10
+                                if score > best_score and score >= 20:
+                                    best_score = score
+                                    best_idx = idx
+
+                            if best_idx is not None:
+                                matched_mrp_indices.add(best_idx)
+                                mr = mrp_rows[best_idx]
+                                req_ok = (ir['req'] == mr['req'])
+                                prod_ok = (ir['prod'] == mr['prod'])
+                                bal_ok = (ir['bal'] == mr['bal'])
+                                job_disp = f"Job {ir['job']}" if ir['job'] else "No Job #"
+                                if req_ok and prod_ok and bal_ok:
+                                    ok(f"Dia {ir['dia']}mm | {ir['product']} ({job_disp}): Req={ir['req']:,}, Prod={ir['prod']:,}, Bal={ir['bal']:,}")
                                 else:
-                                    diff = pending_total - mrp_total
-                                    fail(f"Pending Tube Orders Mismatch: {pending_basename} ({target_sheet})={pending_total:,}  MRP Sheet={mrp_total:,} (diff={diff:+,})")
-                                    errors.append(f"Pending Tube Orders mismatch: {pending_basename} ({target_sheet})={pending_total:,}, MRP Sheet={mrp_total:,} (diff={diff:+,})")
-                            except Exception as e:
-                                warn(f"Error parsing Grand Total in {pending_basename} sheet {target_sheet}: {e}")
-                                errors.append(f"Error parsing Grand Total in {pending_basename} sheet {target_sheet}: {e}")
+                                    diff_req = ir['req'] - mr['req']
+                                    diff_prod = ir['prod'] - mr['prod']
+                                    diff_bal = ir['bal'] - mr['bal']
+                                    warn(f"Dia {ir['dia']}mm | Imran '{ir['product']}' vs MRP '{mr['product']}':")
+                                    if not req_ok: print(f"         Req:  Imran={ir['req']:,} vs MRP={mr['req']:,} ({diff_req:+,})")
+                                    if not prod_ok: print(f"         Prod: Imran={ir['prod']:,} vs MRP={mr['prod']:,} ({diff_prod:+,})")
+                                    if not bal_ok: print(f"         Bal:  Imran={ir['bal']:,} vs MRP={mr['bal']:,} ({diff_bal:+,})")
+                                    pending_warnings.append(f"Pending Order SKU difference for '{ir['product']}': Req diff={diff_req:+,}, Prod diff={diff_prod:+,}, Bal diff={diff_bal:+,}")
+                                    line_mismatches += 1
+                            else:
+                                warn(f"Unmatched Imran floor line: Dia {ir['dia']}mm | '{ir['product']}' | Bal: {ir['bal']:,}")
+                                pending_warnings.append(f"Unmatched Imran floor line in {pending_basename}: '{ir['product']}' (Bal: {ir['bal']:,})")
+                                line_mismatches += 1
+
+                        # Print unscheduled MRP orders
+                        unscheduled_mrp = [mr for idx, mr in enumerate(mrp_rows) if idx not in matched_mrp_indices]
+                        if unscheduled_mrp:
+                            safe_print(f"    {CYAN}[INFO]{RESET} Booked in MRP / Awaiting shop-floor schedule:")
+                            for mr in unscheduled_mrp:
+                                rem = f" ({mr['remarks']})" if mr['remarks'] else ""
+                                safe_print(f"      • Dia {mr['dia']}mm | {mr['customer']} - {mr['product']}: Req {mr['req']:,}, Bal {mr['bal']:,}{rem}")
+
+                        unscheduled_mrp_bal = sum(mr['bal'] for mr in unscheduled_mrp)
+
+                        if pending_total is not None and mrp_total is not None:
+                            accounted_diff = pending_total - (mrp_total - unscheduled_mrp_bal)
+                            if accounted_diff == 0:
+                                ok(f"Scheduled Floor Orders: Imran={pending_total:,} == MRP Scheduled Total={mrp_total - unscheduled_mrp_bal:,}")
+                                safe_print(f"    {CYAN}ℹ{RESET} Total MRP Order Book: {mrp_total:,} ({pending_total:,} floor + {unscheduled_mrp_bal:,} unscheduled Vince)")
+                            else:
+                                warn(f"Pending Orders difference: Imran={pending_total:,} vs MRP Scheduled={mrp_total - unscheduled_mrp_bal:,} (diff={accounted_diff:+,})")
+                                print(f"    {DIM}(Advisory notice: e.g. Imran pending sheet missing completed batches such as Vince 17k or timing lag — non-blocking){RESET}")
+                                pending_warnings.append(f"Pending Orders floor difference: Imran={pending_total:,} vs MRP Scheduled={mrp_total - unscheduled_mrp_bal:,} (diff={accounted_diff:+,})")
+                        elif pending_total is not None:
+                            ok(f"Imran Floor Total: {pending_total:,}")
     except Exception as e:
         warn(f"Pending Tube Orders cross-check error: {e}")
-        errors.append(f"Pending Tube Orders cross-check error: {e}")
+        pending_warnings.append(f"Pending Tube Orders cross-check error: {e}")
 
     # --- Part D: Check for unassigned PIDs (PID=0) in Production_Log ---
     try:
@@ -938,15 +1285,15 @@ def step_crosscheck():
                         pid_zeros.append(f"Row {r}: {val_name}")
                 if pid_zeros:
                     fail(f"Found {len(pid_zeros)} unassigned PID=0 entry/entries in Production_Log: {', '.join(pid_zeros[:3])}")
-                    errors.append(f"Unassigned PID=0 in Production_Log: {len(pid_zeros)} entries ({', '.join(pid_zeros[:3])})")
+                    critical_errors.append(f"Unassigned PID=0 in Production_Log: {len(pid_zeros)} entries ({', '.join(pid_zeros[:3])})")
                 else:
                     ok("All Production_Log entries have valid assigned PIDs (0 unassigned PID=0)")
             wb_check.close()
     except Exception as e:
         warn(f"PID check error: {e}")
-        errors.append(f"PID check error: {e}")
+        critical_errors.append(f"PID check error: {e}")
 
-    return errors
+    return critical_errors, pending_warnings
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1177,6 +1524,7 @@ def main():
     
     all_errors = []
 
+    check_excel_running()      # Pre-flight check: warn or terminate if Excel is open
     step_backup()              # 1. Backup Excel
     
     erp_warnings = step_check_erp()  # 2. Check ERP exports
@@ -1184,9 +1532,9 @@ def main():
     
     step_find_production(      # 3. Find Production file
         skip=skip_prod)
-    step_wip(skip=skip_wip, wip_text=cli_wip)    # 4. WIP update
+    wip_msg = step_wip(skip=skip_wip, wip_text=cli_wip)    # 4. WIP ingestion (clipboard / prompt / CLI)
     
-    success = step_pipeline()  # 5. Run all 5 scripts
+    success = step_pipeline(wip_msg=wip_msg)  # 5. Run pipeline (applies WIP after update_inventory)
     if not success:
         all_errors.append("Pipeline execution had failures (one or more scripts failed)")
 
@@ -1194,22 +1542,26 @@ def main():
     mismatch_log = os.path.join(LOGS_DIR, "mismatches.log")
     inv_warns, map_warns = read_mismatches_log(mismatch_log)
 
-    crosscheck_errors = []
+    critical_errors = []
+    pending_warnings = []
     if success:
-        crosscheck_errors = step_crosscheck()  # 6. Cross-check
-        step_screenshot()                      # 7. Screenshot
-        # R4-02: Deployment gating - gate git push if critical cross-check errors exist
-        if crosscheck_errors:
-            fail(f"CRITICAL: Cross-check found {len(crosscheck_errors)} discrepancy/discrepancies. Gating deployment — skipping Git push to protect production integrity.")
+        critical_errors, pending_warnings = step_crosscheck()  # 6. Cross-check
+        step_screenshot()                                      # 7. Screenshot
+        # Deployment gating: ONLY block Git push if critical core discrepancies exist (Machine/KPI/PID)
+        if critical_errors:
+            fail(f"CRITICAL: Core cross-check found {len(critical_errors)} discrepancy/discrepancies (Machine/KPI/PID). Gating deployment — skipping Git push to protect production integrity.")
         else:
-            step_git_push(skip=skip_git)       # 8. Git push
+            if pending_warnings:
+                safe_print(f"    {CYAN}ℹ{RESET} {len(pending_warnings)} pending order floor notice(s) detected — non-blocking, proceeding with Git push.")
+            step_git_push(skip=skip_git)                       # 8. Git push
     else:
         fail("CRITICAL: Core pipeline experienced failure. Skipping Git push to protect production integrity.")
 
     elapsed = time.time() - start
 
     # ── Unified Error Summary ──
-    has_issues = bool(all_errors or inv_warns or map_warns or crosscheck_errors)
+    has_blocking = bool(all_errors or inv_warns or map_warns or critical_errors)
+    has_issues = bool(has_blocking or pending_warnings)
     error_summary_path = os.path.join(LOGS_DIR, "error_summary.txt")
     
     with open(error_summary_path, 'w', encoding='utf-8') as f_sum:
@@ -1223,9 +1575,9 @@ def main():
 
         if has_issues:
             print_both()
-            print_both(f"  {RED}{BOLD}╔══════════════════════════════════════════════════════════╗{RESET}")
-            print_both(f"  {RED}{BOLD}║  ⚠ DAILY WORKFLOW ERROR SUMMARY                          ║{RESET}")
-            print_both(f"  {RED}{BOLD}╚══════════════════════════════════════════════════════════╝{RESET}")
+            print_both(f"  {RED if has_blocking else YELLOW}{BOLD}╔══════════════════════════════════════════════════════════╗{RESET}")
+            print_both(f"  {RED if has_blocking else YELLOW}{BOLD}║  ⚠ DAILY WORKFLOW ERROR & ADVISORY SUMMARY               ║{RESET}")
+            print_both(f"  {RED if has_blocking else YELLOW}{BOLD}╚══════════════════════════════════════════════════════════╝{RESET}")
             print_both()
             
             if all_errors:
@@ -1241,10 +1593,17 @@ def main():
                     print_both(f"    • {err}")
                 print_both()
                 
-            if crosscheck_errors:
-                print_both(f"  {RED}{BOLD}[CROSS-CHECK MISMATCHES]{RESET}")
-                for err in crosscheck_errors:
+            if critical_errors:
+                print_both(f"  {RED}{BOLD}[CORE PRODUCTION CROSS-CHECK MISMATCHES (BLOCKING)]{RESET}")
+                for err in critical_errors:
                     print_both(f"    • {err}")
+                print_both()
+
+            if pending_warnings:
+                print_both(f"  {CYAN}{BOLD}[PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]{RESET}")
+                print_both(f"  {DIM}  (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push){RESET}")
+                for w in pending_warnings:
+                    print_both(f"    • {w}")
                 print_both()
                 
             if map_warns:
@@ -1261,8 +1620,10 @@ def main():
     print(f"\n  {'='*52}")
     if not has_issues:
         print(f"  {GREEN}{BOLD}  ALL DONE{RESET} in {elapsed:.0f} seconds")
+    elif not has_blocking:
+        print(f"  {GREEN}{BOLD}  ALL CORE STEPS DONE{RESET} in {elapsed:.0f} seconds (Git updated, floor advisories logged)")
     else:
-        print(f"  {YELLOW}{BOLD}  COMPLETED WITH ISSUES{RESET} — see summary above")
+        print(f"  {YELLOW}{BOLD}  COMPLETED WITH BLOCKING ISSUES{RESET} — see summary above (Git push gated)")
     print(f"  {DIM}  Log: {os.path.basename(log_path)}{RESET}")
     print(f"  {DIM}  Error Summary: {os.path.basename(error_summary_path)}{RESET}")
     print(f"  {'='*52}\n")

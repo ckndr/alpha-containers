@@ -1,7 +1,7 @@
 @echo off
-if "%~1"=="" if not defined _KEEP_OPEN (
+if not defined _KEEP_OPEN (
     set _KEEP_OPEN=1
-    cmd /k ""%~f0""
+    cmd /k ""%~f0" %*"
     exit /b
 )
 cd /d "%~dp0"

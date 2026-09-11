@@ -1,2 +1,12 @@
 
-  ✓ ALL CHECKS PASSED: No errors, missing items, or mismatches detected!
+  ╔══════════════════════════════════════════════════════════╗
+  ║  ⚠ DAILY WORKFLOW ERROR & ADVISORY SUMMARY               ║
+  ╚══════════════════════════════════════════════════════════╝
+
+  [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
+    (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
+    • Pending Order SKU difference for 'SAMSOL COMMON RED': Req diff=+0, Prod diff=+420, Bal diff=-420
+    • Unmatched Imran floor line in PENDING ORDER SEPTEMBER 2026 (2).xlsx: 'VINCE HIS' (Bal: 20,000)
+    • Pending Order SKU difference for 'VINCE NURTURAL': Req diff=-17,612, Prod diff=-17,612, Bal diff=+0
+    • Pending Orders floor difference: Imran=946,712 vs MRP Scheduled=927,132 (diff=+19,580)
+

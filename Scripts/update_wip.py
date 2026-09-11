@@ -207,7 +207,11 @@ def main():
         ws.cell(row, INV_WIP_COL).value = kg
         written.append((dia, kg, row, name))
 
-    wb.save(excel_path)
+    try:
+        from alpha_checks import atomic_save
+        atomic_save(wb, excel_path)
+    except Exception:
+        wb.save(excel_path)
 
     # Report
     print("")

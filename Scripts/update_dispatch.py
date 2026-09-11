@@ -372,7 +372,11 @@ def update_dispatch(ac_path, dispatch_by_pid):
         ws.cell(pid_row_map[pid], DASHBOARD_DISP_COL).value = int(qty)
         updated += 1
 
-    wb.save(ac_path)
+    try:
+        from alpha_checks import atomic_save
+        atomic_save(wb, ac_path)
+    except Exception:
+        wb.save(ac_path)
     return updated, skipped
 
 

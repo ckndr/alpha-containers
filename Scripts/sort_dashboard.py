@@ -694,7 +694,11 @@ ws.cell(pet_tot_row, 14).number_format = '#,##0.0'
 ws.cell(pet_tot_row, 15).number_format = '0.0%'
 
 # ── SAVE ─────────────────────────────────────────────────────
-wb.save(EXCEL_PATH)
+try:
+    from alpha_checks import atomic_save
+    atomic_save(wb, EXCEL_PATH)
+except Exception:
+    wb.save(EXCEL_PATH)
 
 print(f"\n[OK] Dashboard sorted successfully -> {os.path.basename(EXCEL_PATH)}")
 print(f"  Active:   {N_at} tubes + {N_ap} PET")

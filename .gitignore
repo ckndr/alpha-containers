@@ -52,3 +52,4 @@ mrp_dump.txt
 # ── Pre-run backups (local only) ──
 Logs/backup_*
 Logs/ERP_Archives/
+Logs/Reports_Archive/

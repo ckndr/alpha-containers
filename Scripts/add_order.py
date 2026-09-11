@@ -741,8 +741,12 @@ def run_add_order_session(filepath, catalog, initial_product=None, initial_qty=N
     # Rearrange MRP orders by Dia/ml (lower to higher) and update all formulas
     rearrange_mrp_orders(ws_mrp)
 
-    # Save workbook
-    wb.save(filepath)
+    # Save workbook atomically
+    try:
+        from alpha_checks import atomic_save
+        atomic_save(wb, filepath)
+    except Exception:
+        wb.save(filepath)
     wb.close()
     print(f"\n[OK] Changes written to {os.path.basename(filepath)}.")
 
@@ -828,7 +832,11 @@ def remove_order_from_workbook(filepath, search_term, auto_keep=False):
     # Rearrange MRP orders and update all formulas
     rearrange_mrp_orders(ws_mrp)
 
-    wb.save(filepath)
+    try:
+        from alpha_checks import atomic_save
+        atomic_save(wb, filepath)
+    except Exception:
+        wb.save(filepath)
     wb.close()
     print(f"[OK] Removed row from MRP and updated all formulas.")
 
@@ -1017,123 +1025,153 @@ def main():
     parser.add_argument('-y', '--yes', '--keep', dest='auto_keep', action='store_true', help="Automatically keep changes without prompting")
     parser.add_argument('--remove', '--delete', dest='remove_target', help="Remove an order by Product ID or Product Name")
     parser.add_argument('--list', action='store_true', help="List all active orders currently in MRP")
+    parser.add_argument('--dry-run', action='store_true', help="Run add/remove order in test mode on a temporary copy without modifying live workbook")
     parser.add_argument('--sort', '--sort-mrp', dest='sort_mrp', action='store_true', help="Rearrange MRP orders according to Dia/ml (lower to higher)")
 
     args = parser.parse_args()
 
-    if args.list:
-        list_active_orders()
-        return
+    target_excel = EXCEL_PATH
+    temp_sandbox = None
+    if args.dry_run:
+        print("\n" + "=" * 70)
+        print("   [DRY-RUN MODE ACTIVE] Operating on a temporary sandbox copy.")
+        print("   Live production workbook will NOT be modified.")
+        print("=" * 70 + "\n")
+        temp_sandbox = EXCEL_PATH + ".dry_run.tmp.xlsx"
+        shutil.copy2(EXCEL_PATH, temp_sandbox)
+        target_excel = temp_sandbox
 
-    if args.sort_mrp:
-        print("[SORT] Rearranging MRP orders according to Dia/ml (lower to higher)...")
-        backup_file = backup_workbook(EXCEL_PATH)
-        wb = load_workbook(EXCEL_PATH, data_only=False)
-        rearrange_mrp_orders(wb['MRP'])
-        wb.save(EXCEL_PATH)
-        wb.close()
-        sort_script = os.path.join(os.path.dirname(__file__), 'sort_dashboard.py')
-        if os.path.exists(sort_script):
-            os.system(f'python "{sort_script}"')
-        confirm_keep_or_revert(EXCEL_PATH, backup_file, args.auto_keep)
-        return
-
-    if args.remove_target:
-        remove_order_from_workbook(EXCEL_PATH, args.remove_target, auto_keep=args.auto_keep)
-        return
-
-    # Load catalog
-    wb_temp = load_workbook(EXCEL_PATH, data_only=True, read_only=True)
-    catalog = load_product_catalog(wb_temp)
-    wb_temp.close()
-
-    product_input = args.product
-    qty_input = None
-    if args.qty is not None:
-        try:
-            qty_input = parse_qty_input(args.qty)
-        except ValueError as e:
-            print(f"[ERROR] {e}")
-            return
-    jof_input = args.jof
-    cust_input = args.customer
-    remarks_input = args.remarks
-
-    # Interactive wizard mode if no CLI options supplied
-    if not product_input:
-        print("=" * 60)
-        print("   ALPHA CONTAINERS -- ORDER MANAGEMENT WIZARD")
-        print("=" * 60)
-        print("  [1] Add or Increase Order Quantity")
-        print("  [2] Remove / Delete an Active Order")
-        print("  [3] List Current Active Orders")
-        print("  [4] Rearrange MRP Orders (Dia/ml low to high)")
-        print("  [Q] Quit")
-
-        try:
-            mode = input("\nSelect option [1/2/3/4/Q] (default: 1): ").strip().upper()
-        except (EOFError, KeyboardInterrupt):
-            return
-
-        if mode == '2':
-            list_active_orders()
-            while True:
-                try:
-                    target = input("\nEnter Product ID or Name to remove (or Enter to cancel): ").strip()
-                    if not target:
-                        break
-                    remove_order_from_workbook(EXCEL_PATH, target, auto_keep=args.auto_keep)
-                    more = input("\nRemove another order? [y/N] (default: N): ").strip().upper()
-                    if more != 'Y':
-                        break
-                except (EOFError, KeyboardInterrupt):
-                    break
-            return
-        elif mode == '3':
+    try:
+        if args.list:
             list_active_orders()
             return
-        elif mode == '4':
+
+        if args.sort_mrp:
             print("[SORT] Rearranging MRP orders according to Dia/ml (lower to higher)...")
-            backup_file = backup_workbook(EXCEL_PATH)
-            wb = load_workbook(EXCEL_PATH, data_only=False)
+            backup_file = None if args.dry_run else backup_workbook(target_excel)
+            wb = load_workbook(target_excel, data_only=False)
             rearrange_mrp_orders(wb['MRP'])
-            wb.save(EXCEL_PATH)
+            try:
+                from alpha_checks import atomic_save
+                atomic_save(wb, target_excel)
+            except Exception:
+                wb.save(target_excel)
             wb.close()
             sort_script = os.path.join(os.path.dirname(__file__), 'sort_dashboard.py')
-            if os.path.exists(sort_script):
+            if os.path.exists(sort_script) and not args.dry_run:
                 os.system(f'python "{sort_script}"')
-            confirm_keep_or_revert(EXCEL_PATH, backup_file, args.auto_keep)
-            return
-        elif mode == 'Q':
-            print("Cancelled.")
+            if not args.dry_run:
+                confirm_keep_or_revert(target_excel, backup_file, args.auto_keep)
             return
 
-    # If product_input passed via CLI, resolve it
-    initial_prod = None
-    if product_input:
-        initial_prod = resolve_product(catalog, product_input)
-        if not initial_prod:
-            print(f"[ERROR] Could not find product matching '{product_input}' in Product_Catalog.")
+        if args.remove_target:
+            remove_order_from_workbook(target_excel, args.remove_target, auto_keep=(args.auto_keep or args.dry_run))
             return
 
-        if qty_input is None:
+        # Load catalog
+        wb_temp = load_workbook(target_excel, data_only=True, read_only=True)
+        catalog = load_product_catalog(wb_temp)
+        wb_temp.close()
+
+        product_input = args.product
+        qty_input = None
+        if args.qty is not None:
             try:
-                qty_str = input(f"Enter Order Quantity to Add for {initial_prod['product_name']}: ").strip()
-                qty_input = parse_qty_input(qty_str)
-            except (ValueError, EOFError, KeyboardInterrupt) as e:
-                print(f"[ERROR] Invalid quantity: {e}")
+                qty_input = parse_qty_input(args.qty)
+            except ValueError as e:
+                print(f"[ERROR] {e}")
+                return
+        jof_input = args.jof
+        cust_input = args.customer
+        remarks_input = args.remarks
+
+        # Interactive wizard mode if no CLI options supplied
+        if not product_input:
+            print("=" * 60)
+            print("   ALPHA CONTAINERS -- ORDER MANAGEMENT WIZARD")
+            print("=" * 60)
+            print("  [1] Add or Increase Order Quantity")
+            print("  [2] Remove / Delete an Active Order")
+            print("  [3] List Current Active Orders")
+            print("  [4] Rearrange MRP Orders (Dia/ml low to high)")
+            print("  [Q] Quit")
+
+            try:
+                mode = input("\nSelect option [1/2/3/4/Q] (default: 1): ").strip().upper()
+            except (EOFError, KeyboardInterrupt):
                 return
 
-    run_add_order_session(
-        filepath=EXCEL_PATH,
-        catalog=catalog,
-        initial_product=initial_prod,
-        initial_qty=qty_input,
-        initial_jof=jof_input,
-        initial_cust=cust_input,
-        initial_remarks=remarks_input,
-        auto_keep=args.auto_keep
-    )
+            if mode == '2':
+                list_active_orders()
+                while True:
+                    try:
+                        target = input("\nEnter Product ID or Name to remove (or Enter to cancel): ").strip()
+                        if not target:
+                            break
+                        remove_order_from_workbook(target_excel, target, auto_keep=(args.auto_keep or args.dry_run))
+                        more = input("\nRemove another order? [y/N] (default: N): ").strip().upper()
+                        if more != 'Y':
+                            break
+                    except (EOFError, KeyboardInterrupt):
+                        break
+                return
+            elif mode == '3':
+                list_active_orders()
+                return
+            elif mode == '4':
+                print("[SORT] Rearranging MRP orders according to Dia/ml (lower to higher)...")
+                backup_file = None if args.dry_run else backup_workbook(target_excel)
+                wb = load_workbook(target_excel, data_only=False)
+                rearrange_mrp_orders(wb['MRP'])
+                try:
+                    from alpha_checks import atomic_save
+                    atomic_save(wb, target_excel)
+                except Exception:
+                    wb.save(target_excel)
+                wb.close()
+                sort_script = os.path.join(os.path.dirname(__file__), 'sort_dashboard.py')
+                if os.path.exists(sort_script) and not args.dry_run:
+                    os.system(f'python "{sort_script}"')
+                if not args.dry_run:
+                    confirm_keep_or_revert(target_excel, backup_file, args.auto_keep)
+                return
+            elif mode == 'Q':
+                print("Cancelled.")
+                return
+
+        # If product_input passed via CLI, resolve it
+        initial_prod = None
+        if product_input:
+            initial_prod = resolve_product(catalog, product_input)
+            if not initial_prod:
+                print(f"[ERROR] Could not find product matching '{product_input}' in Product_Catalog.")
+                return
+
+            if qty_input is None:
+                try:
+                    qty_str = input(f"Enter Order Quantity to Add for {initial_prod['product_name']}: ").strip()
+                    qty_input = parse_qty_input(qty_str)
+                except (ValueError, EOFError, KeyboardInterrupt) as e:
+                    print(f"[ERROR] Invalid quantity: {e}")
+                    return
+
+        run_add_order_session(
+            filepath=target_excel,
+            catalog=catalog,
+            initial_product=initial_prod,
+            initial_qty=qty_input,
+            initial_jof=jof_input,
+            initial_cust=cust_input,
+            initial_remarks=remarks_input,
+            auto_keep=(args.auto_keep or args.dry_run)
+        )
+    finally:
+        if temp_sandbox and os.path.exists(temp_sandbox):
+            try:
+                os.remove(temp_sandbox)
+                print("\n[DRY-RUN COMPLETE] Cleaned up sandbox copy. Live production workbook was NOT modified.")
+            except Exception:
+                pass
 
 
 if __name__ == '__main__':
