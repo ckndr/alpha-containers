@@ -18,12 +18,12 @@ __pycache__/
 
 # Local logs
 Logs/*.log
+Logs/*.png
 
 # Local tools/apps that should not upload to GitHub
-# Aerosol/ is now a project subfolder and tracked
-!Aerosol/
-!Aerosol/**/*.xlsx
-!Aerosol/**/*.pdf
+# Local tools/apps that should not upload to GitHub
+# Aerosol is now an independent project in d:\Aerosol
+Aerosol/
 *.exe
 
 # ── Windows junk ──
@@ -51,3 +51,4 @@ mrp_dump.txt
 
 # ── Pre-run backups (local only) ──
 Logs/backup_*
+Logs/ERP_Archives/
