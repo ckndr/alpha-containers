@@ -106,6 +106,7 @@ PET_SHORT_NAMES = {
     8015: "Mablay 130ml White",
     8016: "Samsol Coconut Oil 200ml White",
     8017: "Horizon 150ml TRP",
+    8018: "Alpha 75ml TRP",
 }
 
 
@@ -553,7 +554,12 @@ def apply_order_to_mrp(ws_mrp, wb, product, order_qty, jof_num=None, customer_ov
 
         # Update JOF # (Column E)
         if jof_num and str(jof_num) not in old_jof_val:
-            new_jof_val = f"{old_jof_val} & {jof_num}" if old_jof_val else str(jof_num)
+            if not old_jof_val:
+                new_jof_val = str(jof_num)
+            elif ' & ' in old_jof_val:
+                new_jof_val = old_jof_val.replace(' & ', ', ') + f" & {jof_num}"
+            else:
+                new_jof_val = f"{old_jof_val} & {jof_num}"
             ws_mrp.cell(existing_row, 5, new_jof_val)
         else:
             new_jof_val = old_jof_val

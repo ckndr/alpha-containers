@@ -247,6 +247,11 @@ ALIASES = {
     ("trp bottle",                "150 ml"): ("TRANSPARENT BOTTLE 150ML",          8001),
     ("trp bottle",                "200 ml"): ("BT-200ML MUSTARD OIL (TRANSPARENT)", 8014),
     ("alpha lab\ttrp bottle",      "150 ml"): ("TRANSPARENT BOTTLE 150ML",          8001),
+    ("transparent bottle",        "75 ml"):  ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
+    ("trp bottle",                "75 ml"):  ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
+    ("pet bottle 75ml",           "75 ml"):  ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
+    ("pet bottle (75ml) transparent body mist", "75 ml"): ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
+    ("alpha lab\ttrp bottle",      "75 ml"):  ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
     ("mabley beauty\tvince nutural", "30"): ("VINCE NURTURAL",                     5814),
 }
 
@@ -319,6 +324,13 @@ FG_ALIASES = {
     ("trp bottle",      "150ml", "alpha lab"):       ("TRANSPARENT BOTTLE 150ML",           8001),
     ("trp bottle",       "150ml","alpha lab"):       ("TRANSPARENT BOTTLE 150ML",           8001),
     ("trp bottle",      "150ml", "alpha labs pvt ltd"): ("TRANSPARENT BOTTLE 150ML",        8001),
+    ("trp bottle",      "75ml",  "horizon"):         ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
+    ("trp bottle",      "75ml",  "horizon chem"):    ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
+    ("trp bottle",      "75ml",  "alpha lab"):       ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
+    ("trp bottle",      "75ml",  "alpha labs pvt ltd"): ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
+    ("pet bottle (75ml) transparent body mist", "75ml", "alpha lab"): ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
+    ("pet bottle (75ml) transparent body mist", "75ml", "alpha labs pvt ltd"): ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
+    ("pet bottle 75ml", "75ml",  "alpha lab"):       ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
     ("yellow bottle",   "120ml", "samsol"):          ("PET BOTTLE SMALL (120ML) YELLOW",    8005),
     ("yellow small",    "120ml", "samsol"):          ("PET BOTTLE SMALL (120ML) YELLOW",    8005),
     ("yellow small bottle", "120ml", "samsol"):      ("PET BOTTLE SMALL (120ML) YELLOW",    8005),
@@ -426,6 +438,7 @@ PID_TO_CUSTOMER = {
     8012: "Samsol International Private Limited",
     8013: "Mablay Beauty PVT LTD.",
     8015: "Mablay Beauty PVT LTD.",
+    8018: "Alpha Labs PVT LTD",
 }
 
 

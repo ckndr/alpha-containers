@@ -108,6 +108,9 @@ NAME_FIXES = {
     "PET BOTTLE SMALL (130ML) TRANSPARENT":                   "PET BOTTLE SMALL (130ML) TRANSPARENT",
     "PET BOTTLE 130 ML WHITE":                                "PET BOTTLE 130ML WHITE",              # PID 8015 — ERP space: "130 ML" vs "130ML"
     "PET BOTTLE 130ML WHITE":                                 "PET BOTTLE 130ML WHITE",
+    "PET BOTTLE (75ML) TRANSPARENT BODY MIST":                "PET BOTTLE (75ML) TRANSPARENT BODY MIST",
+    "PET BOTTLE (75ML)TRANSPARENT BODY MIST":                 "PET BOTTLE (75ML) TRANSPARENT BODY MIST",
+    "PET BOTTLE 75ML":                                        "PET BOTTLE (75ML) TRANSPARENT BODY MIST",
 }
 
 
@@ -171,6 +174,8 @@ def resolve_pid(product_entry, catalog):
         return "PET BOTTLE (150ML)TRANSPARENT BODY MIST", 8017
     if "ALPHA" in party_upper and ("150" in erp_upper or "BODY MIST" in erp_upper):
         return "TRANSPARENT BOTTLE 150ML", 8001
+    if "ALPHA" in party_upper and ("75" in erp_upper or "75ML" in erp_upper):
+        return "PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018
 
     # 2. Check NAME_FIXES
     catalog_name = NAME_FIXES.get(erp_name, erp_name)
