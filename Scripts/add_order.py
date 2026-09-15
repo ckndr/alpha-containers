@@ -282,7 +282,7 @@ def get_mrp_boundaries(ws_mrp):
 def update_tube_material_formulas(ws_mrp, tube_end, tube_items_start, tube_items_end):
     """Updates all formula columns in the Tube Material Plan."""
     for r in range(tube_items_start, tube_items_end + 1):
-        f_req = f'=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end})/1000)'
+        f_req = f'=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*((SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))>0)*(SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))/1000)'
         ws_mrp.cell(r, 5, f_req)
 
         f_stk = f'=IFERROR(INDEX(TableInventory[Store Balance],MATCH(A{r},TableInventory[Item ID],0)),0)+IFERROR(INDEX(TableInventory[WIP],MATCH(A{r},TableInventory[Item ID],0)),0)'
@@ -317,7 +317,7 @@ def update_tube_material_formulas(ws_mrp, tube_end, tube_items_start, tube_items
 def update_pet_material_formulas(ws_mrp, pet_start, pet_end, pet_items_start, pet_items_end):
     """Updates all formula columns in the PET Material Plan."""
     for r in range(pet_items_start, pet_items_end + 1):
-        f_req = f'=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end})/1000)'
+        f_req = f'=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*((SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))>0)*(SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))/1000)'
         ws_mrp.cell(r, 5, f_req)
 
         f_stk = f'=IFERROR(INDEX(TableInventory[Store Balance],MATCH(A{r},TableInventory[Item ID],0)),0)+IFERROR(INDEX(TableInventory[WIP],MATCH(A{r},TableInventory[Item ID],0)),0)'
