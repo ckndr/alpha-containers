@@ -159,6 +159,8 @@ downtime_cols = {
     'Power Shutdown':    16,
     'Gas Shutdown':      17,
     'Workers Shortage':  18,
+    'Compressor Issue':  19,
+    'Order not available': 20,
 }
 tube_dt_totals = {k: 0.0 for k in downtime_cols}
 pet_dt_totals  = {k: 0.0 for k in downtime_cols}
@@ -185,14 +187,16 @@ for row in ws_pl.iter_rows(min_row=3, values_only=True):
 
     if is_press_print:
         for cat, col_idx in downtime_cols.items():
-            val = row[col_idx - 1]
-            if val and isinstance(val, (int, float)):
-                tube_dt_totals[cat] += float(val)
+            if col_idx - 1 < len(row):
+                val = row[col_idx - 1]
+                if val and isinstance(val, (int, float)):
+                    tube_dt_totals[cat] += float(val)
     elif is_pf_pet:
         for cat, col_idx in downtime_cols.items():
-            val = row[col_idx - 1]
-            if val and isinstance(val, (int, float)):
-                pet_dt_totals[cat] += float(val)
+            if col_idx - 1 < len(row):
+                val = row[col_idx - 1]
+                if val and isinstance(val, (int, float)):
+                    pet_dt_totals[cat] += float(val)
 
     if not pid or not good_qty: continue
     good_qty = int(good_qty)

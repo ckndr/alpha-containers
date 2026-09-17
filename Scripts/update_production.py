@@ -610,6 +610,8 @@ COLUMN_CANDIDATES = {
     'Power Shut Down':      ['power shut down', 'power shutdown', 'power'],
     'Gas Shut Down':        ['gas shut down', 'gas shutdown', 'gas'],
     'Workers Shortage':     ['workers shortage', 'worker shortage', 'workers'],
+    'Compressor Issue':     ['compressor issue', 'compressor problem', 'compressor dt', 'compressor'],
+    'Order not available':  ['order not available', 'order not avail', 'no order', 'order unavailable', 'order not available dt'],
 }
 
 
@@ -668,6 +670,7 @@ def detect_header_row(prod_path):
         'mechanical downtime', 'electrical downtime', 'changeover',
         'operations downtime', 'power shut down', 'gas shut down',
         'workers shortage', 'material shortage', 'actual time', 'downtime',
+        'compressor issue', 'order not available',
     }
     raw = pd.read_excel(
         prod_path, sheet_name='Production Day wise',
@@ -868,6 +871,8 @@ def read_production_source(prod_path):
             'power_shutdown_dt':    sf(get_val(r, col_map, 'Power Shut Down')),
             'gas_shutdown_dt':      sf(get_val(r, col_map, 'Gas Shut Down')),
             'workers_shortage_dt':  sf(get_val(r, col_map, 'Workers Shortage')),
+            'compressor_dt':        sf(get_val(r, col_map, 'Compressor Issue')),
+            'order_not_avail_dt':   sf(get_val(r, col_map, 'Order not available')),
             'original_name':        name_raw,
         })
 
@@ -888,22 +893,46 @@ def write_production_log(ac_path, source_rows):
     wb = openpyxl.load_workbook(ac_path)
     ws = wb['Production_Log']
 
+    # Ensure header row (row 2) has headers for columns 19 and 20 if missing
+    header_src = ws.cell(row=2, column=18)
+    if ws.cell(row=2, column=19).value is None or ws.cell(row=2, column=19).value == '':
+        ws.cell(row=2, column=19).value = 'Compressor Issue DT'
+        ws.cell(row=2, column=19).font = copy(header_src.font)
+        ws.cell(row=2, column=19).fill = copy(header_src.fill)
+        ws.cell(row=2, column=19).border = copy(header_src.border)
+        ws.cell(row=2, column=19).alignment = copy(header_src.alignment)
+    if ws.cell(row=2, column=20).value is None or ws.cell(row=2, column=20).value == '':
+        ws.cell(row=2, column=20).value = 'Order not available DT'
+        ws.cell(row=2, column=20).font = copy(header_src.font)
+        ws.cell(row=2, column=20).fill = copy(header_src.fill)
+        ws.cell(row=2, column=20).border = copy(header_src.border)
+        ws.cell(row=2, column=20).alignment = copy(header_src.alignment)
+
     template_row = DATA_START_ROW
     for probe in range(DATA_START_ROW, DATA_START_ROW + 15):
-        if any(ws.cell(row=probe, column=c).value is not None for c in range(1, 20)):
+        if any(ws.cell(row=probe, column=c).value is not None for c in range(1, 21)):
             template_row = probe
             break
 
     template_styles = {}
-    for c in range(1, 20):
+    for c in range(1, 21):
         cell = ws.cell(row=template_row, column=c)
-        template_styles[c] = {
-            'font':          copy(cell.font),
-            'fill':          copy(cell.fill),
-            'border':        copy(cell.border),
-            'alignment':     copy(cell.alignment),
-            'number_format': cell.number_format,
-        }
+        if cell.value is not None or (cell.font and cell.font.name):
+            template_styles[c] = {
+                'font':          copy(cell.font),
+                'fill':          copy(cell.fill),
+                'border':        copy(cell.border),
+                'alignment':     copy(cell.alignment),
+                'number_format': cell.number_format,
+            }
+        elif 18 in template_styles:
+            template_styles[c] = copy(template_styles[18])
+    if 18 in template_styles:
+        if 19 not in template_styles:
+            template_styles[19] = copy(template_styles[18])
+        if 20 not in template_styles:
+            template_styles[20] = copy(template_styles[18])
+
     template_styles[1]['number_format']  = 'DD-MMM-YYYY'
     template_styles[7]['number_format']  = '#,##0'
     template_styles[8]['number_format']  = '#,##0'
@@ -912,8 +941,8 @@ def write_production_log(ac_path, source_rows):
 
     cleared = 0
     for r in range(DATA_START_ROW, ws.max_row + 1):
-        if any(ws.cell(row=r, column=c).value is not None for c in range(1, 20)):
-            for c in range(1, 20):
+        if any(ws.cell(row=r, column=c).value is not None for c in range(1, 21)):
+            for c in range(1, 21):
                 ws.cell(row=r, column=c).value = None
             cleared += 1
     print(f"  Cleared {cleared} existing rows")
@@ -946,8 +975,10 @@ def write_production_log(ac_path, source_rows):
         ws.cell(row=r, column=16).value = row['power_shutdown_dt']
         ws.cell(row=r, column=17).value = row['gas_shutdown_dt']
         ws.cell(row=r, column=18).value = row['workers_shortage_dt']
+        ws.cell(row=r, column=19).value = row['compressor_dt']
+        ws.cell(row=r, column=20).value = row['order_not_avail_dt']
 
-        for c in range(1, 20):
+        for c in range(1, 21):
             cell = ws.cell(row=r, column=c)
             s = template_styles.get(c, {})
             if s:

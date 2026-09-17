@@ -426,6 +426,7 @@ def write_total_row(ws, r, first_row, last_row, fmt_dict=None):
     ws.cell(r, 7).value  = f"=SUM(G{first_row}:G{last_row})"         # G
     ws.cell(r, 8).value  = f"=SUM(H{first_row}:H{last_row})"         # H
     ws.cell(r, 9).value  = f'=SUMIF(I{first_row}:I{last_row},">"&0)' # I
+    ws.cell(r, 10).value = f'=IF(G{r}=0,"-",H{r}/G{r})'              # J
     ws.cell(r, 11).value = f"=SUM(K{first_row}:K{last_row})"         # K
 
     # Apply TOTAL formatting
@@ -444,6 +445,12 @@ def write_total_row(ws, r, first_row, last_row, fmt_dict=None):
         bold_font = Font(bold=True)
         for c in DATA_COLS:
             ws.cell(r, c).font = bold_font
+
+    # Ensure Column 10 (J = Compliance %) has percentage format 0.0%, bold font, and centered
+    cell_j = ws.cell(r, 10)
+    cell_j.number_format = '0.0%'
+    cell_j.font = Font(name='Arial', size=10, bold=True)
+    cell_j.alignment = Alignment(horizontal='center', vertical='center')
 
 
 def write_blank_row(ws, r):
@@ -516,6 +523,8 @@ DOWNTIME_CATEGORIES = [
     ('Power Shutdown', 'P', 16),
     ('Gas Shutdown', 'Q', 17),
     ('Workers Shortage', 'R', 18),
+    ('Compressor Issue', 'S', 19),
+    ('Order not available', 'T', 20),
 ]
 
 tube_dt_map = {k: 0.0 for k, _, _ in DOWNTIME_CATEGORIES}
@@ -531,14 +540,16 @@ for row in ws_pl.iter_rows(min_row=3, values_only=True):
 
     if is_press_print:
         for cat, _, col_idx in DOWNTIME_CATEGORIES:
-            val = row[col_idx - 1]
-            if val and isinstance(val, (int, float)):
-                tube_dt_map[cat] += float(val)
+            if col_idx - 1 < len(row):
+                val = row[col_idx - 1]
+                if val and isinstance(val, (int, float)):
+                    tube_dt_map[cat] += float(val)
     elif is_pf_pet:
         for cat, _, col_idx in DOWNTIME_CATEGORIES:
-            val = row[col_idx - 1]
-            if val and isinstance(val, (int, float)):
-                pet_dt_map[cat] += float(val)
+            if col_idx - 1 < len(row):
+                val = row[col_idx - 1]
+                if val and isinstance(val, (int, float)):
+                    pet_dt_map[cat] += float(val)
 
 active_tube_dt = [(cat, col_letter, tube_dt_map[cat]) for cat, col_letter, _ in DOWNTIME_CATEGORIES if tube_dt_map[cat] > 0]
 active_tube_dt.sort(key=lambda x: x[2], reverse=True)
@@ -567,8 +578,10 @@ dt_box_border = Border(left=dt_thin, right=dt_thin, top=dt_thin, bottom=dt_thin)
 ws.merge_cells('M5:O5')
 ws.cell(5, 13).value = 'Press & Printing Downtime – MTD (Tubes)'
 ws.cell(5, 13).font = Font(name='Segoe UI', size=11, bold=True, color='FFBDD7EE')
-ws.cell(5, 13).fill = PatternFill('solid', fgColor='FF1F3864')
-ws.cell(5, 13).alignment = Alignment(horizontal='center', vertical='center')
+for c in range(13, 16):
+    ws.cell(5, c).fill = PatternFill('solid', fgColor='FF1F3864')
+    ws.cell(5, c).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+ws.row_dimensions[5].height = 30.0
 
 ws.cell(6, 13).value = 'Category'
 ws.cell(6, 14).value = 'Hours (MTD)'
@@ -632,8 +645,10 @@ pet_hdr_row = tube_tot_row + 2
 ws.merge_cells(f'M{pet_hdr_row}:O{pet_hdr_row}')
 ws.cell(pet_hdr_row, 13).value = 'PF Machine Downtime – MTD (PET)'
 ws.cell(pet_hdr_row, 13).font = Font(name='Segoe UI', size=11, bold=True, color='FFB4E0E0')
-ws.cell(pet_hdr_row, 13).fill = PatternFill('solid', fgColor='FF1F6B75')
-ws.cell(pet_hdr_row, 13).alignment = Alignment(horizontal='center', vertical='center')
+for c in range(13, 16):
+    ws.cell(pet_hdr_row, c).fill = PatternFill('solid', fgColor='FF1F6B75')
+    ws.cell(pet_hdr_row, c).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+ws.row_dimensions[pet_hdr_row].height = 30.0
 
 pet_sub_row = pet_hdr_row + 1
 ws.cell(pet_sub_row, 13).value = 'Category'

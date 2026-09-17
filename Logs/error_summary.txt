@@ -3,11 +3,9 @@
   ║  ⚠ DAILY WORKFLOW ERROR & ADVISORY SUMMARY               ║
   ╚══════════════════════════════════════════════════════════╝
 
-  [CORE PRODUCTION CROSS-CHECK MISMATCHES (BLOCKING)]
-    • Summary mismatch - Tube Dispatch (MTD): Imran=118,532, Dashboard=77,876 (diff=-40,656)
-
   [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
     (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
+    • Pending Order SKU difference for 'VINCE HIS BEARED': Req diff=-7,000, Prod diff=+0, Bal diff=-7,000
     • Pending Order SKU difference for 'VINCE NURTURAL': Req diff=-17,612, Prod diff=-17,612, Bal diff=+0
-    • Pending Orders floor difference: Imran=925,016 vs MRP Scheduled=928,520 (diff=-3,504)
+    • Pending Orders floor difference: Imran=850,046 vs MRP Scheduled=860,550 (diff=-10,504)
 
