@@ -446,10 +446,11 @@ def write_total_row(ws, r, first_row, last_row, fmt_dict=None):
         for c in DATA_COLS:
             ws.cell(r, c).font = bold_font
 
-    # Ensure Column 10 (J = Compliance %) has percentage format 0.0%, bold font, and centered
+    # Ensure Column 10 (J = Compliance %) has percentage format 0.0%, bold font, centered, and white font matching total row
     cell_j = ws.cell(r, 10)
     cell_j.number_format = '0.0%'
-    cell_j.font = Font(name='Arial', size=10, bold=True)
+    tot_color = ws.cell(r, 4).font.color if (ws.cell(r, 4).font and ws.cell(r, 4).font.color) else 'FFFFFFFF'
+    cell_j.font = Font(name='Arial', size=10, bold=True, color=tot_color)
     cell_j.alignment = Alignment(horizontal='center', vertical='center')
 
 

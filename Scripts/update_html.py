@@ -227,6 +227,8 @@ if latest_date:
         is_varn  = '(VARNISH)' in str(prod_name).upper()
         if is_print and not is_varn:
             yest_tube += int(good_qty)
+        elif is_pet:
+            yest_pet += int(good_qty)
 # Build PID to product type lookup from Product_Catalog (Rule R1-13)
 cat_pid_type = {}
 for row in ws_cat.iter_rows(min_row=3, values_only=True):
@@ -519,6 +521,8 @@ DOWNTIME_ICONS = {
     'Gas Shutdown':      '🔥',
     'Changeover':        '🔄',
     'Operations':        '⚙️',
+    'Compressor Issue':  '💨',
+    'Order not available': '📋',
 }
 
 def format_date_dict(dt):
@@ -636,12 +640,14 @@ def extract_all_months_dash_data(active_mname, active_mdata):
                         is_pf_m = mach_u.startswith('PF') or mach_u.startswith('PET')
                         if is_pp_m:
                             for cat_name, c_idx in downtime_cols.items():
-                                val_dt = ws_p_local.cell(r_p, c_idx).value
-                                if val_dt and isinstance(val_dt, (int, float)): t_dt[cat_name] += float(val_dt)
+                                if c_idx <= ws_p_local.max_column:
+                                    val_dt = ws_p_local.cell(r_p, c_idx).value
+                                    if val_dt and isinstance(val_dt, (int, float)): t_dt[cat_name] += float(val_dt)
                         elif is_pf_m:
                             for cat_name, c_idx in downtime_cols.items():
-                                val_dt = ws_p_local.cell(r_p, c_idx).value
-                                if val_dt and isinstance(val_dt, (int, float)): p_dt[cat_name] += float(val_dt)
+                                if c_idx <= ws_p_local.max_column:
+                                    val_dt = ws_p_local.cell(r_p, c_idx).value
+                                    if val_dt and isinstance(val_dt, (int, float)): p_dt[cat_name] += float(val_dt)
                     
                     if not prod_v: continue
                     dt_s = dt_v.strftime('%Y-%m-%d') if isinstance(dt_v, (date, datetime)) else str(dt_v)[:10]

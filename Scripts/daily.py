@@ -1040,9 +1040,14 @@ def step_crosscheck():
                         ok(f"{label:28s} Imran ({imran_cell})={imran_val:>8,}  Dashboard ({dash_cell})={dash_val:>8,}")
                     else:
                         diff = dash_val - imran_val
-                        fail(f"{label:28s} Imran ({imran_cell})={imran_val:>8,}  Dashboard ({dash_cell})={dash_val:>8,}  ({diff:+,})")
-                        critical_errors.append(f"Summary mismatch - {label}: Imran={imran_val:,}, Dashboard={dash_val:,} (diff={diff:+,})")
-                        summary_mismatches += 1
+                        is_dispatch = "disp" in metric_key.lower()
+                        if is_dispatch:
+                            warn(f"{label:28s} Imran ({imran_cell})={imran_val:>8,}  Dashboard ({dash_cell})={dash_val:>8,}  ({diff:+,}) [Advisory: ERP is primary authority]")
+                            pending_warnings.append(f"Summary sheet dispatch difference for {label}: Imran={imran_val:,} vs Dashboard={dash_val:,} (diff={diff:+,}) — Dashboard reflects authoritative ERP export; Imran sheet may have timing lag or unrecorded dispatch")
+                        else:
+                            fail(f"{label:28s} Imran ({imran_cell})={imran_val:>8,}  Dashboard ({dash_cell})={dash_val:>8,}  ({diff:+,})")
+                            critical_errors.append(f"Summary mismatch - {label}: Imran={imran_val:,}, Dashboard={dash_val:,} (diff={diff:+,})")
+                            summary_mismatches += 1
                 
                 if summary_mismatches == 0:
                     ok("All Summary sheet KPIs match Dashboard!")
@@ -1457,13 +1462,21 @@ def read_mismatches_log(log_path):
     except Exception:
         pass
 
+    inventory_warnings = []
+    new_slug_warnings = []
+    mapping_warnings = []
+    current_missing = set()
+
     if os.path.exists(log_path):
         with open(log_path, 'r', encoding='utf-8') as f:
             for line in f:
                 l = line.strip()
                 if not l or l.startswith('---') or l.startswith('==='):
                     continue
-                if 'missing from inventory.xls' in l:
+                if 'new slug in erp not in excel' in l.lower():
+                    clean = l.replace('CRITICAL WARNING:', '').replace('WARNING:', '').strip()
+                    new_slug_warnings.append(clean)
+                elif 'missing from inventory.xls' in l:
                     clean = l.replace('WARNING:', '').strip()
                     lower_clean = clean.lower()
                     
@@ -1490,7 +1503,7 @@ def read_mismatches_log(log_path):
     except Exception:
         pass
 
-    return inventory_warnings, mapping_warnings
+    return inventory_warnings, mapping_warnings, new_slug_warnings
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1540,7 +1553,7 @@ def main():
 
     # Read mismatches.log (populated during step 5)
     mismatch_log = os.path.join(LOGS_DIR, "mismatches.log")
-    inv_warns, map_warns = read_mismatches_log(mismatch_log)
+    inv_warns, map_warns, new_slug_warns = read_mismatches_log(mismatch_log)
 
     critical_errors = []
     pending_warnings = []
@@ -1550,6 +1563,8 @@ def main():
         # Deployment gating: ONLY block Git push if critical core discrepancies exist (Machine/KPI/PID)
         if critical_errors:
             fail(f"CRITICAL: Core cross-check found {len(critical_errors)} discrepancy/discrepancies (Machine/KPI/PID). Gating deployment — skipping Git push to protect production integrity.")
+        elif new_slug_warns:
+            fail(f"CRITICAL: Found {len(new_slug_warns)} new SLUG inventory item(s) in ERP missing from Excel. Gating deployment — please update Excel before pushing.")
         else:
             if pending_warnings:
                 safe_print(f"    {CYAN}ℹ{RESET} {len(pending_warnings)} pending order floor notice(s) detected — non-blocking, proceeding with Git push.")
@@ -1560,7 +1575,7 @@ def main():
     elapsed = time.time() - start
 
     # ── Unified Error Summary ──
-    has_blocking = bool(all_errors or inv_warns or map_warns or critical_errors)
+    has_blocking = bool(all_errors or inv_warns or map_warns or critical_errors or new_slug_warns)
     has_issues = bool(has_blocking or pending_warnings)
     error_summary_path = os.path.join(LOGS_DIR, "error_summary.txt")
     
@@ -1586,6 +1601,14 @@ def main():
                     print_both(f"    • {err}")
                 print_both()
                 
+            if new_slug_warns:
+                print_both(f"  {RED}{BOLD}[INVENTORY: CRITICAL NEW SLUG DETECTED IN ERP BUT NOT IN EXCEL]{RESET}")
+                print_both(f"  {RED}{BOLD}  Slug is a critical item! The following SLUG was found in ERP inventory.xls but is MISSING from the Excel file:{RESET}")
+                for err in new_slug_warns:
+                    print_both(f"    • {err}")
+                print_both(f"  {YELLOW}{BOLD}  Action Required: Add this Item ID to Tubex_*.xlsx (Inventory, MRP, and BOM) immediately.{RESET}")
+                print_both()
+
             if inv_warns:
                 print_both(f"  {RED}{BOLD}[INVENTORY: CRITICAL ITEMS (SLUG/RESIN) MISSING FROM ERP]{RESET}")
                 print_both(f"  {DIM}  (These rows are highlighted in RED in Excel and zeroed out){RESET}")

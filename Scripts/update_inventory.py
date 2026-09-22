@@ -138,6 +138,7 @@ def parse_inventory_xls(xls_path):
                     break
             break
 
+    curr_category = ""
     for _, row in df.iterrows():
         col0 = row[0]
 
@@ -153,6 +154,11 @@ def parse_inventory_xls(xls_path):
             val_to_check = row[col_id] if col_id < len(row) else None
             item_id = int(float(val_to_check))
         except (ValueError, TypeError):
+            # Category header tracking
+            if pd.notna(col0) and str(col0).strip() and not str(col0).strip().startswith('='):
+                val_str = str(col0).strip()
+                if val_str.upper() not in ('HEAD', 'ID', 'ITEM WISE CONSOLIDATED REPORT'):
+                    curr_category = val_str
             continue
 
         name    = str(row[col_name]).strip() if col_name < len(row) and pd.notna(row[col_name]) else ""
@@ -163,12 +169,13 @@ def parse_inventory_xls(xls_path):
         unit    = str(row[col_unit]).strip() if col_unit < len(row) and pd.notna(row[col_unit]) else ""
 
         items[item_id] = {
-            'name':    name,
-            'opening': opening,
-            'inward':  inward,
-            'out':     out,
-            'balance': balance,
-            'unit':    unit,
+            'name':     name,
+            'category': curr_category,
+            'opening':  opening,
+            'inward':   inward,
+            'out':      out,
+            'balance':  balance,
+            'unit':     unit,
         }
 
     return items, date_range
@@ -254,7 +261,14 @@ def update_excel(excel_path, xls_items, date_range):
                     "Out: %s->%s"  % (_n(old[2]), new[2]),
                 ))
         else:
-            not_in_excel.append((item_id, data['name'], data['balance'], data['unit']))
+            not_in_excel.append((item_id, data['name'], data['balance'], data['unit'], data.get('category', '')))
+
+    # Identify any new Slugs in ERP that are missing from Excel
+    new_critical_slugs = []
+    for item_id, name, bal, uom, cat in not_in_excel:
+        is_slug = ('slug' in str(cat).lower()) or ('slug' in str(name).lower())
+        if is_slug:
+            new_critical_slugs.append((item_id, name, bal, uom, cat))
 
     # Find missing items (present in Inventory sheet but missing from new inventory.xls)
     missing_items = []
@@ -302,7 +316,7 @@ def update_excel(excel_path, xls_items, date_range):
         atomic_save(wb, excel_path)
     except Exception:
         wb.save(excel_path)
-    return updated, not_in_excel, missing_critical, missing_items
+    return updated, not_in_excel, missing_critical, missing_items, new_critical_slugs
 
 
 def main():
@@ -330,7 +344,7 @@ def main():
 
     print("")
     print("[3/3] Updating Excel...")
-    updated, not_in_excel, missing_critical, missing_items = update_excel(excel_path, xls_items, date_range)
+    updated, not_in_excel, missing_critical, missing_items, new_critical_slugs = update_excel(excel_path, xls_items, date_range)
     print("  Saved: " + os.path.basename(excel_path))
 
     # ── Post-write validation ────────────────────────────────────────────
@@ -350,6 +364,21 @@ def main():
         wb_check.close()
     except Exception as e:
         print(f"  !! Validation error: {e}")
+
+    # Highlight new critical slug items in ERP missing from Excel
+    if new_critical_slugs:
+        print("")
+        print("  " + "!" * 55)
+        print("  !! CRITICAL WARNING: %d NEW SLUG ITEM(S) IN ERP NOT IN EXCEL:" % len(new_critical_slugs))
+        for item_id, name, bal, uom, cat in sorted(new_critical_slugs, key=lambda x: x[0]):
+            print("     - ID %5d [%s]: %s (Balance: %g %s)" % (item_id, cat, name, bal, uom))
+        print("  !! Slug is a critical item! Please add to Inventory, MRP, and BOM.")
+        print("  " + "!" * 55)
+
+        slug_mismatch_entries = []
+        for item_id, name, bal, uom, cat in sorted(new_critical_slugs, key=lambda x: x[0]):
+            slug_mismatch_entries.append((f"CRITICAL WARNING: New SLUG in ERP not in Excel: Item ID {item_id} ({name}) [Category: {cat}, Balance: {bal} {uom}]",))
+        log_mismatches("inventory", slug_mismatch_entries)
 
     # Highlight only critical missing items (Slugs / Resin) to the operator
     if missing_critical:

@@ -46,6 +46,7 @@ DATA_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # -----------------------------------------------------------------------
 # Column constants (1-indexed for openpyxl)
 # -----------------------------------------------------------------------
+INV_ID_COL     = 1   # A: Item ID
 INV_CAT_COL    = 2   # B: Category
 INV_NAME_COL   = 3   # C: Item Name (ERP)
 INV_ISSUED_COL = 7   # G: Issued to Production
@@ -62,14 +63,21 @@ def find_excel():
     return sorted(files)[-1], DATA_DIR
 
 
+class SlugCandidate(tuple):
+    def __new__(cls, r, issued, name, in_bom=False):
+        return super().__new__(cls, (r, issued, name))
+    def __init__(self, r, issued, name, in_bom=False):
+        self.in_bom = in_bom
+
+
 def extract_dia(name):
     """
-    Pull the leading diameter from a slug name like '19X4.5 S/M' or '20.5x4.5'.
+    Pull the leading diameter from a slug name like '19X4.5 S/M', '20.5x4.5', or 'SLUG 30X4.8'.
     Returns float or None.
     """
     if not name:
         return None
-    m = re.match(r'^(\d+(?:\.\d+)?)[Xx]', name.strip())
+    m = re.search(r'(?:^|SLUG\s*)(\d+(?:\.\d+)?)[Xx]', name.strip(), re.IGNORECASE)
     if m:
         return float(m.group(1))
     return None
@@ -103,28 +111,50 @@ def build_slug_map(ws):
     Scan Inventory sheet. For each Slug row, map dia -> list of (row, issued_qty).
     Returns {dia: [(row_num, issued_qty, name), ...]}
     """
+    bom_item_ids = set()
+    if ws.parent and 'BOM' in ws.parent.sheetnames:
+        ws_bom = ws.parent['BOM']
+        for r_bom in range(2, ws_bom.max_row + 1):
+            bid = ws_bom.cell(r_bom, 7).value
+            if bid is not None:
+                try:
+                    bom_item_ids.add(int(float(str(bid))))
+                except (ValueError, TypeError):
+                    pass
+
     slug_map = {}
     for r in range(INV_DATA_START, ws.max_row + 1):
         if str(ws.cell(r, INV_CAT_COL).value or '').strip().upper() != 'SLUG':
             continue
-        name   = ws.cell(r, INV_NAME_COL).value
-        issued = ws.cell(r, INV_ISSUED_COL).value or 0
-        dia    = extract_dia(str(name)) if name else None
+        name    = ws.cell(r, INV_NAME_COL).value
+        issued  = ws.cell(r, INV_ISSUED_COL).value or 0
+        item_id = ws.cell(r, INV_ID_COL).value
+        in_bom  = False
+        if item_id is not None:
+            try:
+                in_bom = int(float(str(item_id))) in bom_item_ids
+            except (ValueError, TypeError):
+                pass
+        dia     = extract_dia(str(name)) if name else None
         if dia is None:
             continue
         if dia not in slug_map:
             slug_map[dia] = []
-        slug_map[dia].append((r, issued, str(name)))
+        slug_map[dia].append(SlugCandidate(r, issued, str(name), in_bom=in_bom))
     return slug_map
 
 
 def pick_row(candidates):
     """
-    Given [(row, issued, name)...] for one diameter,
-    prefer the row with non-zero issuance (= active slug this month).
-    Fall back to the first row.
+    Given [(row, issued, name)...] for one diameter:
+    1. If candidate is active in BOM, prefer it.
+    2. Otherwise prefer the row with non-zero issuance (= active slug this month).
+    3. Fall back to the first row.
     """
-    active = [(r, issued, name) for r, issued, name in candidates if issued and issued > 0]
+    bom_active = [c for c in candidates if getattr(c, 'in_bom', False)]
+    if bom_active:
+        return bom_active[0][0], bom_active[0][2]
+    active = [c for c in candidates if c[1] and c[1] > 0]
     if active:
         return active[0][0], active[0][2]
     return candidates[0][0], candidates[0][2]
