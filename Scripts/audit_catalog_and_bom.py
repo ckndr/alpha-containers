@@ -21,7 +21,7 @@ catalog_pnames = set()
 catalog_pids   = set()
 catalog_by_name = {}
 
-aug_path = r"d:\Alpha\Tubex_Aug26.xlsx"
+aug_path = os.path.join(RECORDS_DIR, "Tubex_Aug26.xlsx")
 wb_aug = openpyxl.load_workbook(aug_path, data_only=True)
 
 if "Product_Catalog" in wb_aug.sheetnames:
@@ -119,7 +119,7 @@ if os.path.exists(july_path):
     wb.close()
 
 # Tubex_Aug26.xlsx
-aug_path = os.path.join(ALPHA_DIR, "Tubex_Aug26.xlsx")
+aug_path = os.path.join(RECORDS_DIR, "Tubex_Aug26.xlsx")
 if os.path.exists(aug_path):
     wb = openpyxl.load_workbook(aug_path, data_only=True)
     if "Production_Log" in wb.sheetnames:

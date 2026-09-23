@@ -38,6 +38,7 @@ warnings.filterwarnings("ignore", message=".*Data Validation.*")
 warnings.filterwarnings("ignore", message=".*extension.*")
 
 from openpyxl import load_workbook
+from alpha_checks import get_active_tubex_file
 
 # Scripts live in Tubex/Scripts/
 # Excel files live in Tubex/ (one level up)
@@ -56,11 +57,11 @@ INV_DATA_START = 3   # first data row
 
 # -----------------------------------------------------------------------
 def find_excel():
-    files = glob.glob(os.path.join(DATA_DIR, "Tubex*.xlsx"))
-    if not files:
+    excel_path = get_active_tubex_file(DATA_DIR)
+    if not excel_path:
         print("  ERROR: No Tubex*.xlsx found in: " + DATA_DIR)
         return None, None
-    return sorted(files)[-1], DATA_DIR
+    return excel_path, DATA_DIR
 
 
 class SlugCandidate(tuple):
@@ -84,25 +85,24 @@ def extract_dia(name):
 
 
 def parse_wip_message(msg):
-    """
-    Parse WhatsApp WIP message. Returns {dia_float: kg_float}.
-    Handles formats like:
-      #19mm 10kg  |  #30mm 125kg  |  32mm 25  |  19 - 10  |  #19mm-10kg
-    """
-    # Normalise: replace - and , separators with spaces
-    msg = re.sub(r'[,\-]+', ' ', msg)
-
-    result = {}
-    # Match patterns: optional # + number + optional mm + optional space + number + optional kg
-    pattern = re.compile(
-        r'#?\s*(\d+(?:\.\d+)?)\s*(?:mm)?\s*(\d+(?:\.\d+)?)\s*(?:kg)?',
-        re.IGNORECASE
-    )
-    for m in pattern.finditer(msg):
-        dia = float(m.group(1))
-        kg  = float(m.group(2))
-        result[dia] = result.get(dia, 0) + kg
-
+    msg = re.sub(r'(?<=\d),(?=\d{3}(?!\d))', '', msg)                              # 1,250 -> 1250
+    msg = re.sub(r'\b\d{1,2}\s*[/.-]\s*\d{1,2}\s*[/.-]\s*\d{2,4}\b', ' ', msg)      # 21-09-2026
+    msg = re.sub(r'\b\d{1,2}\s*/\s*\d{1,2}\b', ' ', msg)                           # 21/09
+    msg = re.sub(r'\b\d{1,2}-\d{2}\b(?!\s*(?:mm|kg))', ' ', msg, flags=re.I)       # 30-09
+    num = r'(\d+(?:\.\d+)?)'
+    with_mm = re.compile(r'#?\s*' + num + r'\s*mm\s*[-:=]?\s*' + num + r'\s*(?:kg)?', re.I)
+    with_kg = re.compile(r'#?\s*' + num + r'\s*[-:=]?\s*' + num + r'\s*kg', re.I)
+    result, seen = {}, []
+    for pat in (with_mm, with_kg):
+        for m in pat.finditer(msg):
+            span = m.span()
+            if any(not (span[1] <= s[0] or span[0] >= s[1]) for s in seen):
+                continue
+            seen.append(span)
+            dia, kg = float(m.group(1)), float(m.group(2))
+            if dia in result:
+                print(f"  WARNING: {dia:g}mm appears more than once in the message - values are added")
+            result[dia] = result.get(dia, 0) + kg
     return result
 
 
@@ -191,7 +191,7 @@ def main():
     if not wip_data:
         print("  ERROR: Could not parse any diameter/weight pairs from message.")
         print("  Expected format: #19mm 10kg #30mm 125kg")
-        return
+        sys.exit(1)
 
     print("")
     print("  Parsed WIP values:")
@@ -203,7 +203,8 @@ def main():
     print("[1/2] Finding Excel file...")
     excel_path, folder = find_excel()
     if not excel_path:
-        return
+        print("  Aborting: Tubex workbook not found.")
+        sys.exit(1)
     print("  File: " + os.path.basename(excel_path))
 
     # Load and update
@@ -237,11 +238,8 @@ def main():
         ws.cell(row, INV_WIP_COL).value = kg
         written.append((dia, kg, row, name))
 
-    try:
-        from alpha_checks import atomic_save
-        atomic_save(wb, excel_path)
-    except Exception:
-        wb.save(excel_path)
+    from alpha_checks import atomic_save
+    atomic_save(wb, excel_path)
 
     # Report
     print("")

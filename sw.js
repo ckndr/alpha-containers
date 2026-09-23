@@ -2,7 +2,7 @@
 // Network-first: always fetches fresh data when online
 // Falls back to cache only when offline
 
-const CACHE_NAME = 'tubex-202609221634';
+const CACHE_NAME = 'tubex-202609231202';
 const ASSETS = [
   './',
   './index.html',

@@ -57,6 +57,7 @@ NAME_FIXES:
 """
 
 import os
+import sys
 import glob
 from datetime import datetime, date
 
@@ -65,7 +66,7 @@ warnings.filterwarnings("ignore", message=".*Data Validation.*")
 warnings.filterwarnings("ignore", message=".*extension.*")
 import pandas as pd
 from openpyxl import load_workbook
-from alpha_checks import check_freshness, check_not_locked, log_mismatches, replace_copy_export
+from alpha_checks import check_freshness, check_not_locked, log_mismatches, replace_copy_export, get_active_tubex_file
 
 
 # -----------------------------------------------------------------------
@@ -327,11 +328,10 @@ def find_files(folder):
     replace_copy_export(folder, "dispatch.xls")
     replace_copy_export(folder, "dispatch_pet.xls")
 
-    ac_files = glob.glob(os.path.join(folder, "Tubex*.xlsx"))
-    if not ac_files:
+    ac = get_active_tubex_file(folder)
+    if not ac:
         print("  ERROR: No Tubex*.xlsx found in: " + folder)
         return None, None, None
-    ac = sorted(ac_files)[-1]
 
     dispatch_tube = os.path.join(folder, "dispatch.xls")
     dispatch_pet  = os.path.join(folder, "dispatch_pet.xls")
@@ -377,11 +377,8 @@ def update_dispatch(ac_path, dispatch_by_pid):
         ws.cell(pid_row_map[pid], DASHBOARD_DISP_COL).value = int(qty)
         updated += 1
 
-    try:
-        from alpha_checks import atomic_save
-        atomic_save(wb, ac_path)
-    except Exception:
-        wb.save(ac_path)
+    from alpha_checks import atomic_save
+    atomic_save(wb, ac_path)
     return updated, skipped
 
 
@@ -399,7 +396,8 @@ def main():
     print("[1/4] Finding files...")
     ac_path, tube_path, pet_path = find_files(folder)
     if not ac_path:
-        return
+        print("  Aborting: Required dispatch files not found.")
+        sys.exit(1)
     print("  Tubex File:    " + os.path.basename(ac_path))
     print("  Dispatch Tube: " + os.path.basename(tube_path))
     print("  Dispatch PET:  " + os.path.basename(pet_path))

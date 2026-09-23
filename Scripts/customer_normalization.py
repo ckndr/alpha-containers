@@ -1,4 +1,5 @@
 import os
+import re
 import openpyxl
 
 # Fallback mapping if reading from catalog fails or to force standard names
@@ -22,17 +23,15 @@ def load_master_customers(alpha_dir):
     if _master_customers:
         return _master_customers
         
-    # Search for latest Tubex_*.xlsx
-    import glob
-    active_files = sorted(glob.glob(os.path.join(alpha_dir, "Tubex_*.xlsx")), key=os.path.getmtime)
-    if active_files:
-        latest_file = active_files[-1]
+    from alpha_checks import get_active_tubex_file
+    latest_file = get_active_tubex_file(alpha_dir)
+    if latest_file:
         try:
             wb = openpyxl.load_workbook(latest_file, data_only=True)
             if "Product_Catalog" in wb.sheetnames:
                 ws = wb["Product_Catalog"]
                 custs = set()
-                for r in range(4, ws.max_row + 1):
+                for r in range(3, ws.max_row + 1):
                     val = ws.cell(r, 3).value
                     if val:
                         custs.add(str(val).strip())
@@ -63,7 +62,7 @@ def normalize_customer_name(raw_name, alpha_dir):
         
     # 2. Check if a key from MANUAL_MAPPING is in the raw string (e.g. "Samsol International" contains "SAMSOL")
     for key, official_name in MANUAL_MAPPING.items():
-        if key in raw_upper:
+        if re.search(r'\b' + re.escape(key) + r'\b', raw_upper):
             return official_name
             
     # 3. Check against master customers dynamically
@@ -75,7 +74,6 @@ def normalize_customer_name(raw_name, alpha_dir):
             return mc
             
     # Partial match check (e.g., "Al-Rehman" in "Al-Rehman Group") (Rule R1-21)
-    import re
     for mc in master_list:
         mc_up = mc.upper()
         if len(raw_upper) >= 4 and len(mc_up) >= 4:

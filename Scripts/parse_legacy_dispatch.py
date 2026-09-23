@@ -16,7 +16,7 @@ ALPHA_DIR   = r"d:\Alpha"
 # Load catalog mapping
 catalog_map = {} # product_name_upper -> {pid, customer, dia, pname}
 
-aug_path = os.path.join(ALPHA_DIR, "Tubex_Aug26.xlsx")
+aug_path = os.path.join(RECORDS_DIR, "Tubex_Aug26.xlsx")
 if os.path.exists(aug_path):
     wb_cat = openpyxl.load_workbook(aug_path, data_only=True)
     if "Product_Catalog" in wb_cat.sheetnames:
@@ -115,25 +115,26 @@ def parse_dispatch_xls(filename, default_type):
 
     return records
 
-tube_disp = parse_dispatch_xls("dispatch nov to jul.xls", "TUBE")
-pet_disp  = parse_dispatch_xls("dispatch pet nov to jul.xls", "PET")
+if __name__ == "__main__":
+    tube_disp = parse_dispatch_xls("dispatch nov to jul.xls", "TUBE")
+    pet_disp  = parse_dispatch_xls("dispatch pet nov to jul.xls", "PET")
 
-all_disp = tube_disp + pet_disp
-print(f"Total Tube Dispatch Records: {len(tube_disp):,}")
-print(f"Total PET Dispatch Records : {len(pet_disp):,}")
-print(f"Total Combined Records     : {len(all_disp):,}")
+    all_disp = tube_disp + pet_disp
+    print(f"Total Tube Dispatch Records: {len(tube_disp):,}")
+    print(f"Total PET Dispatch Records : {len(pet_disp):,}")
+    print(f"Total Combined Records     : {len(all_disp):,}")
 
-# Summarize by month
-monthly_tot = {}
-for r in all_disp:
-    m = r["month"]
-    t = r["type"]
-    if m not in monthly_tot:
-        monthly_tot[m] = {"TUBE": 0, "PET": 0}
-    monthly_tot[m][t] += r["disp_qty"]
+    # Summarize by month
+    monthly_tot = {}
+    for r in all_disp:
+        m = r["month"]
+        t = r["type"]
+        if m not in monthly_tot:
+            monthly_tot[m] = {"TUBE": 0, "PET": 0}
+        monthly_tot[m][t] += r["disp_qty"]
 
-print("\n" + "="*50)
-print(" MONTHLY DISPATCH SUMMARY (Nov 2025 - Jul 2026)")
-print("="*50)
-for m, d in sorted(monthly_tot.items()):
-    print(f" {m:16s} | TUBE: {d['TUBE']:9,} | PET: {d['PET']:9,} | TOTAL: {d['TUBE']+d['PET']:9,}")
+    print("\n" + "="*50)
+    print(" MONTHLY DISPATCH SUMMARY (Nov 2025 - Jul 2026)")
+    print("="*50)
+    for m, d in sorted(monthly_tot.items()):
+        print(f" {m:16s} | TUBE: {d['TUBE']:9,} | PET: {d['PET']:9,} | TOTAL: {d['TUBE']+d['PET']:9,}")

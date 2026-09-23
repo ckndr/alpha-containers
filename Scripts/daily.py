@@ -28,7 +28,7 @@ import shutil
 import time
 import subprocess
 import logging
-from datetime import datetime
+from datetime import datetime, date
 
 # ── PATH SETUP ──────────────────────────────────────────────────────────────
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -42,6 +42,10 @@ if "onedrive" in ALPHA_DIR.lower() and os.path.exists(r"D:\Alpha"):
     SCRIPTS_DIR = os.path.join(ALPHA_DIR, "Scripts")
     if SCRIPTS_DIR not in sys.path:
         sys.path.insert(0, SCRIPTS_DIR)
+
+if SCRIPTS_DIR not in sys.path:
+    sys.path.insert(0, SCRIPTS_DIR)
+from alpha_checks import get_active_tubex_file, _tubex_sort_key, _FULL_MONTHS
 
 LOGS_DIR    = os.path.join(ALPHA_DIR, "Logs")
 REPORTS_ARCHIVE_DIR = os.path.join(LOGS_DIR, "Reports_Archive")
@@ -592,7 +596,7 @@ def is_wip_pattern(text):
             sys.path.insert(0, SCRIPTS_DIR)
             from update_wip import parse_wip_message
             res = parse_wip_message(t)
-            valid_dias = {12.5, 13.5, 16.0, 16, 19.0, 19, 20.5, 25.0, 25, 30.0, 30, 32.0, 32, 35.0, 35}
+            valid_dias = {12.5, 13.5, 16.0, 16, 19.0, 19, 20.5, 22.0, 22, 25.0, 25, 28.0, 28, 30.0, 30, 32.0, 32, 35.0, 35}
             if res and any(d in valid_dias for d in res.keys()):
                 return True
         except Exception:
@@ -627,6 +631,45 @@ def apply_wip(msg):
     ws = wb['Inventory']
     slug_map = build_slug_map(ws)
 
+    # Print table of parsed diameters and kg
+    safe_print("\n    Parsed WIP values:")
+    safe_print(f"    {'Diameter':<12} {'KG':>10}")
+    safe_print(f"    {'-'*12} {'-'*10}")
+    for dia, kg in sorted(wip_data.items()):
+        safe_print(f"    {f'{dia:g}mm':<12} {f'{kg:g} kg':>10}")
+
+    # Check for warnings:
+    # (a) parsed diameters with no slug row
+    missing_slug_dias = [(dia, wip_data[dia]) for dia in sorted(wip_data.keys()) if dia not in slug_map]
+    if missing_slug_dias:
+        warn("WARNING: Parsed diameter(s) with no matching slug row in Inventory:")
+        for dia, kg in missing_slug_dias:
+            safe_print(f"      - {dia:g}mm ({kg:g} kg): no matching slug row (will be dropped)")
+
+    # (b) existing WIP rows that will be cleared because they are not in the message
+    cleared_wip_rows = []
+    for dia, rows in sorted(slug_map.items()):
+        if dia not in wip_data:
+            for r, issued, name in rows:
+                val = ws.cell(r, INV_WIP_COL).value
+                if val is not None and str(val).strip() != "":
+                    cleared_wip_rows.append((dia, r, name, val))
+
+    if cleared_wip_rows:
+        warn("WARNING: Existing WIP row(s) that will be cleared (not in message):")
+        for dia, r, name, val in cleared_wip_rows:
+            safe_print(f"      - Row {r}: {dia:g}mm ({name}) currently {val} kg -> will be cleared")
+
+    if missing_slug_dias or cleared_wip_rows:
+        try:
+            ans = input("    Continue? [y/N] ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            ans = "n"
+        if ans not in ('y', 'yes'):
+            warn("WIP update aborted.")
+            wb.close()
+            return False
+
     # Clear existing WIP
     for dia, rows in slug_map.items():
         for r, issued, name in rows:
@@ -641,7 +684,8 @@ def apply_wip(msg):
             ws.cell(row, INV_WIP_COL).value = kg
             written.append(f"{dia}mm→{kg}kg")
 
-    wb.save(excel_path)
+    from alpha_checks import atomic_save
+    atomic_save(wb, excel_path)
     wb.close()
     if written:
         ok(f"WIP applied: {', '.join(written)}")
@@ -683,13 +727,13 @@ def step_pipeline(wip_msg=None):
     header(5, "Running update pipeline...")
 
     # Check Excel not open
-    excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
-    if excel_files:
+    active_excel = get_active_tubex_file(ALPHA_DIR)
+    if active_excel:
         try:
-            with open(excel_files[-1], 'r+b'):
+            with open(active_excel, 'r+b'):
                 pass
         except PermissionError:
-            fail(f"{os.path.basename(excel_files[-1])} is OPEN in Excel!")
+            fail(f"{os.path.basename(active_excel)} is OPEN in Excel!")
             fail("Close Excel and run again.")
             return False
 
@@ -838,12 +882,12 @@ def step_crosscheck():
             imran_totals = df_imran.groupby(machine_col)[good_col].sum()
 
             # Read our Production_Log
-            excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
-            if not excel_files:
+            active_excel = get_active_tubex_file(ALPHA_DIR)
+            if not active_excel:
                 warn("No Tubex*.xlsx — skipping machine totals check")
                 critical_errors.append("No Tubex*.xlsx found for machine totals check")
             else:
-                df_dash = pd.read_excel(excel_files[-1], sheet_name='Production_Log', header=1)
+                df_dash = pd.read_excel(active_excel, sheet_name='Production_Log', header=1)
 
                 good_col_d = None
                 for col in df_dash.columns:
@@ -927,11 +971,11 @@ def step_crosscheck():
             critical_errors.append("No Summary sheet found in Production.xlsx")
         else:
             ws_sum = wb_imran[summary_sheet_name]
-            excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
-            if not excel_files:
+            active_excel = get_active_tubex_file(ALPHA_DIR)
+            if not active_excel:
                 warn("No Tubex*.xlsx found — skipping summary check")
             else:
-                wb_dash = load_workbook(excel_files[-1], data_only=True)
+                wb_dash = load_workbook(active_excel, data_only=True)
                 ws_dash = wb_dash['Tubex_Dashboard']
                 
                 def _to_int(v):
@@ -1079,12 +1123,11 @@ def step_crosscheck():
             most_recent_pending = pending_files[0][0]
             pending_basename = os.path.basename(most_recent_pending)
 
-            excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
-            if not excel_files:
+            active_tb = get_active_tubex_file(ALPHA_DIR)
+            if not active_tb:
                 warn("No Tubex*.xlsx found — skipping Pending Order check")
                 pending_warnings.append("No Tubex*.xlsx found for Pending Order check")
             else:
-                active_tb = excel_files[-1]
                 wb_mrp = load_workbook(active_tb, data_only=True)
                 if 'MRP' not in wb_mrp.sheetnames:
                     warn("No MRP sheet found in active Tubex workbook")
@@ -1277,9 +1320,9 @@ def step_crosscheck():
 
     # --- Part D: Check for unassigned PIDs (PID=0) in Production_Log ---
     try:
-        excel_files = sorted(glob.glob(os.path.join(ALPHA_DIR, "Tubex*.xlsx")))
-        if excel_files:
-            wb_check = load_workbook(excel_files[-1], data_only=True)
+        active_check = get_active_tubex_file(ALPHA_DIR)
+        if active_check:
+            wb_check = load_workbook(active_check, data_only=True)
             if 'Production_Log' in wb_check.sheetnames:
                 ws_plog = wb_check['Production_Log']
                 pid_zeros = []
@@ -1297,6 +1340,80 @@ def step_crosscheck():
     except Exception as e:
         warn(f"PID check error: {e}")
         critical_errors.append(f"PID check error: {e}")
+
+    # --- Part E: Month and Freshness check in Production_Log ---
+    try:
+        active_check = get_active_tubex_file(ALPHA_DIR)
+        if not active_check:
+            warn("No Tubex*.xlsx found — skipping month check")
+        else:
+            wb_check = load_workbook(active_check, data_only=True)
+            try:
+                if 'Production_Log' not in wb_check.sheetnames:
+                    warn("No Production_Log sheet found in active Tubex workbook — skipping month check")
+                else:
+                    ws_plog = wb_check['Production_Log']
+                    log_dates = []
+                    for r in range(3, ws_plog.max_row + 1):
+                        val = ws_plog.cell(r, 1).value
+                        if val is None or str(val).strip() == '':
+                            continue
+                        if isinstance(val, datetime):
+                            log_dates.append(val.date())
+                        elif isinstance(val, date):
+                            log_dates.append(val)
+                        elif isinstance(val, str):
+                            v_str = val.strip()
+                            if v_str:
+                                try:
+                                    log_dates.append(pd.to_datetime(v_str).date())
+                                except Exception:
+                                    pass
+
+                    if not log_dates:
+                        warn("No valid dates found in Production_Log column A")
+                    else:
+                        # 1. Multi-month check
+                        unique_months = sorted(set((d.year, d.month) for d in log_dates))
+                        if len(unique_months) > 1:
+                            month_names = [_FULL_MONTHS.get(m, str(m)) for y, m in unique_months]
+                            if len(month_names) == 2:
+                                months_text = f"{month_names[0]} and {month_names[1]}"
+                            else:
+                                months_text = ", ".join(month_names[:-1]) + f", and {month_names[-1]}"
+                            msg = f"Production_Log contains {months_text}. Imran's Production.xlsx was not reset. MTD totals are wrong."
+                            fail(msg)
+                            critical_errors.append(msg)
+                        else:
+                            ok(f"Production_Log single-month check passed ({_FULL_MONTHS.get(unique_months[0][1], str(unique_months[0][1]))} {unique_months[0][0]})")
+
+                        # 2. Workbook filename month vs latest log date check
+                        latest_date = max(log_dates)
+                        key = _tubex_sort_key(active_check)
+                        if key is not None and key[0] == 2:
+                            file_year, file_month = key[1], key[2]
+                            if (file_year, file_month) != (latest_date.year, latest_date.month):
+                                file_m_str = f"{_FULL_MONTHS.get(file_month, str(file_month))} {file_year}"
+                                log_m_str = f"{_FULL_MONTHS.get(latest_date.month, str(latest_date.month))} {latest_date.year}"
+                                msg = f"Workbook filename month ({file_m_str}) differs from latest log date ({log_m_str})."
+                                fail(msg)
+                                critical_errors.append(msg)
+                            else:
+                                ok(f"Workbook filename month matches Production_Log ({_FULL_MONTHS.get(file_month, str(file_month))} {file_year})")
+
+                        # 3. Freshness check: latest log date > 4 days before today
+                        days_lag = (date.today() - latest_date).days
+                        if days_lag > 4:
+                            msg = f"Latest Production_Log date ({latest_date.strftime('%d-%b-%Y')}) is {days_lag} days old (> 4 days lag)."
+                            warn(msg)
+                            pending_warnings.append(msg)
+                        else:
+                            ok(f"Production_Log freshness check passed (latest: {latest_date.strftime('%d-%b-%Y')}, {days_lag} day(s) ago)")
+            finally:
+                wb_check.close()
+    except Exception as e:
+        warn(f"Month check error: {e}")
+        critical_errors.append(f"Month check error: {e}")
 
     return critical_errors, pending_warnings
 
@@ -1391,10 +1508,19 @@ def step_git_push(skip=False):
 
     # Commit and push
     msg = f"Daily update {datetime.now().strftime('%d-%b-%Y %H:%M')}"
-    subprocess.run(
+    commit_res = subprocess.run(
         ["git", "-C", ALPHA_DIR, "commit", "-m", msg],
         capture_output=True
     )
+    if commit_res.returncode != 0:
+        commit_out = (commit_res.stdout.decode(errors='replace') + "\n" + commit_res.stderr.decode(errors='replace')).strip()
+        if "nothing to commit" not in commit_out.lower():
+            fail(f"Git commit failed: {commit_out}")
+            return
+        else:
+            ok("Nothing to commit")
+            return
+
     result = subprocess.run(
         ["git", "-C", ALPHA_DIR, "push", "origin", "main"],
         capture_output=True

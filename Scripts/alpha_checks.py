@@ -23,6 +23,8 @@ HOW TO USE:
 """
 
 import os
+import re
+import glob
 import time
 from datetime import datetime
 
@@ -206,17 +208,87 @@ def replace_copy_export(folder, target_name):
     return True
 
 
+_MONTHS = {m: i for i, m in enumerate(
+    ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"], 1)}
+
+def _tubex_sort_key(path):
+    name = os.path.basename(path).lower()
+    m = re.fullmatch(r"tubex_([a-z]{3,9})(\d{2})(?:_(\d+))?\.xlsx", name)
+    if m and m.group(1)[:3] in _MONTHS:
+        return (2, 2000 + int(m.group(2)), _MONTHS[m.group(1)[:3]], int(m.group(3) or 0))
+    m = re.fullmatch(r"tubex_v(\d+)_(\d+)\.xlsx", name)
+    if m:
+        return (1, int(m.group(1)), int(m.group(2)), 0)
+    return None   # anything else (temp files, "- Copy", .dry_run.tmp) is ignored
+
 def get_active_tubex_file(folder):
+    override = os.environ.get("TUBEX_FILE")
+    if override and os.path.exists(override):
+        return override
+    ranked = []
+    for f in glob.glob(os.path.join(folder, "Tubex*.xlsx")):
+        key = _tubex_sort_key(f)
+        if key is not None:
+            ranked.append((key, f))
+    return max(ranked)[1] if ranked else None
+
+
+_FULL_MONTHS = {
+    1: "January", 2: "February", 3: "March", 4: "April",
+    5: "May", 6: "June", 7: "July", 8: "August",
+    9: "September", 10: "October", 11: "November", 12: "December"
+}
+
+LEGACY_MONTHS = [
+    ("November 2025", None, 11, 2025),
+    ("December 2025", None, 12, 2025),
+    ("January 2026", None, 1, 2026),
+    ("February 2026", None, 2, 2026),
+    ("March 2026", None, 3, 2026),
+    ("April 2026", None, 4, 2026),
+    ("May 2026", None, 5, 2026),
+    ("June 2026", None, 6, 2026),
+]
+
+
+def get_month_registry(folder=None):
     """
-    Find the active Tubex master workbook in folder using standard version sorting (Rule R1-22).
-    Excludes temporary Excel lock files (~$).
+    Returns a list of (label, path, month_number, year) sorted oldest to newest.
+    Built from:
+      - constant LEGACY_MONTHS (Nov 2025 to Jun 2026)
+      - every Tubex_<Mon><YY>.xlsx in 'Tubex Records'
+      - active workbook in project root (from get_active_tubex_file)
     """
-    import glob
-    excels = glob.glob(os.path.join(folder, "Tubex*.xlsx"))
-    excels = [f for f in excels if not os.path.basename(f).startswith("~$")]
-    if not excels:
-        return None
-    return sorted(excels)[-1]
+    if folder is None:
+        folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    records_dir = os.path.join(folder, "Tubex Records")
+    months_by_key = {}
+
+    for label, path, mnum, yr in LEGACY_MONTHS:
+        months_by_key[(yr, mnum)] = (label, path, mnum, yr)
+
+    if os.path.exists(records_dir):
+        for f in glob.glob(os.path.join(records_dir, "Tubex*.xlsx")):
+            key = _tubex_sort_key(f)
+            if key is not None and key[0] == 2:
+                yr = key[1]
+                mnum = key[2]
+                label = f"{_FULL_MONTHS[mnum]} {yr}"
+                existing = months_by_key.get((yr, mnum))
+                if existing is None or existing[1] is None or key > _tubex_sort_key(existing[1]):
+                    months_by_key[(yr, mnum)] = (label, f, mnum, yr)
+
+    active = get_active_tubex_file(folder)
+    if active:
+        key = _tubex_sort_key(active)
+        if key is not None and key[0] == 2:
+            yr = key[1]
+            mnum = key[2]
+            label = f"{_FULL_MONTHS[mnum]} {yr}"
+            months_by_key[(yr, mnum)] = (label, active, mnum, yr)
+
+    return [months_by_key[k] for k in sorted(months_by_key.keys())]
 
 
 def cleanup_stale_lockfiles(folder):
