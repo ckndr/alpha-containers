@@ -41,7 +41,9 @@ WHAT THIS SCRIPT UPDATES in Inventory sheet:
   as warnings but NOT added. Only existing rows are updated.
 """
 
+# See AUDIT_NOTES.md Rule R1-02 before changing missing-item handling in update_excel().
 import os
+import sys
 import re
 import glob
 
@@ -51,11 +53,12 @@ warnings.filterwarnings("ignore", message=".*extension.*")
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import Font
-from alpha_checks import check_freshness, check_not_locked, log_mismatches, replace_copy_export
+from alpha_checks import check_freshness, check_not_locked, log_mismatches, replace_copy_export, get_active_tubex_file
 
 # Scripts live in Tubex/Scripts/
 # Excel and ERP files live in Tubex/ (one level up)
 DATA_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MIN_COVERAGE = 0.20
 
 
 
@@ -63,10 +66,10 @@ DATA_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def find_files():
     replace_copy_export(DATA_DIR, "inventory.xls")
 
-    excels = glob.glob(os.path.join(DATA_DIR, "Tubex*.xlsx"))
+    excel_file = get_active_tubex_file(DATA_DIR)
     xls    = os.path.join(DATA_DIR, "inventory.xls")
 
-    if not excels:
+    if not excel_file:
         print("  ERROR: No Tubex*.xlsx found in folder:")
         print("    " + DATA_DIR)
         return None, None
@@ -75,8 +78,6 @@ def find_files():
         print("    " + DATA_DIR)
         print("  Export from ERP and save as 'inventory.xls' there.")
         return None, None
-
-    excel_file = sorted(excels)[-1]
     print("  Folder:  " + DATA_DIR)
     print("  Excel:   " + os.path.basename(excel_file))
     print("  Source:  inventory.xls")
@@ -192,6 +193,40 @@ def _n(v):
         return 0.0
 
 
+def check_export_coverage(xls_items, excel_ids):
+    """
+    Validate ERP inventory export coverage against the workbook's Inventory sheet.
+    Returns (ok, matched, coverage, message).
+    """
+    excel_keys = set(excel_ids.keys()) if hasattr(excel_ids, 'keys') else set(excel_ids)
+    xls_keys = set(xls_items.keys()) if hasattr(xls_items, 'keys') else set(xls_items)
+
+    total = len(excel_keys)
+    def _norm(k):
+        try:
+            return int(float(str(k)))
+        except (ValueError, TypeError):
+            return k
+
+    norm_excel = {_norm(k) for k in excel_keys}
+    norm_xls = {_norm(k) for k in xls_keys}
+    matched = len(norm_excel & norm_xls)
+    coverage = (matched / total) if total > 0 else 0.0
+
+    pct_str = f"{coverage:.1%}"
+    if total >= 10 and (matched < 5 or coverage < MIN_COVERAGE):
+        ok = False
+        message = (
+            f"inventory.xls matched {matched} of {total} Inventory rows ({pct_str}). "
+            f"Looks like a partial or wrong export. Inventory NOT changed."
+        )
+    else:
+        ok = True
+        message = f"inventory.xls matched {matched} of {total} Inventory rows ({pct_str})."
+
+    return ok, matched, coverage, message
+
+
 def update_excel(excel_path, xls_items, date_range):
     wb = load_workbook(excel_path)
     ws = wb['Inventory']
@@ -218,9 +253,11 @@ def update_excel(excel_path, xls_items, date_range):
                 pass
 
     # Safety guardrail check (prevent accidental full wipe if export is filtered)
-    if len(xls_items) < 5 and len(excel_ids) >= 10:
-        print(f"\n  WARNING: ERP inventory export has only {len(xls_items)} items ({len(excel_ids)} in sheet).")
-        print("  Please check if inventory.xls is a filtered/partial export before finalizing.")
+    ok, matched, coverage, msg = check_export_coverage(xls_items, excel_ids)
+    print(f"  Coverage: {coverage:.1%}")
+    if not ok:
+        print(f"  {msg}")
+        sys.exit(2)
 
     updated      = []
     not_in_excel = []
@@ -311,11 +348,8 @@ def update_excel(excel_path, xls_items, date_range):
     ws.cell(row=2, column=11).font = Font(name="Segoe UI", size=9.5, bold=True, color="FF1A1A2E")
 
     # Overwrite same file atomically
-    try:
-        from alpha_checks import atomic_save
-        atomic_save(wb, excel_path)
-    except Exception:
-        wb.save(excel_path)
+    from alpha_checks import atomic_save
+    atomic_save(wb, excel_path)
     return updated, not_in_excel, missing_critical, missing_items, new_critical_slugs
 
 
@@ -331,13 +365,23 @@ def main():
     print("[1/3] Finding files...")
     excel_path, xls_path = find_files()
     if not excel_path:
-        return
+        print("  Aborting: Required files not found.")
+        sys.exit(1)
 
     print("")
     print("[2/3] Safety checks + Reading ERP inventory.xls...")
     check_not_locked(excel_path)
     check_freshness(xls_path, max_hours=26, label="inventory.xls")
-    xls_items, date_range = parse_inventory_xls(xls_path)
+    try:
+        xls_items, date_range = parse_inventory_xls(xls_path)
+    except Exception as e:
+        print(f"  ERROR: Could not read inventory.xls: {e}")
+        sys.exit(1)
+
+    if not xls_items:
+        print("  ERROR: Zero items parsed from inventory.xls.")
+        sys.exit(1)
+
     print("  Found %d items" % len(xls_items))
     if date_range:
         print("  Period: " + date_range)

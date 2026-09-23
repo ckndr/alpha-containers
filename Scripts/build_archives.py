@@ -27,43 +27,25 @@ from openpyxl.utils import get_column_letter
 
 from parse_legacy_xls import get_legacy_production_records
 from parse_legacy_dispatch import parse_dispatch_xls
-from alpha_checks import get_active_tubex_file
+from alpha_checks import get_active_tubex_file, get_month_registry
 
 # ============================================================
 #  CONFIGURATION
 # ============================================================
 
-MONTH_FILES = [
-    ("July 2026",      r"d:\Alpha\Tubex Records\Tubex_July26.xlsx",   7),
-    ("August 2026",    r"d:\Alpha\Tubex Records\Tubex_Aug26.xlsx",    8),
-]
+DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Dynamically find the active month file in d:\Alpha using standard resolution (Rule R1-22)
-latest = get_active_tubex_file(r"d:\Alpha")
-if latest:
-    month_name = datetime.datetime.now().strftime("%B %Y")
-    month_num = datetime.datetime.now().month
-    if "Aug" in os.path.basename(latest):
-        month_name, month_num = "August 2026", 8
-    elif "Sep" in os.path.basename(latest):
-        month_name, month_num = "September 2026", 9
-    
-    # Check if already added
-    if not any(f[1] == latest or f[0] == month_name for f in MONTH_FILES):
-        try:
-            wb_test = openpyxl.load_workbook(latest, data_only=True)
-            if "Production_Log" in wb_test.sheetnames:
-                has_data = any(wb_test["Production_Log"].cell(r, 1).value is not None for r in range(3, 10))
-                if has_data:
-                    MONTH_FILES.append((month_name, latest, month_num))
-            wb_test.close()
-        except Exception:
-            pass
+# Dynamically find all available month files via get_month_registry (Task 3)
+MONTH_FILES = [
+    (label, path, mnum, yr)
+    for label, path, mnum, yr in get_month_registry(DIR)
+    if path and os.path.exists(path)
+]
 
 DASHBOARD_SHEET    = "Tubex_Dashboard"
 PRODUCTION_SHEET   = "Production_Log"
 
-OUTPUT_DIR         = r"d:\Alpha\Tubex Records"
+OUTPUT_DIR         = os.path.join(DIR, "Tubex Records")
 DASHBOARD_ARCHIVE  = os.path.join(OUTPUT_DIR, "Dashboard_Archive.xlsx")
 PRODUCTION_ARCHIVE = os.path.join(OUTPUT_DIR, "Production_Archive.xlsx")
 TEMP_DIR           = os.path.join(OUTPUT_DIR, "_tmp_archive")
@@ -125,7 +107,9 @@ def build_dashboard_archive(available_months):
 
         archive_wb = None
 
-        for idx, (label, src_path, month_num) in enumerate(available_months):
+        for idx, item in enumerate(available_months):
+            label, src_path, month_num = item[0], item[1], item[2]
+            yr = item[3] if len(item) > 3 else 2026
             tab     = label[:31]
             src_abs = os.path.abspath(src_path)
             print(f"\n     {label}")
@@ -145,9 +129,16 @@ def build_dashboard_archive(available_months):
                     print(f"       KPIs => TUBE: {int(tube):,}  PET: {int(pet):,}")
                 else:
                     print(f"       KPIs => {kpis}")
+
+                t_m = float(kpis.get("TUBE_MTD") or 0)
+                t_r = float(kpis.get("TUBE_REJECT") or 0)
+                p_m = float(kpis.get("PET_MTD") or 0)
+                p_r = float(kpis.get("PET_REJECT") or 0)
+                kpis["TUBE_REJECT_QTY"] = (t_m * t_r / (1.0 - t_r)) if (t_r > 0 and t_r < 1.0) else 0.0
+                kpis["PET_REJECT_QTY"]  = (p_m * p_r / (1.0 - p_r)) if (p_r > 0 and p_r < 1.0) else 0.0
             except Exception as e:
                 print(f"       [WARN] KPI read: {e}")
-            kpi_data[label] = {"kpis": kpis, "month_num": month_num}
+            kpi_data[label] = {"kpis": kpis, "month_num": month_num, "year": yr}
 
             try:
                 src_wb.Sheets(DASHBOARD_SHEET).Copy()
@@ -218,28 +209,28 @@ def build_dashboard_archive(available_months):
             legacy_months[m]["TUBE"] += r["good"]
             legacy_months[m]["REJ_TUBE"] += r["reject"]
 
-    month_num_map = {
-        "January 2026": 1, "February 2026": 2, "March 2026": 3, "April 2026": 4,
-        "May 2026": 5, "June 2026": 6, "July 2026": 7, "August 2026": 8,
-        "November 2025": 11, "December 2025": 12
-    }
+    month_meta = {m[0]: (m[2], m[3]) for m in get_month_registry(r"d:\Alpha")}
 
     for mname, mvals in legacy_months.items():
-        if mname not in kpi_data and mname in month_num_map:
+        if mname not in kpi_data and mname in month_meta:
+            mnum, yr = month_meta[mname]
             tot_t = mvals["TUBE"]
             tot_p = mvals["PET"]
-            rej_t = (mvals["REJ_TUBE"] / tot_t) if tot_t > 0 else 0
-            rej_p = (mvals["REJ_PET"] / tot_p) if tot_p > 0 else 0
+            rej_t = (mvals["REJ_TUBE"] / (tot_t + mvals["REJ_TUBE"])) if (tot_t + mvals["REJ_TUBE"]) > 0 else 0
+            rej_p = (mvals["REJ_PET"] / (tot_p + mvals["REJ_PET"])) if (tot_p + mvals["REJ_PET"]) > 0 else 0
             disp_t = disp_months.get(mname, {}).get("TUBE", tot_t)
             disp_p = disp_months.get(mname, {}).get("PET", tot_p)
             kpi_data[mname] = {
-                "month_num": month_num_map[mname],
+                "month_num": mnum,
+                "year": yr,
                 "kpis": {
                     "TUBE_MTD": tot_t,
                     "TUBE_REJECT": rej_t,
+                    "TUBE_REJECT_QTY": mvals["REJ_TUBE"],
                     "TUBE_DISPATCH": disp_t,
                     "PET_MTD": tot_p,
                     "PET_REJECT": rej_p,
+                    "PET_REJECT_QTY": mvals["REJ_PET"],
                     "PET_DISPATCH": disp_p
                 }
             }
@@ -265,7 +256,7 @@ def build_production_archive(available_months):
             by_month[m] = []
         by_month[m].append(r)
 
-    month_order = ["November 2025", "December 2025", "January 2026", "February 2026", "March 2026", "April 2026", "May 2026", "June 2026"]
+    month_order = [m[0] for m in get_month_registry(DIR)]
 
     for mname in month_order:
         if mname in by_month:
@@ -287,7 +278,8 @@ def build_production_archive(available_months):
             print(f"       [OK] Legacy Production -> '{tab}' ({row_idx-3} rows)")
 
     # 2. Add XLSX available months
-    for mi, (label, src_path, month_num) in enumerate(available_months):
+    for mi, item in enumerate(available_months):
+        label, src_path, month_num = item[0], item[1], item[2]
         tab = label[:31]
         if tab in archive_wb.sheetnames:
             continue
@@ -369,21 +361,45 @@ def add_dashboard_summary(kpi_data, year=2026):
         ws.column_dimensions[get_column_letter(ci)].width = w
     ws.row_dimensions[HDR_ROW].height = 32
 
+    # Key lookup by (year, month_num)
     lookup = {}
     for label, entry in kpi_data.items():
         mnum = entry["month_num"]
-        lookup[mnum] = entry["kpis"]
+        yr = entry.get("year", year)
+        lookup[(yr, mnum)] = entry["kpis"]
 
-    for mi, abbr in enumerate(ALL_MONTHS, 1):
-        row      = HDR_ROW + mi
-        bg_color = C_LIGHT if mi % 2 == 0 else C_ALT
+    # Gather all months to display from registry + any remaining months of current year
+    registry = get_month_registry(DIR)
+    months_dict = {}
+    for label, path, mnum, yr in registry:
+        months_dict[(yr, mnum)] = (label, yr, mnum)
 
-        if mi in lookup:
-            k    = lookup[mi]
-            def _num(v):
-                if v is None or v == "" or v == "-": return 0.0
-                try: return float(v)
-                except Exception: return 0.0
+    from alpha_checks import _FULL_MONTHS
+    for m in range(1, 13):
+        if (year, m) not in months_dict:
+            months_dict[(year, m)] = (f"{_FULL_MONTHS[m]} {year}", year, m)
+
+    sorted_month_keys = sorted(months_dict.keys())
+
+    tot_tube_prod = 0.0
+    tot_tube_disp = 0.0
+    tot_tube_rej_qty = 0.0
+    tot_pet_prod = 0.0
+    tot_pet_disp = 0.0
+    tot_pet_rej_qty = 0.0
+
+    def _num(v):
+        if v is None or v == "" or v == "-": return 0.0
+        try: return float(v)
+        except Exception: return 0.0
+
+    for idx, (yr, mi) in enumerate(sorted_month_keys, 1):
+        row      = HDR_ROW + idx
+        bg_color = C_LIGHT if idx % 2 == 0 else C_ALT
+        abbr     = ALL_MONTHS[mi - 1]
+
+        if (yr, mi) in lookup:
+            k    = lookup[(yr, mi)]
             t_m  = _num(k.get("TUBE_MTD"))
             t_d  = _num(k.get("TUBE_DISPATCH"))
             t_r  = _num(k.get("TUBE_REJECT"))
@@ -392,11 +408,26 @@ def add_dashboard_summary(kpi_data, year=2026):
             p_r  = _num(k.get("PET_REJECT"))
             tot  = t_m + p_m
             status = "Archived"
+
+            # Compute reject quantities for weighted total
+            t_rej = k.get("TUBE_REJECT_QTY")
+            if t_rej is None:
+                t_rej = (t_m * t_r / (1.0 - t_r)) if (t_r > 0 and t_r < 1.0) else 0.0
+            p_rej = k.get("PET_REJECT_QTY")
+            if p_rej is None:
+                p_rej = (p_m * p_r / (1.0 - p_r)) if (p_r > 0 and p_r < 1.0) else 0.0
+
+            tot_tube_prod += t_m
+            tot_tube_disp += t_d
+            tot_tube_rej_qty += t_rej
+            tot_pet_prod += p_m
+            tot_pet_disp += p_d
+            tot_pet_rej_qty += p_rej
         else:
             t_m = t_d = t_r = p_m = p_d = p_r = tot = None
             status = "-- Pending"
 
-        row_vals = [f"{abbr} {year}", t_m, t_d, t_r, p_m, p_d, p_r, tot, status]
+        row_vals = [f"{abbr} {yr}", t_m, t_d, t_r, p_m, p_d, p_r, tot, status]
         row_fmts = [None, "#,##0", "#,##0", "0.00%", "#,##0", "#,##0", "0.00%", "#,##0", None]
 
         for ci, (val, fmt) in enumerate(zip(row_vals, row_fmts), 1):
@@ -411,23 +442,26 @@ def add_dashboard_summary(kpi_data, year=2026):
                 c.number_format = fmt
         ws.row_dimensions[row].height = 22
 
-    TOT_ROW = HDR_ROW + 13
+    TOT_ROW = HDR_ROW + len(sorted_month_keys) + 1
     ws.row_dimensions[TOT_ROW].height = 26
     hdr_cell(ws, TOT_ROW, 1, "TOTAL / AVG", bg=C_NAVY, fg=C_GOLD, size=10)
-    agg_cols = {
-        2: ("#,##0",  lambda v: sum(v)),
-        3: ("#,##0",  lambda v: sum(v)),
-        4: ("0.00%",  lambda v: sum(v) / len(v)),
-        5: ("#,##0",  lambda v: sum(v)),
-        6: ("#,##0",  lambda v: sum(v)),
-        7: ("0.00%",  lambda v: sum(v) / len(v)),
-        8: ("#,##0",  lambda v: sum(v)),
+
+    # Weighted reject rates: total rejects / (total produced + total rejects)
+    weighted_tube_rej = (tot_tube_rej_qty / (tot_tube_prod + tot_tube_rej_qty)) if (tot_tube_prod + tot_tube_rej_qty) > 0 else 0.0
+    weighted_pet_rej  = (tot_pet_rej_qty / (tot_pet_prod + tot_pet_rej_qty)) if (tot_pet_prod + tot_pet_rej_qty) > 0 else 0.0
+    total_produced_all = tot_tube_prod + tot_pet_prod
+
+    tot_vals = {
+        2: ("#,##0", tot_tube_prod if tot_tube_prod > 0 else None),
+        3: ("#,##0", tot_tube_disp if tot_tube_disp > 0 else None),
+        4: ("0.00%", weighted_tube_rej if tot_tube_prod > 0 else None),
+        5: ("#,##0", tot_pet_prod if tot_pet_prod > 0 else None),
+        6: ("#,##0", tot_pet_disp if tot_pet_disp > 0 else None),
+        7: ("0.00%", weighted_pet_rej if tot_pet_prod > 0 else None),
+        8: ("#,##0", total_produced_all if total_produced_all > 0 else None),
     }
-    for ci, (fmt, fn) in agg_cols.items():
-        vals = [ws.cell(row=HDR_ROW + mi, column=ci).value
-                for mi in range(1, 13)
-                if isinstance(ws.cell(row=HDR_ROW + mi, column=ci).value, (int, float))]
-        result = fn(vals) if vals else None
+
+    for ci, (fmt, result) in tot_vals.items():
         c = ws.cell(row=TOT_ROW, column=ci, value=result)
         c.font      = Font(bold=True, size=10, color=C_WHITE, name="Calibri")
         c.fill      = PatternFill("solid", fgColor=C_NAVY)
@@ -544,7 +578,8 @@ def add_dispatch_log(available_months):
     all_disp  = tube_disp + pet_disp
     
     # Extract MTD dispatch from active files
-    for label, path, mnum in available_months:
+    for item in available_months:
+        label, path, mnum = item[0], item[1], item[2]
         active_disp = extract_mtd_dispatch(path, label, mnum)
         if active_disp:
             all_disp.extend(active_disp)
@@ -659,11 +694,11 @@ def add_customer_breakdown(available_months):
 
     data_row = HDR_ROW + 1
     cust_idx = 0
-    monthOrder = ["November 2025", "December 2025", "January 2026", "February 2026", "March 2026", "April 2026", "May 2026", "June 2026", "July 2026", "August 2026"]
+    monthOrder = [m[0] for m in get_month_registry(DIR)]
 
     for cust in sorted(cust_summary.keys()):
         bg_color = C_LIGHT if cust_idx % 2 == 0 else C_ALT
-        sorted_months = sorted(cust_summary[cust].keys(), key=lambda m: monthOrder.index(m) if m in monthOrder else 99)
+        sorted_months = sorted(cust_summary[cust].keys(), key=lambda m: monthOrder.index(m) if m in monthOrder else 999)
         for month in sorted_months:
             d = cust_summary[cust][month]
             tot_p = d["tube_prod"] + d["pet_prod"]
@@ -708,7 +743,7 @@ if __name__ == "__main__":
     print("  Tubex Archive Builder -- Dashboard + Production")
     print("=" * 62)
 
-    available = [(l, p, m) for l, p, m in MONTH_FILES if os.path.exists(p)]
+    available = [f for f in MONTH_FILES if os.path.exists(f[1])]
 
     try:
         kpi_data = build_dashboard_archive(available)

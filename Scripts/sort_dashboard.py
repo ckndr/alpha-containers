@@ -32,17 +32,16 @@ from openpyxl.styles import Font, Alignment, Border, Side, PatternFill, numbers
 # ── PATH SETUP ──────────────────────────────────────────────
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-excel_pattern = os.path.join(DIR, 'Tubex*.xlsx')
-excel_files   = sorted(glob.glob(excel_pattern))
-if not excel_files:
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from alpha_checks import get_active_tubex_file, check_not_locked
+
+EXCEL_PATH = get_active_tubex_file(DIR)
+if not EXCEL_PATH:
     raise FileNotFoundError(f"No Tubex*.xlsx found in {DIR}")
-EXCEL_PATH = excel_files[-1]
 
 print(f"Sort Dashboard: {os.path.basename(EXCEL_PATH)}")
 
 # ── SAFETY CHECKS ───────────────────────────────────────────
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from alpha_checks import check_not_locked
 check_not_locked(EXCEL_PATH)
 
 # ── READ ACTUAL VALUES FOR ORDERS AND DISPATCH ────────────────
@@ -710,11 +709,8 @@ ws.cell(pet_tot_row, 14).number_format = '#,##0.0'
 ws.cell(pet_tot_row, 15).number_format = '0.0%'
 
 # ── SAVE ─────────────────────────────────────────────────────
-try:
-    from alpha_checks import atomic_save
-    atomic_save(wb, EXCEL_PATH)
-except Exception:
-    wb.save(EXCEL_PATH)
+from alpha_checks import atomic_save
+atomic_save(wb, EXCEL_PATH)
 
 print(f"\n[OK] Dashboard sorted successfully -> {os.path.basename(EXCEL_PATH)}")
 print(f"  Active:   {N_at} tubes + {N_ap} PET")

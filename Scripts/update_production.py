@@ -138,6 +138,7 @@ KEY BUSINESS RULES:
 """
 
 import os
+import sys
 import json
 import openpyxl
 import re
@@ -146,7 +147,7 @@ import warnings
 warnings.filterwarnings("ignore", message=".*Data Validation.*")
 warnings.filterwarnings("ignore", message=".*extension.*")
 from datetime import datetime
-from alpha_checks import check_freshness, check_not_locked, log_mismatches, replace_copy_export
+from alpha_checks import check_freshness, check_not_locked, log_mismatches, replace_copy_export, get_active_tubex_file
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -646,15 +647,14 @@ def find_files():
     folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     replace_copy_export(folder, "Production.xlsx")
 
-    ac_files   = glob.glob(os.path.join(folder, "Tubex*.xlsx"))
+    ac         = get_active_tubex_file(folder)
     prod_files = glob.glob(os.path.join(folder, "Production*.xlsx"))
-    if not ac_files:
+    if not ac:
         print("  ERROR: No Tubex*.xlsx found in: " + folder)
         return None, None
     if not prod_files:
         print("  ERROR: No Production*.xlsx found in: " + folder)
         return None, None
-    ac   = sorted(ac_files)[-1]
     prod = sorted(prod_files)[-1]
     print("  Tubex File: " + os.path.basename(ac))
     print("  Production: " + os.path.basename(prod))
@@ -988,11 +988,8 @@ def write_production_log(ac_path, source_rows):
                 cell.alignment     = copy(s['alignment'])
                 cell.number_format = s['number_format']
 
-    try:
-        from alpha_checks import atomic_save
-        atomic_save(wb, ac_path)
-    except Exception:
-        wb.save(ac_path)
+    from alpha_checks import atomic_save
+    atomic_save(wb, ac_path)
     return len(source_rows)
 
 
@@ -1199,11 +1196,8 @@ def write_fg_stock(ac_path, fg_rows, latest_date):
 
         ws.cell(row=r, column=6).number_format = '#,##0'
 
-    try:
-        from alpha_checks import atomic_save
-        atomic_save(wb, ac_path)
-    except Exception:
-        wb.save(ac_path)
+    from alpha_checks import atomic_save
+    atomic_save(wb, ac_path)
     return len(fg_rows)
 
 
@@ -1221,7 +1215,8 @@ def main():
     print("[1/4] Finding files...")
     ac_path, prod_path = find_files()
     if not ac_path:
-        return
+        print("  Aborting: Required files not found.")
+        sys.exit(1)
 
     print("\n[1a] Safety checks...")
     check_not_locked(ac_path)
@@ -1232,18 +1227,18 @@ def main():
         result = read_production_source(prod_path)
     except ImportError:
         print("\n  ERROR: pandas not installed. Run: pip install pandas openpyxl")
-        return
+        sys.exit(1)
     except Exception as e:
         import traceback
         print(f"\n  ERROR reading file: {e}")
         traceback.print_exc()
-        return
+        sys.exit(1)
 
     source_rows, no_pid = result
 
     if not source_rows:
-        print("  No rows parsed -- check column diagnostics above.")
-        return
+        print("  ERROR: No rows parsed -- check column diagnostics above.")
+        sys.exit(1)
 
     dates = {r['date'] for r in source_rows if r['date']}
     print(f"  Parsed {len(source_rows)} rows  |  {min(dates)} -> {max(dates)}")

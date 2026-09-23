@@ -27,11 +27,13 @@ from datetime import datetime, date
 # Scripts live in Tubex/Scripts/ — Excel and HTML are one level up
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-excel_pattern = os.path.join(DIR, 'Tubex*.xlsx')
-excel_files   = sorted(glob.glob(excel_pattern))
-if not excel_files:
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from alpha_checks import get_active_tubex_file, get_month_registry
+
+EXCEL_PATH = get_active_tubex_file(DIR)
+if not EXCEL_PATH:
     raise FileNotFoundError(f"No Tubex*.xlsx found in {DIR}")
-EXCEL_PATH = excel_files[-1]
 HTML_PATH  = os.path.join(DIR, 'Tubex.html')
 
 print(f"Reading:  {os.path.basename(EXCEL_PATH)}")
@@ -578,7 +580,7 @@ cur_month_data = {
 
 def extract_all_months_dash_data(active_mname, active_mdata):
     all_m = {}
-    month_order = ['November 2025', 'December 2025', 'January 2026', 'February 2026', 'March 2026', 'April 2026', 'May 2026', 'June 2026', 'July 2026', 'August 2026']
+    month_order = [m[0] for m in get_month_registry(DIR)]
     
     records_dir = os.path.join(DIR, 'Tubex Records')
     pa_path = os.path.join(records_dir, 'Production_Archive.xlsx')
@@ -755,10 +757,12 @@ def extract_all_months_dash_data(active_mname, active_mdata):
     # 2. Add current active month data
     all_m[active_mname] = active_mdata
     
-    # 3. Sort months reverse chronologically
+    # 3. Sort months reverse chronologically (newest first, active month first)
     sorted_m = {}
+    if active_mname in all_m:
+        sorted_m[active_mname] = all_m[active_mname]
     for m_item in reversed(month_order):
-        if m_item in all_m:
+        if m_item in all_m and m_item not in sorted_m:
             sorted_m[m_item] = all_m[m_item]
     # Add any other extra months
     for m_item, data_item in all_m.items():
@@ -1142,7 +1146,7 @@ if pos_start == -1 or pos_end == -1:
 
 new_data_block = (
     f"{marker_start}\n"
-    f"const DASH_DATA = {json.dumps(dash_data, indent=2, ensure_ascii=False)};\n"
+    f"const DASH_DATA = {json.dumps(dash_data, indent=2, ensure_ascii=False).replace('</', '<\\/').replace('<!--', '<\\!--')};\n"
     f"{marker_end}"
 )
 html = html[:pos_start] + new_data_block + html[pos_end + len(marker_end):]
@@ -1182,20 +1186,20 @@ def inject_block(html, start_marker, end_marker, js_content, optional=False):
     return html[:ps] + f"{start_marker}\n{js_content}\n{end_marker}" + html[pe + len(end_marker):]
 
 html = inject_block(html, '/* INVENTORY_START */', '/* INVENTORY_END */',
-    f"const INVENTORY_DATA = {json.dumps({'title': inv_title, 'items': inventory_data}, ensure_ascii=False)};")
+    f"const INVENTORY_DATA = {json.dumps({'title': inv_title, 'items': inventory_data}, ensure_ascii=False).replace('</', '<\\/').replace('<!--', '<\\!--')};")
 html = inject_block(html, '/* PRODLOG_START */', '/* PRODLOG_END */',
-    f"const PRODUCTION_LOG_DATA = {json.dumps({'month': month_name, 'rows': prodlog_data}, ensure_ascii=False)};")
+    f"const PRODUCTION_LOG_DATA = {json.dumps({'month': month_name, 'rows': prodlog_data}, ensure_ascii=False).replace('</', '<\\/').replace('<!--', '<\\!--')};")
 html = inject_block(html, '/* FGSTOCK_START */', '/* FGSTOCK_END */',
-    f"const FG_STOCK_DATA = {json.dumps({'title': fg_title, 'rows': fg_data}, ensure_ascii=False)};")
+    f"const FG_STOCK_DATA = {json.dumps({'title': fg_title, 'rows': fg_data}, ensure_ascii=False).replace('</', '<\\/').replace('<!--', '<\\!--')};")
 html = inject_block(html, '/* MRP_START */', '/* MRP_END */',
-    f"const MRP_DATA = {json.dumps({'title': mrp_title, 'orders': mrp_orders, 'pet_orders': mrp_pet_orders, 'materials': mrp_materials, 'inks': mrp_inks}, ensure_ascii=False)};", optional=True)
+    f"const MRP_DATA = {json.dumps({'title': mrp_title, 'orders': mrp_orders, 'pet_orders': mrp_pet_orders, 'materials': mrp_materials, 'inks': mrp_inks}, ensure_ascii=False).replace('</', '<\\/').replace('<!--', '<\\!--')};", optional=True)
 
 # ── INJECT CUSTOMER REPORT DATA ──────────────────────────────
 try:
     from generate_customer_report import extract_all_customer_records
     cust_recs = extract_all_customer_records()
     html = inject_block(html, '/* CUSTOMER_REPORT_START */', '/* CUSTOMER_REPORT_END */',
-        f"const CUSTOMER_REPORT_DATA = {json.dumps(cust_recs, ensure_ascii=False)};", optional=True)
+        f"const CUSTOMER_REPORT_DATA = {json.dumps(cust_recs, ensure_ascii=False).replace('</', '<\\/').replace('<!--', '<\\!--')};", optional=True)
     print(f"  Customer Report records injected into Tubex.html: {len(cust_recs):,}")
 except Exception as e:
     print(f"  Warning: Could not inject customer report data: {e}")

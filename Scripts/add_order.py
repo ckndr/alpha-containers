@@ -51,6 +51,7 @@ import re
 import shutil
 import difflib
 import argparse
+import subprocess
 from datetime import datetime
 from copy import copy
 
@@ -63,21 +64,17 @@ DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOGS_DIR = os.path.join(DIR, 'Logs')
 os.makedirs(LOGS_DIR, exist_ok=True)
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from alpha_checks import get_active_tubex_file, check_not_locked
+
 # Find active Tubex workbook
-excel_pattern = os.path.join(DIR, 'Tubex*.xlsx')
-excel_files   = sorted(glob.glob(excel_pattern))
-if not excel_files:
+EXCEL_PATH = get_active_tubex_file(DIR)
+if not EXCEL_PATH:
     print(f"[ERROR] No Tubex*.xlsx workbook found in {DIR}")
     sys.exit(1)
-EXCEL_PATH = excel_files[-1]
 
 # ── SAFETY LOCK CHECK ───────────────────────────────────────
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-try:
-    from alpha_checks import check_not_locked
-    check_not_locked(EXCEL_PATH)
-except ImportError:
-    pass
+check_not_locked(EXCEL_PATH)
 
 
 def backup_workbook(filepath):
@@ -89,6 +86,13 @@ def backup_workbook(filepath):
     shutil.copy2(filepath, backup_path)
     print(f"[BACKUP] Created: {backup_name}")
     return backup_path
+
+
+def run_sort_dashboard(script):
+    rc = subprocess.run([sys.executable, script], env=os.environ.copy()).returncode
+    if rc != 0:
+        print("[ERROR] sort_dashboard.py failed - Dashboard NOT re-sorted.")
+    return rc == 0
 
 
 PET_SHORT_NAMES = {
@@ -543,6 +547,11 @@ def apply_order_to_mrp(ws_mrp, wb, product, order_qty, jof_num=None, customer_ov
         old_jof_val = str(ws_mrp.cell(existing_row, 5).value or '').strip()
         old_rem_val = str(ws_mrp.cell(existing_row, 9).value or '').strip()
 
+        jof_tokens = [t.strip() for t in re.split(r'[&,]', old_jof_val) if t.strip()]
+        if jof_num and str(jof_num).strip() in jof_tokens:
+            print(f"[SKIPPED] JOF {jof_num} is already on PID {pid} (row {existing_row}); quantity NOT added again.")
+            return 'SKIPPED', existing_row
+
         # Update Quantity (Column F)
         if old_qty_val is None:
             new_qty_formula = order_qty
@@ -757,9 +766,10 @@ def run_add_order_session(filepath, catalog, initial_product=None, initial_qty=N
     print(f"\n[OK] Changes written to {os.path.basename(filepath)}.")
 
     # Re-sort Dashboard
+    sort_ok = False
     sort_script = os.path.join(os.path.dirname(__file__), 'sort_dashboard.py')
     if os.path.exists(sort_script):
-        os.system(f'python "{sort_script}"')
+        sort_ok = run_sort_dashboard(sort_script)
 
     # Order Session Summary
     print(f"\n" + "=" * 75)
@@ -771,7 +781,8 @@ def run_add_order_session(filepath, catalog, initial_product=None, initial_qty=N
         print(f"  [{idx}] [{p['type']:<4}] PID {p['pid']:<5} | {p['product_name'][:30]:<30} | Dia: {str(p['dia']):<7} | Qty: {item['qty']:<10,d} | JOF: {jof_disp:<8} | {item['action']}")
     print(f"=" * 75)
     print(f"   [OK] MRP orders rearranged according to Dia/ml (lower to higher).")
-    print(f"   [OK] Tubex_Dashboard synchronized and re-sorted.")
+    if sort_ok:
+        print(f"   [OK] Dashboard synchronized and re-sorted.")
     print(f"=" * 75)
 
     return confirm_keep_or_revert(filepath, backup_file, auto_keep)
@@ -848,7 +859,7 @@ def remove_order_from_workbook(filepath, search_term, auto_keep=False):
 
     sort_script = os.path.join(os.path.dirname(__file__), 'sort_dashboard.py')
     if os.path.exists(sort_script):
-        os.system(f'python "{sort_script}"')
+        run_sort_dashboard(sort_script)
 
     print(f"\n" + "=" * 60)
     print(f"   ORDER REMOVAL SUMMARY")
@@ -975,7 +986,7 @@ def confirm_keep_or_revert(filepath, backup_file, auto_keep):
             shutil.copy2(backup_file, filepath)
             sort_script = os.path.join(os.path.dirname(__file__), 'sort_dashboard.py')
             if os.path.exists(sort_script):
-                os.system(f'python "{sort_script}"')
+                run_sort_dashboard(sort_script)
             if preview_file and os.path.exists(preview_file):
                 try:
                     os.remove(preview_file)
@@ -1047,6 +1058,8 @@ def main():
         shutil.copy2(EXCEL_PATH, temp_sandbox)
         target_excel = temp_sandbox
 
+    os.environ["TUBEX_FILE"] = target_excel
+
     try:
         if args.list:
             list_active_orders()
@@ -1065,7 +1078,7 @@ def main():
             wb.close()
             sort_script = os.path.join(os.path.dirname(__file__), 'sort_dashboard.py')
             if os.path.exists(sort_script) and not args.dry_run:
-                os.system(f'python "{sort_script}"')
+                run_sort_dashboard(sort_script)
             if not args.dry_run:
                 confirm_keep_or_revert(target_excel, backup_file, args.auto_keep)
             return
@@ -1137,7 +1150,7 @@ def main():
                 wb.close()
                 sort_script = os.path.join(os.path.dirname(__file__), 'sort_dashboard.py')
                 if os.path.exists(sort_script) and not args.dry_run:
-                    os.system(f'python "{sort_script}"')
+                    run_sort_dashboard(sort_script)
                 if not args.dry_run:
                     confirm_keep_or_revert(target_excel, backup_file, args.auto_keep)
                 return
