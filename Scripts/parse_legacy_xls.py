@@ -18,7 +18,7 @@ RECORDS_DIR = r"d:\Alpha\Tubex Records"
 # Product Catalog mapping from Product Name -> (Customer, Dia/Volume, Type, Prod_ID)
 def load_product_catalog():
     catalog = {}
-    aug_path = r"d:\Alpha\Tubex_Aug26.xlsx"
+    aug_path = os.path.join(RECORDS_DIR, "Tubex_Aug26.xlsx")
     if os.path.exists(aug_path):
         try:
             wb = openpyxl.load_workbook(aug_path, data_only=True)
