@@ -47,6 +47,7 @@ $RECYCLE.BIN/
 # ── One-off debug/AI artifacts ──
 excel_for_ai.json
 mrp_dump.txt
+.agents/
 
 
 # ── Documentation (keep in repo) ──
