@@ -3,7 +3,7 @@
 This repository contains project files, documentation, and automation tools for two plants:
 
 1. **Tubex Plant** (Production): A fully mature plant operating for 40+ years. Its data processing pipeline, scripts, and logs are located in the root directory.
-2. **Aerosol Plant** (Commissioning): A new plant currently in the commissioning phase. All related BOMs, calculations, and specification sheets are located in the [Aerosol](file:///d:/Alpha/Aerosol) folder.
+2. **Aerosol Plant** (Commissioning): A new plant currently in the commissioning phase. It is managed in an independent project directory at `D:\Aerosol` (ignored by this repository).
 
 ---
 
@@ -24,18 +24,15 @@ When editing an Excel workbook:
 
 Use `Scripts\Push.bat` when you want to upload the current project files to GitHub without running the daily update workflow.
 
-`Scripts\Push.bat` also copies the project folder to `C:\Users\HP\OneDrive\Tubex` before pushing to GitHub. It copies new and changed files, but does not delete extra files already in OneDrive. It excludes the `.git` folder, local logs, and temporary Excel lock files.
+`Scripts\Push.bat` stages changed repository files, commits them with a timestamp, and pushes directly to GitHub `main`.
 
 Use `Scripts\Pull.bat` before starting work on another computer. It downloads the latest `main` branch from GitHub into the local `D:\Alpha` folder. If local uncommitted changes exist, it stops and asks you to push or clean up first.
 
 Important: the main versioned workbook files, such as `Tubex_v10_27.xlsx`, are included in GitHub sync so they can move between work and home. Raw Excel/data exports such as `dispatch.xls`, `inventory.xls`, `Production.xlsx`, and other `.xls`/`.xlsx` files remain ignored unless intentionally allowed.
 
-## Hourly Auto Push
+## Monthly Rollover
 
-Run `Scripts\Install_Hourly_Push.bat` once on any PC where you want automatic backups. It creates a Windows scheduled task named `Tubex Hourly Push` that runs `Scripts\Push.bat /auto` every hour.
-
-Before relying on the scheduled task, run `Scripts\Push.bat` manually once on that PC so GitHub credentials are saved.
-
-Hourly auto push only works while the PC is powered on, Windows is running, and internet/GitHub access is available. If there is a blackout or the PC is off, the task cannot push during that time; it will try again on the next scheduled run after the PC is back on.
-
-Logs are saved at `Logs\hourly_push.log`. To remove the scheduled task, run `Scripts\Remove_Hourly_Push.bat`.
+To roll over to a new operating month, run `new_month.py`:
+```cmd
+python new_month.py --month <Mon> --year <YYYY> [--dry-run]
+```

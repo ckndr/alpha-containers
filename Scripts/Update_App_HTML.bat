@@ -31,7 +31,7 @@ if errorlevel 1 (
 
 git -C "%~dp0.." rev-parse --git-dir >nul 2>&1
 if errorlevel 1 (
-    echo  ERROR: Not a git repo. Follow SETUP_GUIDE Step 4.
+    echo  ERROR: Not a git repo. Ensure Git is initialized in the project directory.
     pause
     exit /b 1
 )

@@ -45,9 +45,8 @@ Inside the Remote Desktop session:
 
 **Step 2.1 — Get Production.xlsx from Imran**
 - Imran Manzoor sends the daily production file via WhatsApp
-- Download the file from WhatsApp (it may have a random name like `document_2026-06-05.xlsx`)
-- Rename it to `Production.xlsx`
-- Move/copy it to `d:\Alpha\` folder (replacing the old one)
+- Download the file from WhatsApp to your `Downloads` folder (named e.g. `Production report September-2026.xlsx`)
+- `daily.py` automatically detects and imports the latest `"Production report *.xlsx"` directly from `Downloads`
 
 **Step 2.2 — Get WIP Message from Mehmood**
 - Mehmood sends a WhatsApp message with current WIP (Work In Process) slug weights
@@ -68,7 +67,7 @@ Inside the Remote Desktop session:
 - Make sure NO Tubex Excel files are open (the scripts need exclusive file access)
 
 **Step 3.2 — Run Full Update**
-- Double-click `d:\Alpha\Scripts\Run_All_Updates.bat`
+- Run `daily_update.bat` from `D:\Alpha\` (or run `python Scripts\daily.py`)
 - Wait for all 5 steps to complete
 - Check that all steps say "OK" (no red `!!` errors)
 - The batch / daily pipeline:
@@ -130,7 +129,7 @@ WhatsApp (Mehmood)            │
   └── WIP text message ───────┤  pasted into update_wip.py
                               │
                               ▼
-                    Run_All_Updates.bat
+                     daily_update.bat (daily.py)
                               │
                     ┌─────────┴─────────┐
                     │                   │

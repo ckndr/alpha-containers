@@ -9,7 +9,7 @@
 
 ### Step 1: Final Daily Run
 - [ ] Download fresh ERP exports (dispatch.xls, dispatch_pet.xls, inventory.xls, Production.xlsx)
-- [ ] Run `Run_All_Updates.bat` one final time
+- [ ] Run `daily_update.bat` (or `python Scripts\daily.py`) one final time
 - [ ] Open Tubex.html, verify all numbers look correct for end-of-month
 - [ ] Screenshot the Dashboard totals (Tube MTD, PET MTD, Dispatch) — save in WhatsApp/Notes as backup
 
@@ -20,6 +20,13 @@
 ---
 
 ## 🟢 START of New Month (1st working day)
+
+### Automated Setup: new_month.py
+You can automate workbook rollover for the new month by running:
+```cmd
+python Scripts\new_month.py --month <Mon> --year <YYYY> [--dry-run]
+```
+This script duplicates the previous month's workbook to `Tubex_<Mon><YY>.xlsx`, clears `Production_Log`, updates formula ranges, and prepares the sheet.
 
 ### Step 3: Imran's Production File
 Imran clears `Production Day wise` sheet and starts fresh for the new month.
@@ -44,10 +51,6 @@ This is the **most important manual step**. The MRP sheet drives what the factor
   - [ ] Same process: remove done, update continuing, add new
 - [ ] **DO NOT touch** the Material Requirement rows (19–101, 116–123) — they calculate automatically from orders
 
-> **Common mistake**: Forgetting to update the `Date` cell in MRP (H1). This cell controls which month the production formulas filter by. Set it to any date in the new month (e.g., `01-Jul-2026`).
-
-- [ ] Update cell `H1` in MRP sheet to a date in the new month
-
 ### Step 5: Update Dashboard Orders
 The Dashboard has a separate "Orders" column that some products use.
 
@@ -62,7 +65,7 @@ The Dashboard has a separate "Orders" column that some products use.
 
 ### Step 7: First Run of the New Month
 - [ ] Close Excel (all Tubex files)
-- [ ] Run `Run_All_Updates.bat`
+- [ ] Run `daily_update.bat` (or `python Scripts\daily.py`)
 - [ ] Check the console output for:
   - [ ] No `!! PRODUCTS NOT MATCHED` warnings
   - [ ] No `!! WARNING` about stale files
@@ -81,7 +84,7 @@ The Dashboard has a separate "Orders" column that some products use.
 
 | Problem | Fix |
 |---|---|
-| Dashboard still shows last month's production | MRP cell H1 not updated to new month. Fix it and re-run. |
+| Dashboard still shows last month's production | Verify Production.xlsx contains new month dates and re-run daily pipeline. |
 | "No Tubex*.xlsx found" error | Excel file is open. Close it and re-run. |
 | New product not appearing on Dashboard | Add it to `Product_Catalog` sheet first, then to MRP orders. |
 | Dispatch numbers seem wrong | Check dispatch.xls is the new month's export, not last month's. |
@@ -96,7 +99,6 @@ The Dashboard has a separate "Orders" column that some products use.
 |---|---|---|
 | MRP Orders (Tube) | **You** | MRP sheet rows 3–14 |
 | MRP Orders (PET) | **You** | MRP sheet rows 106–111 |
-| MRP Date Filter | **You** | MRP sheet cell H1 |
 | Production Day wise | **Imran** | Production.xlsx |
 | FG Stock In hand | **Imran** | Production.xlsx |
 | Dispatch exports | **ERP** | Download fresh from ERP |

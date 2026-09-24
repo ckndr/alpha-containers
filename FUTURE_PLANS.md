@@ -104,9 +104,9 @@
   1. **Briefing Payload Composition** (hooked right after screenshot in Step 7):
      - Compute from active workbook (`Tubex_Sep26.xlsx`) and Imran's `Production.xlsx`:
        - 🏭 **Plant Date & Operating Shift Timestamps**
-       - 📦 **Yesterday Production**: Tube pieces (Print 1 + Print 2) & PET bottles (PF 1 + PF 2).
+       - 📦 **Yesterday Production**: Tube pieces (Printing-03 + Printing-04) & PET bottles (PF Machine).
        - 📈 **MTD vs Monthly Plan**: MTD output vs Plan (% compliance & required run-rate).
-       - 🎯 **Printing 22K Target**: Status of Print Line 1 & Line 2 against the 22,000 pcs/day OTIF benchmark.
+       - 🎯 **Printing 22K Target**: Status of Printing-03 & Printing-04 against the 22,000 pcs/day OTIF benchmark.
        - 🚨 **Critical Shortages**: Any active MRP items with deficit balance (`Balance <= 0`).
        - ⏱️ **Top Downtimes**: Top 3 machine downtime causes and hours.
        - 🔗 **Live Link**: GitHub Pages URL for phone access.
@@ -125,8 +125,8 @@
 - **Objective**: Algorithmic advisory tool sequencing open tube orders by diameter and base coat color gradient to minimize mechanical tooling swaps (saving 3–4 hours) and ink washdowns (saving 1–2 hours) on Print 1 and Print 2.
 - **Specification**:
   1. **Machine Line Constraints**:
-     - Print 1: Small/medium diameters (12.5mm, 13.5mm, 16mm, 19mm, 20.5mm, 25mm).
-     - Print 2: Medium/large diameters (25mm, 30mm, 32mm, 35mm).
+     - Printing-03: Small/medium diameters (12.5mm, 13.5mm, 16mm, 19mm, 20.5mm, 25mm).
+     - Printing-04: Medium/large diameters (25mm, 30mm, 32mm, 35mm).
   2. **Sequencing Optimization Algorithm**:
      - Ingest open unfulfilled orders from `Tubex_Dashboard` and `MRP`.
      - Group jobs by **Diameter** (eliminates mechanical tooling changeovers).

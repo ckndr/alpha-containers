@@ -37,10 +37,14 @@ This document serves as a permanent reference explaining intentional design deci
 
 ## 4. Machine String Matching & Line Identifiers (Rule R1-04)
 
-- **Behavior**: Production line identifiers in `Production.xlsx` may appear as `"Print 1"`, `"Print 2"`, or `"PLINE 1"`, `"PLINE 2"`.
+- **Behavior**: Production line identifiers in `Production.xlsx` reflect physical factory lines:
+  - Printing lines: `Printing-03`, `Printing-04`
+  - Press lines: `Press-03`, `Press-04`, `Press-06`
+  - Lacquer lines: `Lacquer-03`, `Lacquer-04`
+  - Latex line: `Latex-01`
+  - PET line: `PF Machine`
 - **Operational Rationale**:
-  - Both naming conventions refer to the tube offset printing lines.
-  - All aggregation formulas and Python sorting logic treat `"Print*"` and `"PLINE*"` as printing lines, and `"PF*"` / `"PET*"` as PET bottle injection-blow molding lines.
+  - Aggregation formulas and Python sorting logic treat `"Print*"` and `"PLINE*"` as tube offset printing lines, and `"PF*"` / `"PET*"` as PET bottle lines.
 
 ---
 

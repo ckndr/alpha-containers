@@ -32,16 +32,14 @@ Step 5: build_archives.py       ← Fifth (rebuilds historical production and da
 Step 6: update_html.py          ← LAST (reads all sheets, generates final Tubex.html & updates sw.js)
 ```
 
-> `daily.py` (or `Daily_Update.bat` / `Run_All_Updates.bat`) runs these in the correct order automatically.
+> `daily.py` (or `daily_update.bat` / `Daily_Update.bat`) runs these in the correct order automatically.
 
 ## Manual/Optional Scripts (NOT in the daily pipeline)
 
 | Script | When to Use |
 |---|---|
 | `update_wip.py` | When Aurangzeb sends WIP message on WhatsApp |
-| `update_mrp.py` | ⚠️ ONE-TIME migration only. Do NOT run again. |
-| `update_from_images.py` | When you have screenshot images instead of Production.xlsx |
-| `Excel_Scrap.py` | When you need to dump Excel data for AI context |
+| `new_month.py` | Automated month rollover: `python new_month.py --month <Mon> --year <YYYY> [--dry-run]` |
 
 ## What Each Script Reads and Writes
 
@@ -92,7 +90,7 @@ WRITES: Tubex.html    → Injects JSON data constants between /* MARKER */ comme
 | `dispatch.xls` | Step 3 fails. Dispatch column stays empty. |
 | `dispatch_pet.xls` | Step 3 fails. PET dispatch stays empty. |
 | `alpha_checks.py` | All scripts fail on import. Shared safety utilities. |
-| `Tubex.html` | Step 5 fails. No web dashboard generated. |
+| `Tubex.html` | Step 6 fails. No web dashboard generated. |
 | `sw.js` | PWA offline caching stops. Dashboard still works online. |
 
 ## Shared Module: alpha_checks.py
