@@ -407,6 +407,8 @@ def step_check_erp():
                 warn(msg)
                 warnings_list.append(msg)
                 stale_files.append((filename, label, msg))
+            else:
+                ok(f"{label}: {filename} (data as of {real_date.strftime('%d-%b-%Y')})")
         else:
             # Fall back to mtime check with a 12-hour threshold
             age_h = (time.time() - os.path.getmtime(target)) / 3600
@@ -415,6 +417,8 @@ def step_check_erp():
                 warn(msg)
                 warnings_list.append(msg)
                 stale_files.append((filename, label, msg))
+            else:
+                ok(f"{label}: {filename} ({age_h:.1f}h old, mtime fallback)")
 
     if not all_ok:
         print(f"\n    {DIM}Copy fresh ERP exports to {ALPHA_DIR}")
