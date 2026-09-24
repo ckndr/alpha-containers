@@ -997,13 +997,6 @@ def write_production_log(ac_path, source_rows):
 # FG STOCK FUNCTIONS
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _norm_dia(raw):
-    s = str(raw).strip().lower()
-    s = re.sub(r'\bdia\b', '', s)
-    s = re.sub(r'\s+ml$', 'ml', s)
-    return re.sub(r'\s+', ' ', s).strip()
-
-
 def read_fg_stock(prod_path):
     import pandas as pd
 

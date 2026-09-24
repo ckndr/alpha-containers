@@ -339,7 +339,6 @@ def step_check_erp():
         target = os.path.join(ALPHA_DIR, filename)
 
         # Check for "- copy" variant first (Sikander's ERP download workflow)
-        import re
         stem, ext = os.path.splitext(filename)
         pattern = re.compile(rf"^{re.escape(stem)} - copy(?: \(\d+\))?{re.escape(ext)}$", re.IGNORECASE)
         copy_matches = [

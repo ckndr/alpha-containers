@@ -279,7 +279,7 @@ def build_production_archive(available_months):
 
     # 2. Add XLSX available months
     for mi, item in enumerate(available_months):
-        label, src_path, month_num = item[0], item[1], item[2]
+        label, src_path = item[0], item[1]
         tab = label[:31]
         if tab in archive_wb.sheetnames:
             continue

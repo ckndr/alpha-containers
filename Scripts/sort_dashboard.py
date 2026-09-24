@@ -161,7 +161,6 @@ def read_product_row(ws, r):
         return None
 
     orders_raw   = ws.cell(r, 7).value   # col G
-    dispatch_raw = ws.cell(r, 11).value  # col K
     remarks_raw  = ws.cell(r, 12).value  # col L
 
     # Look up actual evaluated values from pre-read maps or MRP lookup
