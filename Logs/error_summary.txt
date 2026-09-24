@@ -3,11 +3,10 @@
   ║  ⚠ DAILY WORKFLOW ERROR & ADVISORY SUMMARY               ║
   ╚══════════════════════════════════════════════════════════╝
 
-  [CORE PRODUCTION CROSS-CHECK MISMATCHES (BLOCKING)]
-    • Summary mismatch - PET Dispatch (MTD): Imran=223,320, Dashboard=223,480 (diff=+160)
-
   [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
     (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
+    • Summary sheet dispatch difference for PET Dispatch (MTD): Imran=250,800 vs Dashboard=250,960 (diff=+160) — Dashboard reflects authoritative ERP export; Imran sheet may have timing lag or unrecorded dispatch
+    • Pending Order SKU difference for 'HELLO HAIR': Req diff=+0, Prod diff=+8, Bal diff=-8
     • Pending Order SKU difference for 'VINCE NURTURAL': Req diff=-17,612, Prod diff=-17,612, Bal diff=+0
-    • Pending Orders floor difference: Imran=779,402 vs MRP Scheduled=782,906 (diff=-3,504)
+    • Pending Orders floor difference: Imran=746,320 vs MRP Scheduled=749,832 (diff=-3,512)
 
