@@ -28,6 +28,7 @@ import shutil
 import time
 import subprocess
 import logging
+import openpyxl
 from datetime import datetime, date
 
 # ── PATH SETUP ──────────────────────────────────────────────────────────────
@@ -1569,7 +1570,7 @@ def read_mismatches_log(log_path):
         from alpha_checks import get_active_tubex_file
         active_tb = get_active_tubex_file(ALPHA_DIR)
         if active_tb and os.path.exists(active_tb):
-            wb_mrp = load_workbook(active_tb, data_only=True)
+            wb_mrp = openpyxl.load_workbook(active_tb, data_only=True)
             if 'MRP' in wb_mrp.sheetnames:
                 ws_m = wb_mrp['MRP']
                 for r_m in range(7, ws_m.max_row + 1):
@@ -1616,6 +1617,8 @@ def read_mismatches_log(log_path):
                     if item_id:
                         current_missing.add(item_id)
                         tag = "[PERSISTENT]" if (item_id in prev_missing) else "[NEW]"
+                        if item_id in mrp_required_items:
+                            tag = f"[URGENT] {tag}"
                         inventory_warnings.append(f"{tag} {clean}")
                 else:
                     mapping_warnings.append(l)

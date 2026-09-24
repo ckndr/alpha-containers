@@ -35,683 +35,689 @@ DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from alpha_checks import get_active_tubex_file, check_not_locked
 
-EXCEL_PATH = get_active_tubex_file(DIR)
-if not EXCEL_PATH:
-    raise FileNotFoundError(f"No Tubex*.xlsx found in {DIR}")
 
-print(f"Sort Dashboard: {os.path.basename(EXCEL_PATH)}")
+def main():
+    EXCEL_PATH = get_active_tubex_file(DIR)
+    if not EXCEL_PATH:
+        raise FileNotFoundError(f"No Tubex*.xlsx found in {DIR}")
 
-# ── SAFETY CHECKS ───────────────────────────────────────────
-check_not_locked(EXCEL_PATH)
+    print(f"Sort Dashboard: {os.path.basename(EXCEL_PATH)}")
 
-# ── READ ACTUAL VALUES FOR ORDERS AND DISPATCH ────────────────
-# Since we load the main workbook with data_only=False to preserve formula strings,
-# reading cells in G and K would return formulas (e.g. '=IFERROR(...)').
-# To classify active/inactive products correctly, we load a temporary copy with data_only=True.
-wb_val = load_workbook(EXCEL_PATH, data_only=True, read_only=True)
-ws_val = wb_val['Tubex_Dashboard']
+    # ── SAFETY CHECKS ───────────────────────────────────────────
+    check_not_locked(EXCEL_PATH)
 
-def safe_eval_math(expr):
-    if not expr:
-        return 0
-    if isinstance(expr, (int, float)):
-        return int(expr)
-    expr_str = str(expr).lstrip('=').strip()
-    if re.match(r'^[0-9+\-*/().\s]+$', expr_str):
-        try:
-            return int(float(eval(expr_str)))
-        except Exception:
+    # ── READ ACTUAL VALUES FOR ORDERS AND DISPATCH ────────────────
+    # Since we load the main workbook with data_only=False to preserve formula strings,
+    # reading cells in G and K would return formulas (e.g. '=IFERROR(...)').
+    # To classify active/inactive products correctly, we load a temporary copy with data_only=True.
+    wb_val = load_workbook(EXCEL_PATH, data_only=True, read_only=True)
+    ws_val = wb_val['Tubex_Dashboard']
+
+    def safe_eval_math(expr):
+        if not expr:
             return 0
-    return 0
-
-orders_by_row = {}
-dispatch_by_row = {}
-
-for r in range(11, 200):
-    # Column G (7) = Orders
-    o_val = ws_val.cell(r, 7).value
-    try:
-        orders_by_row[r] = int(o_val) if o_val else 0
-    except (TypeError, ValueError):
-        orders_by_row[r] = 0
-
-    # Column K (11) = Dispatch
-    d_val = ws_val.cell(r, 11).value
-    try:
-        dispatch_by_row[r] = int(d_val) if d_val else 0
-    except (TypeError, ValueError):
-        dispatch_by_row[r] = 0
-
-wb_val.close()
-
-
-# ── OPEN WORKBOOK ────────────────────────────────────────────
-wb = load_workbook(EXCEL_PATH, data_only=False)
-ws = wb['Tubex_Dashboard']
-ws_pl = wb['Production_Log']
-
-# Read MRP sheet (from formula workbook) to resolve order lookup values & arithmetic formulas
-mrp_orders = {}
-if 'MRP' in wb.sheetnames:
-    ws_mrp = wb['MRP']
-    for r_mrp in range(3, 150):
-        pid_val = ws_mrp.cell(r_mrp, 4).value # col D = PID
-        ord_val = ws_mrp.cell(r_mrp, 6).value # col F = Orders
-        if pid_val is not None:
+        if isinstance(expr, (int, float)):
+            return int(expr)
+        expr_str = str(expr).lstrip('=').strip()
+        if re.match(r'^[0-9+\-*/().\s]+$', expr_str):
             try:
-                pid_int = int(pid_val)
-                qty_val = safe_eval_math(ord_val) if isinstance(ord_val, str) else (int(ord_val) if ord_val else 0)
-                mrp_orders[pid_int] = mrp_orders.get(pid_int, 0) + qty_val
+                return int(float(eval(expr_str)))
+            except Exception:
+                return 0
+        return 0
+
+    orders_by_row = {}
+    dispatch_by_row = {}
+
+    for r in range(11, 200):
+        # Column G (7) = Orders
+        o_val = ws_val.cell(r, 7).value
+        try:
+            orders_by_row[r] = int(o_val) if o_val else 0
+        except (TypeError, ValueError):
+            orders_by_row[r] = 0
+
+        # Column K (11) = Dispatch
+        d_val = ws_val.cell(r, 11).value
+        try:
+            dispatch_by_row[r] = int(d_val) if d_val else 0
+        except (TypeError, ValueError):
+            dispatch_by_row[r] = 0
+
+    wb_val.close()
+
+
+    # ── OPEN WORKBOOK ────────────────────────────────────────────
+    wb = load_workbook(EXCEL_PATH, data_only=False)
+    ws = wb['Tubex_Dashboard']
+    ws_pl = wb['Production_Log']
+
+    # Read MRP sheet (from formula workbook) to resolve order lookup values & arithmetic formulas
+    mrp_orders = {}
+    if 'MRP' in wb.sheetnames:
+        ws_mrp = wb['MRP']
+        for r_mrp in range(3, 150):
+            pid_val = ws_mrp.cell(r_mrp, 4).value # col D = PID
+            ord_val = ws_mrp.cell(r_mrp, 6).value # col F = Orders
+            if pid_val is not None:
+                try:
+                    pid_int = int(pid_val)
+                    qty_val = safe_eval_math(ord_val) if isinstance(ord_val, str) else (int(ord_val) if ord_val else 0)
+                    mrp_orders[pid_int] = mrp_orders.get(pid_int, 0) + qty_val
+                except (TypeError, ValueError):
+                    pass
+
+    # Fallback check: evaluate simple arithmetic formulas if data_only read returned None/0
+    for r in range(11, 200):
+        if not orders_by_row.get(r):
+            raw_o = ws.cell(r, 7).value
+            if raw_o:
+                orders_by_row[r] = safe_eval_math(raw_o)
+
+        if not dispatch_by_row.get(r):
+            raw_d = ws.cell(r, 11).value
+            if raw_d:
+                dispatch_by_row[r] = safe_eval_math(raw_d)
+
+    # ── COMPUTE MTD PRODUCTION FROM PRODUCTION_LOG ───────────────
+    # Since user only keeps current month in Production_Log, no month
+    # filter needed.  We just sum good qty by PID for Print/PET machines.
+    mtd_by_pid = {}
+    for row in ws_pl.iter_rows(min_row=3, values_only=True):
+        machine   = row[1]   # col B
+        prod_name = row[3]   # col D
+        pid       = row[5]   # col F
+        good_qty  = row[7]   # col H
+
+        if not machine or not pid or not good_qty:
+            continue
+
+        mach_up  = str(machine).upper()
+        is_print = mach_up.startswith('PRINT') or mach_up.startswith('PLINE')
+        is_pet   = mach_up.startswith('PF') or mach_up.startswith('PET')
+        is_varn  = '(VARNISH)' in str(prod_name).upper()
+
+        if (is_print and not is_varn) or is_pet:
+            try:
+                pid_int = int(pid)
+                mtd_by_pid[pid_int] = mtd_by_pid.get(pid_int, 0) + int(good_qty)
             except (TypeError, ValueError):
                 pass
 
-# Fallback check: evaluate simple arithmetic formulas if data_only read returned None/0
-for r in range(11, 200):
-    if not orders_by_row.get(r):
-        raw_o = ws.cell(r, 7).value
-        if raw_o:
-            orders_by_row[r] = safe_eval_math(raw_o)
+    print(f"  Production Log: {len(mtd_by_pid)} PIDs with MTD production")
 
-    if not dispatch_by_row.get(r):
-        raw_d = ws.cell(r, 11).value
-        if raw_d:
-            dispatch_by_row[r] = safe_eval_math(raw_d)
+    # ── READ ALL PRODUCT ROWS ───────────────────────────────────
+    # Scan rows 11 onward; collect every row with Type = TUBE or PET.
+    # Skip TOTAL rows (col D = "TOTAL") and blank rows.
 
-# ── COMPUTE MTD PRODUCTION FROM PRODUCTION_LOG ───────────────
-# Since user only keeps current month in Production_Log, no month
-# filter needed.  We just sum good qty by PID for Print/PET machines.
-mtd_by_pid = {}
-for row in ws_pl.iter_rows(min_row=3, values_only=True):
-    machine   = row[1]   # col B
-    prod_name = row[3]   # col D
-    pid       = row[5]   # col F
-    good_qty  = row[7]   # col H
+    DATA_COLS = range(2, 13)  # columns B(2) through L(12)
 
-    if not machine or not pid or not good_qty:
-        continue
-
-    mach_up  = str(machine).upper()
-    is_print = mach_up.startswith('PRINT') or mach_up.startswith('PLINE')
-    is_pet   = mach_up.startswith('PF') or mach_up.startswith('PET')
-    is_varn  = '(VARNISH)' in str(prod_name).upper()
-
-    if (is_print and not is_varn) or is_pet:
+    def read_product_row(ws, r):
+        """Read a product row's data as a dict."""
+        pid_raw = ws.cell(r, 6).value  # col F = Prod ID
+        if pid_raw is None:
+            return None
         try:
-            pid_int = int(pid)
-            mtd_by_pid[pid_int] = mtd_by_pid.get(pid_int, 0) + int(good_qty)
+            pid_int = int(pid_raw)
         except (TypeError, ValueError):
-            pass
+            return None
 
-print(f"  Production Log: {len(mtd_by_pid)} PIDs with MTD production")
+        orders_raw   = ws.cell(r, 7).value   # col G
+        remarks_raw  = ws.cell(r, 12).value  # col L
 
-# ── READ ALL PRODUCT ROWS ───────────────────────────────────
-# Scan rows 11 onward; collect every row with Type = TUBE or PET.
-# Skip TOTAL rows (col D = "TOTAL") and blank rows.
+        # Look up actual evaluated values from pre-read maps or MRP lookup
+        orders   = orders_by_row.get(r, 0)
+        if not orders and pid_int in mrp_orders:
+            orders = mrp_orders[pid_int]
 
-DATA_COLS = range(2, 13)  # columns B(2) through L(12)
+        dispatch = dispatch_by_row.get(r, 0)
+        produced = mtd_by_pid.get(pid_int, 0)
 
-def read_product_row(ws, r):
-    """Read a product row's data as a dict."""
-    pid_raw = ws.cell(r, 6).value  # col F = Prod ID
-    if pid_raw is None:
-        return None
-    try:
-        pid_int = int(pid_raw)
-    except (TypeError, ValueError):
-        return None
+        is_active = (orders > 0) or (produced > 0) or (dispatch > 0)
 
-    orders_raw   = ws.cell(r, 7).value   # col G
-    remarks_raw  = ws.cell(r, 12).value  # col L
+        return {
+            'type':     str(ws.cell(r, 2).value).strip().upper(),  # TUBE or PET
+            'customer': ws.cell(r, 3).value,   # col C
+            'product':  ws.cell(r, 4).value,   # col D
+            'dia':      ws.cell(r, 5).value,   # col E
+            'pid':      pid_int,               # col F
+            'orders':   orders_raw,            # col G (keep original value)
+            'dispatch_raw': ws.cell(r, 11).value,  # col K (preserve formula or value)
+            'remarks':  remarks_raw,           # col L
+            'produced': produced,
+            'is_active': is_active,
+            'orig_row': r,
+        }
 
-    # Look up actual evaluated values from pre-read maps or MRP lookup
-    orders   = orders_by_row.get(r, 0)
-    if not orders and pid_int in mrp_orders:
-        orders = mrp_orders[pid_int]
 
-    dispatch = dispatch_by_row.get(r, 0)
-    produced = mtd_by_pid.get(pid_int, 0)
+    all_tubes = []
+    all_pets  = []
 
-    is_active = (orders > 0) or (produced > 0) or (dispatch > 0)
+    for r in range(11, 200):
+        type_val = ws.cell(r, 2).value   # col B
+        name_val = ws.cell(r, 4).value   # col D
 
-    return {
-        'type':     str(ws.cell(r, 2).value).strip().upper(),  # TUBE or PET
-        'customer': ws.cell(r, 3).value,   # col C
-        'product':  ws.cell(r, 4).value,   # col D
-        'dia':      ws.cell(r, 5).value,   # col E
-        'pid':      pid_int,               # col F
-        'orders':   orders_raw,            # col G (keep original value)
-        'dispatch_raw': ws.cell(r, 11).value,  # col K (preserve formula or value)
-        'remarks':  remarks_raw,           # col L
-        'produced': produced,
-        'is_active': is_active,
-        'orig_row': r,
+        if not type_val:
+            # Could be TOTAL row or blank — skip
+            continue
+
+        type_str = str(type_val).strip().upper()
+        if type_str not in ('TUBE', 'PET'):
+            continue
+
+        row_data = read_product_row(ws, r)
+        if row_data is None:
+            continue
+
+        if type_str == 'TUBE':
+            all_tubes.append(row_data)
+        else:
+            all_pets.append(row_data)
+
+    active_tubes   = [t for t in all_tubes if t['is_active']]
+    inactive_tubes = [t for t in all_tubes if not t['is_active']]
+    active_pets    = [p for p in all_pets  if p['is_active']]
+    inactive_pets  = [p for p in all_pets  if not p['is_active']]
+
+    # ── SORT BY DIAMETER (low → high) ───────────────────────────
+    # Tubes: dia is numeric (int/float like 16, 19, 20.5, 25, 30)
+    # PETs:  dia is string like "120 ml", "200 ml" — extract the number
+
+    def dia_sort_key(row_data):
+        """Extract numeric dia for sorting. Returns float."""
+        dia = row_data.get('dia')
+        if dia is None:
+            return 9999.0
+        if isinstance(dia, (int, float)):
+            return float(dia)
+        # String like "120 ml" — extract number
+        m = re.search(r'(\d+(?:\.\d+)?)', str(dia))
+        return float(m.group(1)) if m else 9999.0
+
+    active_tubes.sort(key=dia_sort_key)
+    inactive_tubes.sort(key=dia_sort_key)
+    active_pets.sort(key=dia_sort_key)
+    inactive_pets.sort(key=dia_sort_key)
+
+    print(f"  Tubes: {len(active_tubes)} active, {len(inactive_tubes)} inactive")
+    print(f"  PET:   {len(active_pets)} active, {len(inactive_pets)} inactive")
+
+    # ── SAVE TOTAL ROW FORMATTING ────────────────────────────────
+    # Find current TOTAL rows and copy their formatting for reuse.
+    def save_row_format(ws, r, cols):
+        """Save font/fill/border/alignment/number_format for specified columns."""
+        fmt = {}
+        for c in cols:
+            cell = ws.cell(r, c)
+            fmt[c] = {
+                'font':      copy(cell.font),
+                'fill':      copy(cell.fill),
+                'border':    copy(cell.border),
+                'alignment': copy(cell.alignment),
+                'number_format': cell.number_format,
+            }
+        return fmt
+
+    # Find current TOTAL rows
+    total_fmt = None
+    for r in range(11, 100):
+        if ws.cell(r, 4).value == "TOTAL" and not ws.cell(r, 2).value:
+            total_fmt = save_row_format(ws, r, DATA_COLS)
+            break
+
+    # Also save a product row format (from row 11) as template
+    product_fmt = save_row_format(ws, 11, DATA_COLS)
+
+    # ── CALCULATE NEW LAYOUT ────────────────────────────────────
+    # Layout (no blank separators — TOTAL rows provide visual break):
+    #   Row 11              : first active tube (sorted by dia)
+    #   Row 10 + N_at       : last active tube
+    #   Row 11 + N_at       : TUBE TOTAL
+    #   Row 12 + N_at       : first active PET (sorted by ml)
+    #   Row 11 + N_at + N_ap: last active PET
+    #   Row 12 + N_at + N_ap: PET TOTAL
+    #   Row 13 + N_at + N_ap: first inactive tube
+    #   ...                 : inactive tubes, then inactive PETs
+
+    N_at = len(active_tubes)
+    N_ap = len(active_pets)
+    N_it = len(inactive_tubes)
+    N_ip = len(inactive_pets)
+
+    # Row positions (all 1-indexed)
+    FIRST_ROW = 11
+
+    tube_active_start = FIRST_ROW
+    tube_active_end   = FIRST_ROW + N_at - 1   # -1 because inclusive
+    tube_total_row    = FIRST_ROW + N_at
+
+    pet_active_start  = tube_total_row + 1
+    pet_active_end    = pet_active_start + N_ap - 1
+    pet_total_row     = pet_active_start + N_ap
+
+    inactive_tube_start = pet_total_row + 1
+    inactive_tube_end   = inactive_tube_start + N_it - 1
+
+    if N_it > 0:
+        inactive_pet_start = inactive_tube_end + 1
+    else:
+        inactive_pet_start = inactive_tube_start
+    inactive_pet_end    = inactive_pet_start + N_ip - 1
+
+    last_used_row = max(inactive_pet_end, pet_total_row)
+
+    print(f"\n  New layout:")
+    print(f"    Active TUBE : rows {tube_active_start}-{tube_active_end} ({N_at} items)")
+    print(f"    TUBE TOTAL  : row {tube_total_row}")
+    print(f"    Active PET  : rows {pet_active_start}-{pet_active_end} ({N_ap} items)")
+    print(f"    PET TOTAL   : row {pet_total_row}")
+    print(f"    Inactive TUBE: rows {inactive_tube_start}-{inactive_tube_end} ({N_it} items)")
+    print(f"    Inactive PET : rows {inactive_pet_start}-{inactive_pet_end} ({N_ip} items)")
+    print(f"    Last used row: {last_used_row}")
+
+    # ── FORMULA TEMPLATES ────────────────────────────────────────
+    # Simplified: no MONTH/YEAR filter (user keeps only current month in log)
+    pl_max_row = max(ws_pl.max_row, 1000)
+
+    TUBE_H_TPL = (
+        f'=SUMPRODUCT((Production_Log!$F$3:$F${pl_max_row}=F{{r}})'
+        f'*((LEFT(Production_Log!$B$3:$B${pl_max_row},5)="Print")+(LEFT(Production_Log!$B$3:$B${pl_max_row},5)="PLINE"))'
+        f'*(ISERROR(SEARCH("(Varnish)",Production_Log!$D$3:$D${pl_max_row})))'
+        f'*Production_Log!$H$3:$H${pl_max_row})'
+    )
+
+    PET_H_TPL = (
+        f'=SUMPRODUCT((Production_Log!$F$3:$F${pl_max_row}=F{{r}})'
+        f'*Production_Log!$H$3:$H${pl_max_row})'
+    )
+
+    I_TPL = '=G{r}-H{r}'
+    J_TPL = '=IF(G{r}=0,"-",H{r}/G{r})'
+
+    # ── FORMATTING DEFINITIONS ───────────────────────────────────
+    # Product row formatting (from inspection of existing rows 11-24):
+    #   Font: Arial 10pt, not bold (except H=col8 and K=col11 which ARE bold)
+    #   Alignment: B=center, C=left, D=left, E=center, F-K=center (J=center)
+    #   Number format: B=General, C=General, D=#,##0, E=0.#, F=#,##0,
+    #                  G=#,##0, H=#,##0, I=#,##0, J=0%, K=#,##0
+
+    PRODUCT_FONT        = Font(name='Arial', size=10, bold=False)
+    PRODUCT_FONT_BOLD   = Font(name='Arial', size=10, bold=True)
+
+    PRODUCT_COL_STYLES = {
+        2:  {'bold': False, 'nf': 'General',  'halign': 'center'},  # B = Type
+        3:  {'bold': False, 'nf': 'General',  'halign': 'left'},    # C = Customer
+        4:  {'bold': False, 'nf': '#,##0',    'halign': 'left'},    # D = Product Name
+        5:  {'bold': False, 'nf': '0.#',      'halign': 'center'},  # E = Dia
+        6:  {'bold': False, 'nf': '#,##0',    'halign': 'center'},  # F = Prod ID
+        7:  {'bold': False, 'nf': '#,##0',    'halign': 'center'},  # G = Orders
+        8:  {'bold': True,  'nf': '#,##0',    'halign': 'center'},  # H = MTD Produced
+        9:  {'bold': False, 'nf': '#,##0',    'halign': 'center'},  # I = Remaining
+        10: {'bold': False, 'nf': '0%',       'halign': 'center'},  # J = Compliance
+        11: {'bold': True,  'nf': '#,##0',    'halign': 'center'},  # K = Dispatch
+        12: {'bold': True,  'nf': 'General',  'halign': 'left'},    # L = Remarks
     }
 
+    def apply_product_format(ws, r):
+        """Apply standard product row formatting to all data columns in row r."""
+        thin_side = Side(style='thin')
+        thin_border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
 
-all_tubes = []
-all_pets  = []
-
-for r in range(11, 200):
-    type_val = ws.cell(r, 2).value   # col B
-    name_val = ws.cell(r, 4).value   # col D
-
-    if not type_val:
-        # Could be TOTAL row or blank — skip
-        continue
-
-    type_str = str(type_val).strip().upper()
-    if type_str not in ('TUBE', 'PET'):
-        continue
-
-    row_data = read_product_row(ws, r)
-    if row_data is None:
-        continue
-
-    if type_str == 'TUBE':
-        all_tubes.append(row_data)
-    else:
-        all_pets.append(row_data)
-
-active_tubes   = [t for t in all_tubes if t['is_active']]
-inactive_tubes = [t for t in all_tubes if not t['is_active']]
-active_pets    = [p for p in all_pets  if p['is_active']]
-inactive_pets  = [p for p in all_pets  if not p['is_active']]
-
-# ── SORT BY DIAMETER (low → high) ───────────────────────────
-# Tubes: dia is numeric (int/float like 16, 19, 20.5, 25, 30)
-# PETs:  dia is string like "120 ml", "200 ml" — extract the number
-
-def dia_sort_key(row_data):
-    """Extract numeric dia for sorting. Returns float."""
-    dia = row_data.get('dia')
-    if dia is None:
-        return 9999.0
-    if isinstance(dia, (int, float)):
-        return float(dia)
-    # String like "120 ml" — extract number
-    m = re.search(r'(\d+(?:\.\d+)?)', str(dia))
-    return float(m.group(1)) if m else 9999.0
-
-active_tubes.sort(key=dia_sort_key)
-inactive_tubes.sort(key=dia_sort_key)
-active_pets.sort(key=dia_sort_key)
-inactive_pets.sort(key=dia_sort_key)
-
-print(f"  Tubes: {len(active_tubes)} active, {len(inactive_tubes)} inactive")
-print(f"  PET:   {len(active_pets)} active, {len(inactive_pets)} inactive")
-
-# ── SAVE TOTAL ROW FORMATTING ────────────────────────────────
-# Find current TOTAL rows and copy their formatting for reuse.
-def save_row_format(ws, r, cols):
-    """Save font/fill/border/alignment/number_format for specified columns."""
-    fmt = {}
-    for c in cols:
-        cell = ws.cell(r, c)
-        fmt[c] = {
-            'font':      copy(cell.font),
-            'fill':      copy(cell.fill),
-            'border':    copy(cell.border),
-            'alignment': copy(cell.alignment),
-            'number_format': cell.number_format,
-        }
-    return fmt
-
-# Find current TOTAL rows
-total_fmt = None
-for r in range(11, 100):
-    if ws.cell(r, 4).value == "TOTAL" and not ws.cell(r, 2).value:
-        total_fmt = save_row_format(ws, r, DATA_COLS)
-        break
-
-# Also save a product row format (from row 11) as template
-product_fmt = save_row_format(ws, 11, DATA_COLS)
-
-# ── CALCULATE NEW LAYOUT ────────────────────────────────────
-# Layout (no blank separators — TOTAL rows provide visual break):
-#   Row 11              : first active tube (sorted by dia)
-#   Row 10 + N_at       : last active tube
-#   Row 11 + N_at       : TUBE TOTAL
-#   Row 12 + N_at       : first active PET (sorted by ml)
-#   Row 11 + N_at + N_ap: last active PET
-#   Row 12 + N_at + N_ap: PET TOTAL
-#   Row 13 + N_at + N_ap: first inactive tube
-#   ...                 : inactive tubes, then inactive PETs
-
-N_at = len(active_tubes)
-N_ap = len(active_pets)
-N_it = len(inactive_tubes)
-N_ip = len(inactive_pets)
-
-# Row positions (all 1-indexed)
-FIRST_ROW = 11
-
-tube_active_start = FIRST_ROW
-tube_active_end   = FIRST_ROW + N_at - 1   # -1 because inclusive
-tube_total_row    = FIRST_ROW + N_at
-
-pet_active_start  = tube_total_row + 1
-pet_active_end    = pet_active_start + N_ap - 1
-pet_total_row     = pet_active_start + N_ap
-
-inactive_tube_start = pet_total_row + 1
-inactive_tube_end   = inactive_tube_start + N_it - 1
-
-if N_it > 0:
-    inactive_pet_start = inactive_tube_end + 1
-else:
-    inactive_pet_start = inactive_tube_start
-inactive_pet_end    = inactive_pet_start + N_ip - 1
-
-last_used_row = max(inactive_pet_end, pet_total_row)
-
-print(f"\n  New layout:")
-print(f"    Active TUBE : rows {tube_active_start}-{tube_active_end} ({N_at} items)")
-print(f"    TUBE TOTAL  : row {tube_total_row}")
-print(f"    Active PET  : rows {pet_active_start}-{pet_active_end} ({N_ap} items)")
-print(f"    PET TOTAL   : row {pet_total_row}")
-print(f"    Inactive TUBE: rows {inactive_tube_start}-{inactive_tube_end} ({N_it} items)")
-print(f"    Inactive PET : rows {inactive_pet_start}-{inactive_pet_end} ({N_ip} items)")
-print(f"    Last used row: {last_used_row}")
-
-# ── FORMULA TEMPLATES ────────────────────────────────────────
-# Simplified: no MONTH/YEAR filter (user keeps only current month in log)
-pl_max_row = max(ws_pl.max_row, 1000)
-
-TUBE_H_TPL = (
-    f'=SUMPRODUCT((Production_Log!$F$3:$F${pl_max_row}=F{{r}})'
-    f'*((LEFT(Production_Log!$B$3:$B${pl_max_row},5)="Print")+(LEFT(Production_Log!$B$3:$B${pl_max_row},5)="PLINE"))'
-    f'*(ISERROR(SEARCH("(Varnish)",Production_Log!$D$3:$D${pl_max_row})))'
-    f'*Production_Log!$H$3:$H${pl_max_row})'
-)
-
-PET_H_TPL = (
-    f'=SUMPRODUCT((Production_Log!$F$3:$F${pl_max_row}=F{{r}})'
-    f'*Production_Log!$H$3:$H${pl_max_row})'
-)
-
-I_TPL = '=G{r}-H{r}'
-J_TPL = '=IF(G{r}=0,"-",H{r}/G{r})'
-
-# ── FORMATTING DEFINITIONS ───────────────────────────────────
-# Product row formatting (from inspection of existing rows 11-24):
-#   Font: Arial 10pt, not bold (except H=col8 and K=col11 which ARE bold)
-#   Alignment: B=center, C=left, D=left, E=center, F-K=center (J=center)
-#   Number format: B=General, C=General, D=#,##0, E=0.#, F=#,##0,
-#                  G=#,##0, H=#,##0, I=#,##0, J=0%, K=#,##0
-
-PRODUCT_FONT        = Font(name='Arial', size=10, bold=False)
-PRODUCT_FONT_BOLD   = Font(name='Arial', size=10, bold=True)
-
-PRODUCT_COL_STYLES = {
-    2:  {'bold': False, 'nf': 'General',  'halign': 'center'},  # B = Type
-    3:  {'bold': False, 'nf': 'General',  'halign': 'left'},    # C = Customer
-    4:  {'bold': False, 'nf': '#,##0',    'halign': 'left'},    # D = Product Name
-    5:  {'bold': False, 'nf': '0.#',      'halign': 'center'},  # E = Dia
-    6:  {'bold': False, 'nf': '#,##0',    'halign': 'center'},  # F = Prod ID
-    7:  {'bold': False, 'nf': '#,##0',    'halign': 'center'},  # G = Orders
-    8:  {'bold': True,  'nf': '#,##0',    'halign': 'center'},  # H = MTD Produced
-    9:  {'bold': False, 'nf': '#,##0',    'halign': 'center'},  # I = Remaining
-    10: {'bold': False, 'nf': '0%',       'halign': 'center'},  # J = Compliance
-    11: {'bold': True,  'nf': '#,##0',    'halign': 'center'},  # K = Dispatch
-    12: {'bold': True,  'nf': 'General',  'halign': 'left'},    # L = Remarks
-}
-
-def apply_product_format(ws, r):
-    """Apply standard product row formatting to all data columns in row r."""
-    thin_side = Side(style='thin')
-    thin_border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
-
-    for c in DATA_COLS:
-        cell = ws.cell(r, c)
-        style = PRODUCT_COL_STYLES.get(c, {})
-        cell.font = PRODUCT_FONT_BOLD if style.get('bold') else PRODUCT_FONT
-        cell.alignment = Alignment(horizontal=style.get('halign', 'center'), vertical='center')
-        cell.number_format = style.get('nf', 'General')
-        cell.fill = PatternFill()  # clear any fill
-        cell.border = thin_border
-
-# ── CLEAR ALL DATA ROWS ─────────────────────────────────────
-# Clear from row 11 down to the old last used row (generous)
-old_last = max(last_used_row, ws.max_row)
-for r in range(11, old_last + 1):
-    for c in DATA_COLS:
-        ws.cell(r, c).value = None
-
-# ── WRITE PRODUCT ROWS ──────────────────────────────────────
-def write_product_row(ws, r, data):
-    """Write one product row at row r with correct formulas and formatting."""
-    ws.cell(r, 2).value = data['type']      # B = Type
-    ws.cell(r, 3).value = data['customer']   # C = Customer
-    ws.cell(r, 4).value = data['product']    # D = Product Name
-    ws.cell(r, 5).value = data['dia']        # E = Dia
-    ws.cell(r, 6).value = data['pid']        # F = Prod ID
-
-    # G = Orders: If it is a formula string, update relative F{row} references (and strip any 'Tubex_Dashboard!')
-    orders_val = data['orders']
-    if isinstance(orders_val, str) and orders_val.startswith('='):
-        orders_val = re.sub(r'(?:Tubex_Dashboard!)?F\d+\b(?!\$)', f'F{r}', orders_val)
-    elif orders_val is None or orders_val == 0 or orders_val == '':
-        orders_val = f'=IFERROR(INDEX(MRP!$F$3:$F$150,MATCH(F{r},MRP!$D$3:$D$150,0)),0)'
-    ws.cell(r, 7).value = orders_val
-
-    # H = MTD Produced (formula — rebuild for this row position)
-    if data['type'] == 'TUBE':
-        ws.cell(r, 8).value = TUBE_H_TPL.format(r=r)
-    else:
-        ws.cell(r, 8).value = PET_H_TPL.format(r=r)
-
-    # I = Remaining, J = Compliance (formulas)
-    ws.cell(r, 9).value  = I_TPL.format(r=r)
-    ws.cell(r, 10).value = J_TPL.format(r=r)
-
-    # K = Dispatch (preserve original value/formula)
-    ws.cell(r, 11).value = data['dispatch_raw']
-
-    # L = Remarks (preserve original value)
-    ws.cell(r, 12).value = data.get('remarks')
-
-    # Apply consistent product formatting
-    apply_product_format(ws, r)
-
-
-def write_total_row(ws, r, first_row, last_row, fmt_dict=None):
-    """Write a TOTAL row at row r that sums from first_row to last_row."""
-    # Clear all data columns first
-    for c in DATA_COLS:
-        ws.cell(r, c).value = None
-
-    ws.cell(r, 4).value  = "TOTAL"                                   # D
-    ws.cell(r, 7).value  = f"=SUM(G{first_row}:G{last_row})"         # G
-    ws.cell(r, 8).value  = f"=SUM(H{first_row}:H{last_row})"         # H
-    ws.cell(r, 9).value  = f'=SUMIF(I{first_row}:I{last_row},">"&0)' # I
-    ws.cell(r, 10).value = f'=IF(G{r}=0,"-",H{r}/G{r})'              # J
-    ws.cell(r, 11).value = f"=SUM(K{first_row}:K{last_row})"         # K
-
-    # Apply TOTAL formatting
-    if fmt_dict:
         for c in DATA_COLS:
             cell = ws.cell(r, c)
-            f = fmt_dict.get(c)
-            if f:
-                cell.font      = copy(f['font'])
-                cell.fill      = copy(f['fill'])
-                cell.border    = copy(f['border'])
-                cell.alignment = copy(f['alignment'])
-                cell.number_format = f['number_format']
-    else:
-        # Fallback: just make bold
-        bold_font = Font(bold=True)
+            style = PRODUCT_COL_STYLES.get(c, {})
+            cell.font = PRODUCT_FONT_BOLD if style.get('bold') else PRODUCT_FONT
+            cell.alignment = Alignment(horizontal=style.get('halign', 'center'), vertical='center')
+            cell.number_format = style.get('nf', 'General')
+            cell.fill = PatternFill()  # clear any fill
+            cell.border = thin_border
+
+    # ── CLEAR ALL DATA ROWS ─────────────────────────────────────
+    # Clear from row 11 down to the old last used row (generous)
+    old_last = max(last_used_row, ws.max_row)
+    for r in range(11, old_last + 1):
         for c in DATA_COLS:
-            ws.cell(r, c).font = bold_font
+            ws.cell(r, c).value = None
 
-    # Ensure Column 10 (J = Compliance %) has percentage format 0.0%, bold font, centered, and white font matching total row
-    cell_j = ws.cell(r, 10)
-    cell_j.number_format = '0.0%'
-    tot_color = ws.cell(r, 4).font.color if (ws.cell(r, 4).font and ws.cell(r, 4).font.color) else 'FFFFFFFF'
-    cell_j.font = Font(name='Arial', size=10, bold=True, color=tot_color)
-    cell_j.alignment = Alignment(horizontal='center', vertical='center')
+    # ── WRITE PRODUCT ROWS ──────────────────────────────────────
+    def write_product_row(ws, r, data):
+        """Write one product row at row r with correct formulas and formatting."""
+        ws.cell(r, 2).value = data['type']      # B = Type
+        ws.cell(r, 3).value = data['customer']   # C = Customer
+        ws.cell(r, 4).value = data['product']    # D = Product Name
+        ws.cell(r, 5).value = data['dia']        # E = Dia
+        ws.cell(r, 6).value = data['pid']        # F = Prod ID
+
+        # G = Orders: If it is a formula string, update relative F{row} references (and strip any 'Tubex_Dashboard!')
+        orders_val = data['orders']
+        if isinstance(orders_val, str) and orders_val.startswith('='):
+            orders_val = re.sub(r'(?:Tubex_Dashboard!)?F\d+\b(?!\$)', f'F{r}', orders_val)
+        elif orders_val is None or orders_val == 0 or orders_val == '':
+            orders_val = f'=IFERROR(INDEX(MRP!$F$3:$F$150,MATCH(F{r},MRP!$D$3:$D$150,0)),0)'
+        ws.cell(r, 7).value = orders_val
+
+        # H = MTD Produced (formula — rebuild for this row position)
+        if data['type'] == 'TUBE':
+            ws.cell(r, 8).value = TUBE_H_TPL.format(r=r)
+        else:
+            ws.cell(r, 8).value = PET_H_TPL.format(r=r)
+
+        # I = Remaining, J = Compliance (formulas)
+        ws.cell(r, 9).value  = I_TPL.format(r=r)
+        ws.cell(r, 10).value = J_TPL.format(r=r)
+
+        # K = Dispatch (preserve original value/formula)
+        ws.cell(r, 11).value = data['dispatch_raw']
+
+        # L = Remarks (preserve original value)
+        ws.cell(r, 12).value = data.get('remarks')
+
+        # Apply consistent product formatting
+        apply_product_format(ws, r)
 
 
-def write_blank_row(ws, r):
-    """Ensure a row is blank (separator) with clean formatting."""
-    for c in DATA_COLS:
-        cell = ws.cell(r, c)
-        cell.value = None
-        cell.font = PRODUCT_FONT
-        cell.fill = PatternFill()
-        cell.border = Border()
-        cell.alignment = Alignment()
-        cell.number_format = 'General'
+    def write_total_row(ws, r, first_row, last_row, fmt_dict=None):
+        """Write a TOTAL row at row r that sums from first_row to last_row."""
+        # Clear all data columns first
+        for c in DATA_COLS:
+            ws.cell(r, c).value = None
+
+        ws.cell(r, 4).value  = "TOTAL"                                   # D
+        ws.cell(r, 7).value  = f"=SUM(G{first_row}:G{last_row})"         # G
+        ws.cell(r, 8).value  = f"=SUM(H{first_row}:H{last_row})"         # H
+        ws.cell(r, 9).value  = f'=SUMIF(I{first_row}:I{last_row},">"&0)' # I
+        ws.cell(r, 10).value = f'=IF(G{r}=0,"-",H{r}/G{r})'              # J
+        ws.cell(r, 11).value = f"=SUM(K{first_row}:K{last_row})"         # K
+
+        # Apply TOTAL formatting
+        if fmt_dict:
+            for c in DATA_COLS:
+                cell = ws.cell(r, c)
+                f = fmt_dict.get(c)
+                if f:
+                    cell.font      = copy(f['font'])
+                    cell.fill      = copy(f['fill'])
+                    cell.border    = copy(f['border'])
+                    cell.alignment = copy(f['alignment'])
+                    cell.number_format = f['number_format']
+        else:
+            # Fallback: just make bold
+            bold_font = Font(bold=True)
+            for c in DATA_COLS:
+                ws.cell(r, c).font = bold_font
+
+        # Ensure Column 10 (J = Compliance %) has percentage format 0.0%, bold font, centered, and white font matching total row
+        cell_j = ws.cell(r, 10)
+        cell_j.number_format = '0.0%'
+        tot_color = ws.cell(r, 4).font.color if (ws.cell(r, 4).font and ws.cell(r, 4).font.color) else 'FFFFFFFF'
+        cell_j.font = Font(name='Arial', size=10, bold=True, color=tot_color)
+        cell_j.alignment = Alignment(horizontal='center', vertical='center')
 
 
-# ── WRITE ACTIVE TUBES ──────────────────────────────────────
-for i, data in enumerate(active_tubes):
-    write_product_row(ws, tube_active_start + i, data)
+    def write_blank_row(ws, r):
+        """Ensure a row is blank (separator) with clean formatting."""
+        for c in DATA_COLS:
+            cell = ws.cell(r, c)
+            cell.value = None
+            cell.font = PRODUCT_FONT
+            cell.fill = PatternFill()
+            cell.border = Border()
+            cell.alignment = Alignment()
+            cell.number_format = 'General'
 
-# ── WRITE TUBE TOTAL ────────────────────────────────────────
-if N_at > 0:
-    write_total_row(ws, tube_total_row, tube_active_start, tube_active_end, total_fmt)
-else:
-    # No active tubes — still write a TOTAL row showing zeros
-    write_total_row(ws, tube_total_row, FIRST_ROW, FIRST_ROW, total_fmt)
 
-# ── WRITE ACTIVE PETS ───────────────────────────────────────
-for i, data in enumerate(active_pets):
-    write_product_row(ws, pet_active_start + i, data)
+    # ── WRITE ACTIVE TUBES ──────────────────────────────────────
+    for i, data in enumerate(active_tubes):
+        write_product_row(ws, tube_active_start + i, data)
 
-# ── WRITE PET TOTAL ─────────────────────────────────────────
-if N_ap > 0:
-    write_total_row(ws, pet_total_row, pet_active_start, pet_active_end, total_fmt)
-else:
-    write_total_row(ws, pet_total_row, pet_active_start, pet_active_start, total_fmt)
+    # ── WRITE TUBE TOTAL ────────────────────────────────────────
+    if N_at > 0:
+        write_total_row(ws, tube_total_row, tube_active_start, tube_active_end, total_fmt)
+    else:
+        # No active tubes — still write a TOTAL row showing zeros
+        write_total_row(ws, tube_total_row, FIRST_ROW, FIRST_ROW, total_fmt)
 
-# ── WRITE INACTIVE TUBES ────────────────────────────────────
-for i, data in enumerate(inactive_tubes):
-    write_product_row(ws, inactive_tube_start + i, data)
+    # ── WRITE ACTIVE PETS ───────────────────────────────────────
+    for i, data in enumerate(active_pets):
+        write_product_row(ws, pet_active_start + i, data)
 
-# ── WRITE INACTIVE PETS ─────────────────────────────────────
-for i, data in enumerate(inactive_pets):
-    write_product_row(ws, inactive_pet_start + i, data)
+    # ── WRITE PET TOTAL ─────────────────────────────────────────
+    if N_ap > 0:
+        write_total_row(ws, pet_total_row, pet_active_start, pet_active_end, total_fmt)
+    else:
+        write_total_row(ws, pet_total_row, pet_active_start, pet_active_start, total_fmt)
 
-# ── CLEAR REMAINING OLD ROWS ────────────────────────────────
-for r in range(last_used_row + 1, old_last + 1):
-    write_blank_row(ws, r)
+    # ── WRITE INACTIVE TUBES ────────────────────────────────────
+    for i, data in enumerate(inactive_tubes):
+        write_product_row(ws, inactive_tube_start + i, data)
 
-# ── UPDATE KPI SUMMARY FORMULAS (rows 6, 8) ─────────────────
-# These use SUMIF across all product rows.  Update range to cover
-# the new layout generously (11 to last_used_row).
-end = last_used_row
+    # ── WRITE INACTIVE PETS ─────────────────────────────────────
+    for i, data in enumerate(inactive_pets):
+        write_product_row(ws, inactive_pet_start + i, data)
 
-# Row 6: Tube MTD summary
-# D6 = total tube production
-ws.cell(6, 4).value = f'=SUMIF($B${FIRST_ROW}:$B${end},"TUBE",$H${FIRST_ROW}:$H${end})'
-# J6 = total tube dispatch
-ws.cell(6, 10).value = f'=SUMIF($B${FIRST_ROW}:$B${end},"TUBE",$K${FIRST_ROW}:$K${end})'
+    # ── CLEAR REMAINING OLD ROWS ────────────────────────────────
+    for r in range(last_used_row + 1, old_last + 1):
+        write_blank_row(ws, r)
 
-# Row 8: PET MTD summary
-ws.cell(8, 4).value = f'=SUMIF($B${FIRST_ROW}:$B${end},"PET",$H${FIRST_ROW}:$H${end})'
-ws.cell(8, 10).value = f'=SUMIF($B${FIRST_ROW}:$B${end},"PET",$K${FIRST_ROW}:$K${end})'
+    # ── UPDATE KPI SUMMARY FORMULAS (rows 6, 8) ─────────────────
+    # These use SUMIF across all product rows.  Update range to cover
+    # the new layout generously (11 to last_used_row).
+    end = last_used_row
 
-# ── SORT & WRITE DOWNTIME SUMMARY (COLUMNS M:O) ────────────────
-DOWNTIME_CATEGORIES = [
-    ('Mechanical', 'K', 11),
-    ('Electrical', 'L', 12),
-    ('Material Shortage', 'M', 13),
-    ('Changeover', 'N', 14),
-    ('Operations', 'O', 15),
-    ('Power Shutdown', 'P', 16),
-    ('Gas Shutdown', 'Q', 17),
-    ('Workers Shortage', 'R', 18),
-    ('Compressor Issue', 'S', 19),
-    ('Order not available', 'T', 20),
-]
+    # Row 6: Tube MTD summary
+    # D6 = total tube production
+    ws.cell(6, 4).value = f'=SUMIF($B${FIRST_ROW}:$B${end},"TUBE",$H${FIRST_ROW}:$H${end})'
+    # J6 = total tube dispatch
+    ws.cell(6, 10).value = f'=SUMIF($B${FIRST_ROW}:$B${end},"TUBE",$K${FIRST_ROW}:$K${end})'
 
-tube_dt_map = {k: 0.0 for k, _, _ in DOWNTIME_CATEGORIES}
-pet_dt_map  = {k: 0.0 for k, _, _ in DOWNTIME_CATEGORIES}
+    # Row 8: PET MTD summary
+    ws.cell(8, 4).value = f'=SUMIF($B${FIRST_ROW}:$B${end},"PET",$H${FIRST_ROW}:$H${end})'
+    ws.cell(8, 10).value = f'=SUMIF($B${FIRST_ROW}:$B${end},"PET",$K${FIRST_ROW}:$K${end})'
 
-for row in ws_pl.iter_rows(min_row=3, values_only=True):
-    machine = row[1]
-    if not machine:
-        continue
-    mach_up = str(machine).upper()
-    is_press_print = mach_up.startswith('PRESS') or mach_up.startswith('PRINT') or mach_up.startswith('PLINE')
-    is_pf_pet      = mach_up.startswith('PF') or mach_up.startswith('PET')
+    # ── SORT & WRITE DOWNTIME SUMMARY (COLUMNS M:O) ────────────────
+    DOWNTIME_CATEGORIES = [
+        ('Mechanical', 'K', 11),
+        ('Electrical', 'L', 12),
+        ('Material Shortage', 'M', 13),
+        ('Changeover', 'N', 14),
+        ('Operations', 'O', 15),
+        ('Power Shutdown', 'P', 16),
+        ('Gas Shutdown', 'Q', 17),
+        ('Workers Shortage', 'R', 18),
+        ('Compressor Issue', 'S', 19),
+        ('Order not available', 'T', 20),
+    ]
 
-    if is_press_print:
-        for cat, _, col_idx in DOWNTIME_CATEGORIES:
-            if col_idx - 1 < len(row):
-                val = row[col_idx - 1]
-                if val and isinstance(val, (int, float)):
-                    tube_dt_map[cat] += float(val)
-    elif is_pf_pet:
-        for cat, _, col_idx in DOWNTIME_CATEGORIES:
-            if col_idx - 1 < len(row):
-                val = row[col_idx - 1]
-                if val and isinstance(val, (int, float)):
-                    pet_dt_map[cat] += float(val)
+    tube_dt_map = {k: 0.0 for k, _, _ in DOWNTIME_CATEGORIES}
+    pet_dt_map  = {k: 0.0 for k, _, _ in DOWNTIME_CATEGORIES}
 
-active_tube_dt = [(cat, col_letter, tube_dt_map[cat]) for cat, col_letter, _ in DOWNTIME_CATEGORIES if tube_dt_map[cat] > 0]
-active_tube_dt.sort(key=lambda x: x[2], reverse=True)
+    for row in ws_pl.iter_rows(min_row=3, values_only=True):
+        machine = row[1]
+        if not machine:
+            continue
+        mach_up = str(machine).upper()
+        is_press_print = mach_up.startswith('PRESS') or mach_up.startswith('PRINT') or mach_up.startswith('PLINE')
+        is_pf_pet      = mach_up.startswith('PF') or mach_up.startswith('PET')
 
-active_pet_dt = [(cat, col_letter, pet_dt_map[cat]) for cat, col_letter, _ in DOWNTIME_CATEGORIES if pet_dt_map[cat] > 0]
-active_pet_dt.sort(key=lambda x: x[2], reverse=True)
+        if is_press_print:
+            for cat, _, col_idx in DOWNTIME_CATEGORIES:
+                if col_idx - 1 < len(row):
+                    val = row[col_idx - 1]
+                    if val and isinstance(val, (int, float)):
+                        tube_dt_map[cat] += float(val)
+        elif is_pf_pet:
+            for cat, _, col_idx in DOWNTIME_CATEGORIES:
+                if col_idx - 1 < len(row):
+                    val = row[col_idx - 1]
+                    if val and isinstance(val, (int, float)):
+                        pet_dt_map[cat] += float(val)
 
-# Unmerge old ranges in M5:O60
-for r_range in list(ws.merged_cells.ranges):
-    if r_range.min_col >= 13 and r_range.max_col <= 15 and r_range.min_row >= 5 and r_range.max_row <= 60:
-        ws.unmerge_cells(str(r_range))
+    active_tube_dt = [(cat, col_letter, tube_dt_map[cat]) for cat, col_letter, _ in DOWNTIME_CATEGORIES if tube_dt_map[cat] > 0]
+    active_tube_dt.sort(key=lambda x: x[2], reverse=True)
 
-# Clear M5:O60 and S5:U60
-for r in range(5, 61):
-    for c in range(13, 23):
-        cell = ws.cell(r, c)
-        cell.value = None
-        cell.fill = PatternFill()
-        cell.border = Border()
-        cell.alignment = Alignment()
+    active_pet_dt = [(cat, col_letter, pet_dt_map[cat]) for cat, col_letter, _ in DOWNTIME_CATEGORIES if pet_dt_map[cat] > 0]
+    active_pet_dt.sort(key=lambda x: x[2], reverse=True)
 
-dt_thin = Side(style='thin', color='D9D9D9')
-dt_box_border = Border(left=dt_thin, right=dt_thin, top=dt_thin, bottom=dt_thin)
+    # Unmerge old ranges in M5:O60
+    for r_range in list(ws.merged_cells.ranges):
+        if r_range.min_col >= 13 and r_range.max_col <= 15 and r_range.min_row >= 5 and r_range.max_row <= 60:
+            ws.unmerge_cells(str(r_range))
 
-# 1. TUBE DOWNTIME SECTION (Matches TUBE Card: Navy #1F3864, Text #BDD7EE)
-ws.merge_cells('M5:O5')
-ws.cell(5, 13).value = 'Press & Printing Downtime – MTD (Tubes)'
-ws.cell(5, 13).font = Font(name='Segoe UI', size=11, bold=True, color='FFBDD7EE')
-for c in range(13, 16):
-    ws.cell(5, c).fill = PatternFill('solid', fgColor='FF1F3864')
-    ws.cell(5, c).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
-ws.row_dimensions[5].height = 30.0
+    # Clear M5:O60 and S5:U60
+    for r in range(5, 61):
+        for c in range(13, 23):
+            cell = ws.cell(r, c)
+            cell.value = None
+            cell.fill = PatternFill()
+            cell.border = Border()
+            cell.alignment = Alignment()
 
-ws.cell(6, 13).value = 'Category'
-ws.cell(6, 14).value = 'Hours (MTD)'
-ws.cell(6, 15).value = '% Share'
-for c in range(13, 16):
-    ws.cell(6, c).font = Font(name='Segoe UI', size=9.5, bold=True, color='FF1F3864')
-    ws.cell(6, c).fill = PatternFill('solid', fgColor='FFD9E1F2')
-    ws.cell(6, c).border = dt_box_border
-    ws.cell(6, c).alignment = Alignment(horizontal='left' if c == 13 else 'right', vertical='center')
+    dt_thin = Side(style='thin', color='D9D9D9')
+    dt_box_border = Border(left=dt_thin, right=dt_thin, top=dt_thin, bottom=dt_thin)
 
-curr_row = 7
-if not active_tube_dt:
-    ws.cell(curr_row, 13).value = 'No Downtime'
-    ws.cell(curr_row, 14).value = 0.0
-    ws.cell(curr_row, 15).value = '0.0%'
+    # 1. TUBE DOWNTIME SECTION (Matches TUBE Card: Navy #1F3864, Text #BDD7EE)
+    ws.merge_cells('M5:O5')
+    ws.cell(5, 13).value = 'Press & Printing Downtime – MTD (Tubes)'
+    ws.cell(5, 13).font = Font(name='Segoe UI', size=11, bold=True, color='FFBDD7EE')
     for c in range(13, 16):
-        ws.cell(curr_row, c).font = Font(name='Segoe UI', size=9)
-        ws.cell(curr_row, c).border = dt_box_border
-    curr_row += 1
-    tube_tot_row = curr_row
-    ws.cell(tube_tot_row, 13).value = 'TOTAL'
-    ws.cell(tube_tot_row, 14).value = 0.0
-    ws.cell(tube_tot_row, 15).value = '100%'
-else:
-    tube_start_row = curr_row
-    tube_tot_row = tube_start_row + len(active_tube_dt)
-    for cat, col_letter, _ in active_tube_dt:
-        ws.cell(curr_row, 13).value = cat
-        ws.cell(curr_row, 14).value = f'=SUMPRODUCT(((LEFT(Production_Log!$B$3:$B${pl_max_row},5)="Press")+(LEFT(Production_Log!$B$3:$B${pl_max_row},5)="Print")+(LEFT(Production_Log!$B$3:$B${pl_max_row},5)="PLINE"))*Production_Log!${col_letter}$3:${col_letter}${pl_max_row})/60'
-        ws.cell(curr_row, 15).value = f'=IFERROR(N{curr_row}/$N${tube_tot_row},"")'
-        
-        ws.cell(curr_row, 13).font = Font(name='Segoe UI', size=9)
-        ws.cell(curr_row, 14).font = Font(name='Segoe UI', size=9)
-        ws.cell(curr_row, 15).font = Font(name='Segoe UI', size=9)
-        
-        ws.cell(curr_row, 13).alignment = Alignment(horizontal='left', vertical='center')
-        ws.cell(curr_row, 14).alignment = Alignment(horizontal='right', vertical='center')
-        ws.cell(curr_row, 15).alignment = Alignment(horizontal='right', vertical='center')
-        
-        ws.cell(curr_row, 14).number_format = '#,##0.0'
-        ws.cell(curr_row, 15).number_format = '0.0%'
-        for c in range(13, 16): ws.cell(curr_row, c).border = dt_box_border
-        curr_row += 1
-        
-    ws.cell(tube_tot_row, 13).value = 'TOTAL'
-    ws.cell(tube_tot_row, 14).value = f'=SUM(N{tube_start_row}:N{tube_tot_row-1})'
-    ws.cell(tube_tot_row, 15).value = '100%'
+        ws.cell(5, c).fill = PatternFill('solid', fgColor='FF1F3864')
+        ws.cell(5, c).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    ws.row_dimensions[5].height = 30.0
 
-for c in range(13, 16):
-    ws.cell(tube_tot_row, c).font = Font(name='Segoe UI', size=9, bold=True)
-    ws.cell(tube_tot_row, c).fill = PatternFill('solid', fgColor='FFF2F2F2')
-    ws.cell(tube_tot_row, c).border = dt_box_border
-ws.cell(tube_tot_row, 13).alignment = Alignment(horizontal='left', vertical='center')
-ws.cell(tube_tot_row, 14).alignment = Alignment(horizontal='right', vertical='center')
-ws.cell(tube_tot_row, 15).alignment = Alignment(horizontal='right', vertical='center')
-ws.cell(tube_tot_row, 14).number_format = '#,##0.0'
-ws.cell(tube_tot_row, 15).number_format = '0.0%'
-
-# 2. PET DOWNTIME SECTION (Matches PET Card: Teal #1F6B75, Text #B4E0E0)
-pet_hdr_row = tube_tot_row + 2
-ws.merge_cells(f'M{pet_hdr_row}:O{pet_hdr_row}')
-ws.cell(pet_hdr_row, 13).value = 'PF Machine Downtime – MTD (PET)'
-ws.cell(pet_hdr_row, 13).font = Font(name='Segoe UI', size=11, bold=True, color='FFB4E0E0')
-for c in range(13, 16):
-    ws.cell(pet_hdr_row, c).fill = PatternFill('solid', fgColor='FF1F6B75')
-    ws.cell(pet_hdr_row, c).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
-ws.row_dimensions[pet_hdr_row].height = 30.0
-
-pet_sub_row = pet_hdr_row + 1
-ws.cell(pet_sub_row, 13).value = 'Category'
-ws.cell(pet_sub_row, 14).value = 'Hours (MTD)'
-ws.cell(pet_sub_row, 15).value = '% Share'
-for c in range(13, 16):
-    ws.cell(pet_sub_row, c).font = Font(name='Segoe UI', size=9.5, bold=True, color='FF1F6B75')
-    ws.cell(pet_sub_row, c).fill = PatternFill('solid', fgColor='FFD0EAEA')
-    ws.cell(pet_sub_row, c).border = dt_box_border
-    ws.cell(pet_sub_row, c).alignment = Alignment(horizontal='left' if c == 13 else 'right', vertical='center')
-
-curr_row = pet_sub_row + 1
-if not active_pet_dt:
-    ws.cell(curr_row, 13).value = 'No Downtime'
-    ws.cell(curr_row, 14).value = 0.0
-    ws.cell(curr_row, 15).value = '0.0%'
+    ws.cell(6, 13).value = 'Category'
+    ws.cell(6, 14).value = 'Hours (MTD)'
+    ws.cell(6, 15).value = '% Share'
     for c in range(13, 16):
-        ws.cell(curr_row, c).font = Font(name='Segoe UI', size=9)
-        ws.cell(curr_row, c).border = dt_box_border
-    curr_row += 1
-    pet_tot_row = curr_row
-    ws.cell(pet_tot_row, 13).value = 'TOTAL'
-    ws.cell(pet_tot_row, 14).value = 0.0
-    ws.cell(pet_tot_row, 15).value = '100%'
-else:
-    pet_start_row = curr_row
-    pet_tot_row = pet_start_row + len(active_pet_dt)
-    for cat, col_letter, _ in active_pet_dt:
-        ws.cell(curr_row, 13).value = cat
-        ws.cell(curr_row, 14).value = f'=SUMPRODUCT(((LEFT(Production_Log!$B$3:$B${pl_max_row},2)="PF")+(LEFT(Production_Log!$B$3:$B${pl_max_row},3)="PET"))*Production_Log!${col_letter}$3:${col_letter}${pl_max_row})/60'
-        ws.cell(curr_row, 15).value = f'=IFERROR(N{curr_row}/$N${pet_tot_row},"")'
-        
-        ws.cell(curr_row, 13).font = Font(name='Segoe UI', size=9)
-        ws.cell(curr_row, 14).font = Font(name='Segoe UI', size=9)
-        ws.cell(curr_row, 15).font = Font(name='Segoe UI', size=9)
-        
-        ws.cell(curr_row, 13).alignment = Alignment(horizontal='left', vertical='center')
-        ws.cell(curr_row, 14).alignment = Alignment(horizontal='right', vertical='center')
-        ws.cell(curr_row, 15).alignment = Alignment(horizontal='right', vertical='center')
-        
-        ws.cell(curr_row, 14).number_format = '#,##0.0'
-        ws.cell(curr_row, 15).number_format = '0.0%'
-        for c in range(13, 16): ws.cell(curr_row, c).border = dt_box_border
+        ws.cell(6, c).font = Font(name='Segoe UI', size=9.5, bold=True, color='FF1F3864')
+        ws.cell(6, c).fill = PatternFill('solid', fgColor='FFD9E1F2')
+        ws.cell(6, c).border = dt_box_border
+        ws.cell(6, c).alignment = Alignment(horizontal='left' if c == 13 else 'right', vertical='center')
+
+    curr_row = 7
+    if not active_tube_dt:
+        ws.cell(curr_row, 13).value = 'No Downtime'
+        ws.cell(curr_row, 14).value = 0.0
+        ws.cell(curr_row, 15).value = '0.0%'
+        for c in range(13, 16):
+            ws.cell(curr_row, c).font = Font(name='Segoe UI', size=9)
+            ws.cell(curr_row, c).border = dt_box_border
         curr_row += 1
+        tube_tot_row = curr_row
+        ws.cell(tube_tot_row, 13).value = 'TOTAL'
+        ws.cell(tube_tot_row, 14).value = 0.0
+        ws.cell(tube_tot_row, 15).value = '100%'
+    else:
+        tube_start_row = curr_row
+        tube_tot_row = tube_start_row + len(active_tube_dt)
+        for cat, col_letter, _ in active_tube_dt:
+            ws.cell(curr_row, 13).value = cat
+            ws.cell(curr_row, 14).value = f'=SUMPRODUCT(((LEFT(Production_Log!$B$3:$B${pl_max_row},5)="Press")+(LEFT(Production_Log!$B$3:$B${pl_max_row},5)="Print")+(LEFT(Production_Log!$B$3:$B${pl_max_row},5)="PLINE"))*Production_Log!${col_letter}$3:${col_letter}${pl_max_row})/60'
+            ws.cell(curr_row, 15).value = f'=IFERROR(N{curr_row}/$N${tube_tot_row},"")'
         
-    ws.cell(pet_tot_row, 13).value = 'TOTAL'
-    ws.cell(pet_tot_row, 14).value = f'=SUM(N{pet_start_row}:N{pet_tot_row-1})'
-    ws.cell(pet_tot_row, 15).value = '100%'
+            ws.cell(curr_row, 13).font = Font(name='Segoe UI', size=9)
+            ws.cell(curr_row, 14).font = Font(name='Segoe UI', size=9)
+            ws.cell(curr_row, 15).font = Font(name='Segoe UI', size=9)
+        
+            ws.cell(curr_row, 13).alignment = Alignment(horizontal='left', vertical='center')
+            ws.cell(curr_row, 14).alignment = Alignment(horizontal='right', vertical='center')
+            ws.cell(curr_row, 15).alignment = Alignment(horizontal='right', vertical='center')
+        
+            ws.cell(curr_row, 14).number_format = '#,##0.0'
+            ws.cell(curr_row, 15).number_format = '0.0%'
+            for c in range(13, 16): ws.cell(curr_row, c).border = dt_box_border
+            curr_row += 1
+        
+        ws.cell(tube_tot_row, 13).value = 'TOTAL'
+        ws.cell(tube_tot_row, 14).value = f'=SUM(N{tube_start_row}:N{tube_tot_row-1})'
+        ws.cell(tube_tot_row, 15).value = '100%'
 
-for c in range(13, 16):
-    ws.cell(pet_tot_row, c).font = Font(name='Segoe UI', size=9, bold=True)
-    ws.cell(pet_tot_row, c).fill = PatternFill('solid', fgColor='FFF2F2F2')
-    ws.cell(pet_tot_row, c).border = dt_box_border
-ws.cell(pet_tot_row, 13).alignment = Alignment(horizontal='left', vertical='center')
-ws.cell(pet_tot_row, 14).alignment = Alignment(horizontal='right', vertical='center')
-ws.cell(pet_tot_row, 15).alignment = Alignment(horizontal='right', vertical='center')
-ws.cell(pet_tot_row, 14).number_format = '#,##0.0'
-ws.cell(pet_tot_row, 15).number_format = '0.0%'
+    for c in range(13, 16):
+        ws.cell(tube_tot_row, c).font = Font(name='Segoe UI', size=9, bold=True)
+        ws.cell(tube_tot_row, c).fill = PatternFill('solid', fgColor='FFF2F2F2')
+        ws.cell(tube_tot_row, c).border = dt_box_border
+    ws.cell(tube_tot_row, 13).alignment = Alignment(horizontal='left', vertical='center')
+    ws.cell(tube_tot_row, 14).alignment = Alignment(horizontal='right', vertical='center')
+    ws.cell(tube_tot_row, 15).alignment = Alignment(horizontal='right', vertical='center')
+    ws.cell(tube_tot_row, 14).number_format = '#,##0.0'
+    ws.cell(tube_tot_row, 15).number_format = '0.0%'
 
-# ── SAVE ─────────────────────────────────────────────────────
-from alpha_checks import atomic_save
-atomic_save(wb, EXCEL_PATH)
+    # 2. PET DOWNTIME SECTION (Matches PET Card: Teal #1F6B75, Text #B4E0E0)
+    pet_hdr_row = tube_tot_row + 2
+    ws.merge_cells(f'M{pet_hdr_row}:O{pet_hdr_row}')
+    ws.cell(pet_hdr_row, 13).value = 'PF Machine Downtime – MTD (PET)'
+    ws.cell(pet_hdr_row, 13).font = Font(name='Segoe UI', size=11, bold=True, color='FFB4E0E0')
+    for c in range(13, 16):
+        ws.cell(pet_hdr_row, c).fill = PatternFill('solid', fgColor='FF1F6B75')
+        ws.cell(pet_hdr_row, c).alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    ws.row_dimensions[pet_hdr_row].height = 30.0
 
-print(f"\n[OK] Dashboard sorted successfully -> {os.path.basename(EXCEL_PATH)}")
-print(f"  Active:   {N_at} tubes + {N_ap} PET")
-print(f"  Inactive: {N_it} tubes + {N_ip} PET")
-print(f"  Open in Excel and press Ctrl+Shift+F9 to recalculate formulas.")
+    pet_sub_row = pet_hdr_row + 1
+    ws.cell(pet_sub_row, 13).value = 'Category'
+    ws.cell(pet_sub_row, 14).value = 'Hours (MTD)'
+    ws.cell(pet_sub_row, 15).value = '% Share'
+    for c in range(13, 16):
+        ws.cell(pet_sub_row, c).font = Font(name='Segoe UI', size=9.5, bold=True, color='FF1F6B75')
+        ws.cell(pet_sub_row, c).fill = PatternFill('solid', fgColor='FFD0EAEA')
+        ws.cell(pet_sub_row, c).border = dt_box_border
+        ws.cell(pet_sub_row, c).alignment = Alignment(horizontal='left' if c == 13 else 'right', vertical='center')
+
+    curr_row = pet_sub_row + 1
+    if not active_pet_dt:
+        ws.cell(curr_row, 13).value = 'No Downtime'
+        ws.cell(curr_row, 14).value = 0.0
+        ws.cell(curr_row, 15).value = '0.0%'
+        for c in range(13, 16):
+            ws.cell(curr_row, c).font = Font(name='Segoe UI', size=9)
+            ws.cell(curr_row, c).border = dt_box_border
+        curr_row += 1
+        pet_tot_row = curr_row
+        ws.cell(pet_tot_row, 13).value = 'TOTAL'
+        ws.cell(pet_tot_row, 14).value = 0.0
+        ws.cell(pet_tot_row, 15).value = '100%'
+    else:
+        pet_start_row = curr_row
+        pet_tot_row = pet_start_row + len(active_pet_dt)
+        for cat, col_letter, _ in active_pet_dt:
+            ws.cell(curr_row, 13).value = cat
+            ws.cell(curr_row, 14).value = f'=SUMPRODUCT(((LEFT(Production_Log!$B$3:$B${pl_max_row},2)="PF")+(LEFT(Production_Log!$B$3:$B${pl_max_row},3)="PET"))*Production_Log!${col_letter}$3:${col_letter}${pl_max_row})/60'
+            ws.cell(curr_row, 15).value = f'=IFERROR(N{curr_row}/$N${pet_tot_row},"")'
+        
+            ws.cell(curr_row, 13).font = Font(name='Segoe UI', size=9)
+            ws.cell(curr_row, 14).font = Font(name='Segoe UI', size=9)
+            ws.cell(curr_row, 15).font = Font(name='Segoe UI', size=9)
+        
+            ws.cell(curr_row, 13).alignment = Alignment(horizontal='left', vertical='center')
+            ws.cell(curr_row, 14).alignment = Alignment(horizontal='right', vertical='center')
+            ws.cell(curr_row, 15).alignment = Alignment(horizontal='right', vertical='center')
+        
+            ws.cell(curr_row, 14).number_format = '#,##0.0'
+            ws.cell(curr_row, 15).number_format = '0.0%'
+            for c in range(13, 16): ws.cell(curr_row, c).border = dt_box_border
+            curr_row += 1
+        
+        ws.cell(pet_tot_row, 13).value = 'TOTAL'
+        ws.cell(pet_tot_row, 14).value = f'=SUM(N{pet_start_row}:N{pet_tot_row-1})'
+        ws.cell(pet_tot_row, 15).value = '100%'
+
+    for c in range(13, 16):
+        ws.cell(pet_tot_row, c).font = Font(name='Segoe UI', size=9, bold=True)
+        ws.cell(pet_tot_row, c).fill = PatternFill('solid', fgColor='FFF2F2F2')
+        ws.cell(pet_tot_row, c).border = dt_box_border
+    ws.cell(pet_tot_row, 13).alignment = Alignment(horizontal='left', vertical='center')
+    ws.cell(pet_tot_row, 14).alignment = Alignment(horizontal='right', vertical='center')
+    ws.cell(pet_tot_row, 15).alignment = Alignment(horizontal='right', vertical='center')
+    ws.cell(pet_tot_row, 14).number_format = '#,##0.0'
+    ws.cell(pet_tot_row, 15).number_format = '0.0%'
+
+    # ── SAVE ─────────────────────────────────────────────────────
+    from alpha_checks import atomic_save
+    atomic_save(wb, EXCEL_PATH)
+
+    print(f"\n[OK] Dashboard sorted successfully -> {os.path.basename(EXCEL_PATH)}")
+    print(f"  Active:   {N_at} tubes + {N_ap} PET")
+    print(f"  Inactive: {N_it} tubes + {N_ip} PET")
+    print(f"  Open in Excel and press Ctrl+Shift+F9 to recalculate formulas.")
+
+
+if __name__ == '__main__':
+    main()
