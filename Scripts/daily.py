@@ -336,6 +336,18 @@ def step_check_erp():
     }
 
     all_ok = True
+    real_dates = {}
+    stale_files = []
+
+    active_excel = get_active_tubex_file(ALPHA_DIR)
+    target_month = None
+    if active_excel:
+        base = os.path.basename(active_excel)
+        for m in ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]:
+            if m in base.upper():
+                target_month = m
+                break
+
     for filename, label in erp_files.items():
         target = os.path.join(ALPHA_DIR, filename)
 
@@ -361,27 +373,69 @@ def step_check_erp():
             except Exception as ce:
                 warn(f"{label}: could not auto-replace: {ce}")
 
-        if os.path.exists(target):
-            size_b = os.path.getsize(target)
-            if size_b < 1024:
-                fail(f"{label}: {filename} is empty or corrupted ({size_b} bytes)")
-                warnings_list.append(f"{label}: file ({filename}) is empty/corrupt ({size_b} bytes)")
-                all_ok = False
-                continue
-
-            age_h = (time.time() - os.path.getmtime(target)) / 3600
-            if age_h < 26:
-                ok(f"{label}: {filename} ({age_h:.1f}h old)")
-            else:
-                warn(f"{label}: {filename} is {age_h:.0f}h old (weekend / advisory notice)")
-        else:
+        if not os.path.exists(target):
             fail(f"{label}: {filename} NOT FOUND")
             warnings_list.append(f"{label}: file ({filename}) not found")
             all_ok = False
+            continue
+
+        size_b = os.path.getsize(target)
+        if size_b < 1024:
+            fail(f"{label}: {filename} is empty or corrupted ({size_b} bytes)")
+            warnings_list.append(f"{label}: file ({filename}) is empty/corrupt ({size_b} bytes)")
+            all_ok = False
+            continue
+
+        # Extract embedded data date
+        real_date = None
+        try:
+            if filename == 'inventory.xls':
+                from update_inventory import parse_inventory_xls
+                _, _, real_date = parse_inventory_xls(target)
+            else:
+                from update_dispatch import parse_dispatch_file
+                _, real_date = parse_dispatch_file(target, target_month_abbr=target_month, silent=True)
+        except Exception:
+            real_date = None
+
+        today = date.today()
+        if real_date is not None:
+            real_dates[filename] = real_date
+            gap_days = (today - real_date).days
+            if gap_days >= 2:
+                msg = f"{label}: {filename} has stale data from {real_date.strftime('%d-%b-%Y')} ({gap_days} days old)"
+                warn(msg)
+                warnings_list.append(msg)
+                stale_files.append((filename, label, msg))
+        else:
+            # Fall back to mtime check with a 12-hour threshold
+            age_h = (time.time() - os.path.getmtime(target)) / 3600
+            if age_h > 12:
+                msg = f"{label}: {filename} is {age_h:.1f}h old (using file modification time as fallback; >12h threshold)"
+                warn(msg)
+                warnings_list.append(msg)
+                stale_files.append((filename, label, msg))
 
     if not all_ok:
         print(f"\n    {DIM}Copy fresh ERP exports to {ALPHA_DIR}")
         print(f"    as 'filename - copy.xls' — pipeline auto-replaces.{RESET}")
+
+    if stale_files:
+        try:
+            ans = input("    One or more ERP exports have stale data - see above. Continue anyway? [y/N]: ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            ans = "n"
+        if ans not in ('y', 'yes'):
+            print("    Aborted cleanly: stale ERP exports.")
+            sys.exit(1)
+
+    if not stale_files and all_ok:
+        if real_dates:
+            as_of_date = min(real_dates.values())
+            as_of_str = as_of_date.strftime("%d-%b-%Y")
+        else:
+            as_of_str = date.today().strftime("%d-%b-%Y")
+        ok(f"ERP data current as of {as_of_str} - no staleness detected")
 
     return warnings_list
 

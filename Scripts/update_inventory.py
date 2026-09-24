@@ -46,6 +46,7 @@ import os
 import sys
 import re
 import glob
+from datetime import datetime
 
 import warnings
 warnings.filterwarnings("ignore", message=".*Data Validation.*")
@@ -87,13 +88,14 @@ def find_files():
 def parse_inventory_xls(xls_path):
     """
     Parse ERP inventory.xls (Item Wise Consolidated Report).
-    Returns ({item_id: {name, opening, inward, out, balance, unit}}, date_range_str).
+    Returns ({item_id: {name, opening, inward, out, balance, unit}}, date_range_str, period_end_date).
     Only rows where col_id is a valid integer ID are treated as data rows.
     """
     df = pd.read_excel(xls_path, sheet_name=0, engine='xlrd', header=None)
 
     items = {}
     date_range = ""
+    period_end_date = None
 
     # Default column indices (Item Wise Consolidated 8-column layout)
     col_id = 0
@@ -148,6 +150,13 @@ def parse_inventory_xls(xls_path):
             m = re.search(r'From\s*:\s*(\S+)\s+To\s*:\s*(\S+)', col0)
             if m:
                 date_range = m.group(1) + " to " + m.group(2)
+                end_str = m.group(2).strip()
+                for fmt in ("%d-%m-%Y", "%d/%m/%Y", "%d.%m.%Y", "%Y-%m-%d"):
+                    try:
+                        period_end_date = datetime.strptime(end_str, fmt).date()
+                        break
+                    except (ValueError, TypeError):
+                        pass
             continue
 
         # Data row: col_id must be a valid integer item ID
@@ -179,7 +188,7 @@ def parse_inventory_xls(xls_path):
             'unit':     unit,
         }
 
-    return items, date_range
+    return items, date_range, period_end_date
 
 
 def _n(v):
@@ -373,7 +382,7 @@ def main():
     check_not_locked(excel_path)
     check_freshness(xls_path, max_hours=26, label="inventory.xls")
     try:
-        xls_items, date_range = parse_inventory_xls(xls_path)
+        xls_items, date_range, period_end_date = parse_inventory_xls(xls_path)
     except Exception as e:
         print(f"  ERROR: Could not read inventory.xls: {e}")
         sys.exit(1)

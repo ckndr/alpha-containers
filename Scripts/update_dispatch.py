@@ -186,11 +186,11 @@ def resolve_pid(product_entry, catalog):
     return catalog_name, pid
 
 
-def parse_dispatch_file(path, target_month_abbr=None):
+def parse_dispatch_file(path, target_month_abbr=None, silent=False):
     """
     Parse one ERP dispatch .xls (Date Wise format).
     Ignores any dispatch rows matching the current day (Rule R1-06 / AUDIT_NOTES.md).
-    Returns {(product_name, party_name): total_dispatched_qty}.
+    Returns ({(product_name, party_name): total_dispatched_qty}, latest_date_seen).
     """
     import xlrd
     df = pd.read_excel(path, sheet_name=0, engine='xlrd', header=None)
@@ -207,8 +207,9 @@ def parse_dispatch_file(path, target_month_abbr=None):
             if file_month:
                 break
         if file_month and target_month_abbr.upper() not in file_month:
-            print(f"  [WARN] {os.path.basename(path)} header is '{file_month}', but active file is '{target_month_abbr}'. Stale previous-month dispatch ignored.")
-            return {}
+            if not silent:
+                print(f"  [WARN] {os.path.basename(path)} header is '{file_month}', but active file is '{target_month_abbr}'. Stale previous-month dispatch ignored.")
+            return {}, None
 
     SKIP_PREFIXES = ('dispatch report', 'month :', 'no.')
     SKIP_EXACT    = {'end of file'}
@@ -216,6 +217,7 @@ def parse_dispatch_file(path, target_month_abbr=None):
     result = {}
     current_product = None
     ignored_today = 0
+    latest_date_seen = None
 
     today = datetime.now()
     today_date = today.date()
@@ -231,7 +233,8 @@ def parse_dispatch_file(path, target_month_abbr=None):
         today.strftime("%d/%m/%y").lower()
     ]
 
-    # Dynamically detect dispatch quantity and party columns (Rule R1-07)
+    # Dynamically detect dispatch quantity, party, and date columns (Rule R1-07)
+    col_date_idx = 2
     col_disp_idx = 7
     col_party_idx = 12
     for idx, r in df.iterrows():
@@ -242,6 +245,8 @@ def parse_dispatch_file(path, target_month_abbr=None):
                     col_disp_idx = i
                 elif pd.notna(s) and 'party' in str(s).lower():
                     col_party_idx = i
+                elif pd.notna(s) and str(s).strip().lower() == 'date':
+                    col_date_idx = i
             break
 
     for _, row in df.iterrows():
@@ -268,43 +273,43 @@ def parse_dispatch_file(path, target_month_abbr=None):
 
             # Robust date check including xlrd serial floats (Rule R1-06)
             skip_row = False
-            for val in row:
+            for c_idx, val in enumerate(row):
                 if pd.isna(val) or val is None:
                     continue
+                d = None
                 if hasattr(val, 'date') and callable(getattr(val, 'date')):
-                    if val.date() == today_date:
-                        skip_row = True
-                        break
+                    d = val.date()
                 elif isinstance(val, (datetime, date)):
                     d = val.date() if isinstance(val, datetime) else val
-                    if d == today_date:
-                        skip_row = True
-                        break
                 elif isinstance(val, (int, float)):
-                    if 40000 <= val <= 55000:
+                    if 40000 <= val <= 55000 and c_idx == col_date_idx:
                         try:
                             d = xlrd.xldate_as_datetime(val, 0).date()
-                            if d == today_date:
-                                skip_row = True
-                                break
                         except Exception:
                             pass
                 elif isinstance(val, str):
                     v_str = val.strip().lower()
                     if v_str in today_strs:
+                        d = today_date
+                    else:
+                        for ts in today_strs:
+                            if v_str.startswith(ts + ' ') or v_str.startswith(ts + 't'):
+                                d = today_date
+                                break
+                    if d is None and (c_idx == col_date_idx or (not val.strip().isdigit() and any(sep in val for sep in ('/', '-', '.')))):
+                        try:
+                            ts = pd.to_datetime(val, dayfirst=True, errors='coerce')
+                            if pd.notna(ts):
+                                d = ts.date()
+                        except Exception:
+                            pass
+
+                if d is not None:
+                    if latest_date_seen is None or d > latest_date_seen:
+                        latest_date_seen = d
+                    if d == today_date:
                         skip_row = True
                         break
-                    for ts in today_strs:
-                        if v_str.startswith(ts + ' ') or v_str.startswith(ts + 't'):
-                            skip_row = True
-                            break
-                    try:
-                        ts = pd.to_datetime(val, dayfirst=True, errors='coerce')
-                        if pd.notna(ts) and ts.date() == today_date:
-                            skip_row = True
-                            break
-                    except Exception:
-                        pass
 
             if skip_row:
                 ignored_today += 1
@@ -318,10 +323,10 @@ def parse_dispatch_file(path, target_month_abbr=None):
         except (ValueError, TypeError):
             pass
 
-    if ignored_today > 0:
+    if not silent and ignored_today > 0:
         print(f"  -> Ignored {ignored_today} dispatch row(s) from today ({today_date}) in {os.path.basename(path)}")
 
-    return result
+    return result, latest_date_seen
 
 
 def find_files(folder):
@@ -424,8 +429,8 @@ def main():
             target_month = m
             break
 
-    tube_dispatch = parse_dispatch_file(tube_path, target_month_abbr=target_month)
-    pet_dispatch  = parse_dispatch_file(pet_path, target_month_abbr=target_month)
+    tube_dispatch, tube_latest_date = parse_dispatch_file(tube_path, target_month_abbr=target_month)
+    pet_dispatch, pet_latest_date  = parse_dispatch_file(pet_path, target_month_abbr=target_month)
 
     print("")
     print("  TUBE dispatches (TUBEX-ALUM):")
