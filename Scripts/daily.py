@@ -425,10 +425,13 @@ def step_check_erp():
         print(f"    as 'filename - copy.xls' — pipeline auto-replaces.{RESET}")
 
     if stale_files:
-        try:
-            ans = input("    One or more ERP exports have stale data - see above. Continue anyway? [y/N]: ").strip().lower()
-        except (EOFError, KeyboardInterrupt):
-            ans = "n"
+        if '-y' in sys.argv or '--yes' in sys.argv:
+            ans = 'y'
+        else:
+            try:
+                ans = input("    One or more ERP exports have stale data - see above. Continue anyway? [y/N]: ").strip().lower()
+            except (EOFError, KeyboardInterrupt):
+                ans = "n"
         if ans not in ('y', 'yes'):
             print("    Aborted cleanly: stale ERP exports.")
             sys.exit(1)
@@ -582,7 +585,8 @@ def step_find_production(skip=False):
             try:
                 shutil.copy2(best_arch_path, target)
                 ok(f"Copied from archive ({best_arch_name}) → {PROD_TARGET_NAME}")
-                return True
+                if best_arch_age < 26:
+                    return True
             except Exception:
                 pass
 
@@ -594,6 +598,16 @@ def step_find_production(skip=False):
             return True
         else:
             warn(f"Existing {PROD_TARGET_NAME} is {age_h:.0f}h old — no fresh file found in Downloads or archive")
+            if '-y' in sys.argv or '--yes' in sys.argv:
+                ans = 'y'
+            else:
+                try:
+                    ans = input(f"    Continue with old {PROD_TARGET_NAME}? [y/N]: ").strip().lower()
+                except (EOFError, KeyboardInterrupt):
+                    ans = "n"
+            if ans in ('y', 'yes'):
+                ok(f"Using existing {PROD_TARGET_NAME} ({age_h:.0f}h old, confirmed by user)")
+                return True
     else:
         fail(f"No 'Production report *.xlsx' found in {DOWNLOADS_DIR} or {REPORTS_ARCHIVE_DIR}")
         fail(f"No existing {PROD_TARGET_NAME} in {ALPHA_DIR}")
