@@ -102,7 +102,7 @@
 - **Objective**: Automatically compose a formatted, emoji-enhanced morning executive text summary during `daily.py` and copy it directly to the Windows clipboard for instant WhatsApp group pasting.
 - **Specification**:
   1. **Briefing Payload Composition** (hooked right after screenshot in Step 7):
-     - Compute from active workbook (`Tubex_Sep26.xlsx`) and Imran's `Production.xlsx`:
+     - Compute from active workbook (`Tubex_Oct26.xlsx`) and Imran's `Production.xlsx`:
        - 🏭 **Plant Date & Operating Shift Timestamps**
        - 📦 **Yesterday Production**: Tube pieces (Printing-03 + Printing-04) & PET bottles (PF Machine).
        - 📈 **MTD vs Monthly Plan**: MTD output vs Plan (% compliance & required run-rate).

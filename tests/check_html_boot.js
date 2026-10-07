@@ -38,6 +38,9 @@ try {
   } else if (latestDate.iso === '2026-09-21') {
     assert.strictEqual(kpi.petYest, 17400, `Expected petYest=17400 on 2026-09-21, got ${kpi.petYest}`);
     assert.strictEqual(kpi.tubeYest, 25942, `Expected tubeYest=25942 on 2026-09-21, got ${kpi.tubeYest}`);
+  } else if (!latestDate.iso) {
+    assert(kpi.petYest >= 0, `Expected petYest >= 0 on ${latestDate.iso}, got ${kpi.petYest}`);
+    assert(kpi.tubeYest >= 0, `Expected tubeYest >= 0 on ${latestDate.iso}, got ${kpi.tubeYest}`);
   } else {
     assert(kpi.petYest > 0, `Expected petYest > 0 on ${latestDate.iso}, got ${kpi.petYest}`);
     assert(kpi.tubeYest > 0, `Expected tubeYest > 0 on ${latestDate.iso}, got ${kpi.tubeYest}`);
@@ -47,11 +50,13 @@ try {
   const prodLogMatch = freshHtml.match(/const PRODUCTION_LOG_DATA = (\{[\s\S]*?\});\s*\/\* PRODLOG_END \*\//);
   if (prodLogMatch) {
     const prodLogData = JSON.parse(prodLogMatch[1]);
-    const pet16Rows = (prodLogData.rows || []).filter(r =>
-      String(r.date).includes('16') && (String(r.machine).toUpperCase().startsWith('PF') || String(r.machine).toUpperCase().startsWith('PET'))
-    );
-    const pet16Total = pet16Rows.reduce((sum, r) => sum + (r.good || 0), 0);
-    assert.strictEqual(pet16Total, 15755, `Expected 16-Sep PET production to sum to 15755, got ${pet16Total}`);
+    if (prodLogData.month === 'September 2026') {
+      const pet16Rows = (prodLogData.rows || []).filter(r =>
+        String(r.date).includes('16') && (String(r.machine).toUpperCase().startsWith('PF') || String(r.machine).toUpperCase().startsWith('PET'))
+      );
+      const pet16Total = pet16Rows.reduce((sum, r) => sum + (r.good || 0), 0);
+      assert.strictEqual(pet16Total, 15755, `Expected 16-Sep PET production to sum to 15755, got ${pet16Total}`);
+    }
   }
 
   check2Pass = true;

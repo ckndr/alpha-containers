@@ -48,7 +48,7 @@ fallback_scripts = os.path.join(r"D:\Alpha", "Scripts")
 if os.path.exists(fallback_scripts) and fallback_scripts not in sys.path:
     sys.path.insert(0, fallback_scripts)
 
-from alpha_checks import get_active_tubex_file, check_not_locked, atomic_save
+from alpha_checks import get_active_tubex_file, check_not_locked, atomic_save, _FULL_MONTHS, _MONTHS
 from add_order import get_mrp_boundaries, rearrange_mrp_orders
 
 MONTH_MAP = {
@@ -290,14 +290,19 @@ def roll_new_month(month_str, year_val, dry_run=False, root_dir=None):
         if ws_pl.max_row >= 3:
             ws_pl.delete_rows(3, ws_pl.max_row - 2)
 
+    mnum = _MONTHS.get(mon_title.lower(), 10)
+    full_month = _FULL_MONTHS.get(mnum, mon_title)
+
     if 'FG Stock' in wb.sheetnames:
         ws_fg = wb['FG Stock']
+        ws_fg.cell(1, 1).value = f"FG STOCK IN HAND — Last Updated: Pending ({full_month} {y})"
         if ws_fg.max_row >= 4:
             ws_fg.delete_rows(4, ws_fg.max_row - 3)
 
     # Step 5 & 6 prep: Reset Dashboard orders/dispatch references
     if 'Tubex_Dashboard' in wb.sheetnames:
         ws_dash = wb['Tubex_Dashboard']
+        ws_dash.cell(2, 2).value = f"TUBEX  — {full_month} {y} Month to Date Report"
         for r in range(11, ws_dash.max_row + 1):
             pid_val = ws_dash.cell(r, 6).value
             if pid_val:

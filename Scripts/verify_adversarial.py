@@ -19,7 +19,7 @@ def check_excel_integrity():
     print("=" * 80)
     
     workbooks = [
-        ('Tubex_Sep26.xlsx', True),
+        ('Tubex_Oct26.xlsx', True),
         ('August_Plan.xlsx', True),
         (os.path.join('Aerosol', 'Aerosol BOM.xlsx'), True),
         (os.path.join('Aerosol', 'Aerosol_Job_Card.xlsx'), True),
@@ -35,6 +35,7 @@ def check_excel_integrity():
         (os.path.join('Tubex Records', 'Production report Jan-2026 till Date.xlsx'), False), # Closed legacy archive
         (os.path.join('Tubex Records', 'Tubex_July26.xlsx'), False), # Closed legacy archive
         (os.path.join('Tubex Records', 'Tubex_Aug26.xlsx'), False), # Closed legacy archive
+        (os.path.join('Tubex Records', 'Tubex_Sep26.xlsx'), False), # Closed legacy archive
         (os.path.join('Aerosol', 'Tubex_v10_30.xlsx'), False), # Closed legacy baseline
     ]
     
