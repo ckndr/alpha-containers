@@ -3,10 +3,16 @@
   ║  ⚠ DAILY WORKFLOW ERROR & ADVISORY SUMMARY               ║
   ╚══════════════════════════════════════════════════════════╝
 
+  [SYSTEM / FILE CHECK ISSUES]
+    • Dispatch (Tube): dispatch.xls has stale data from 30-Sep-2026 (7 days old)
+    • Dispatch (PET): dispatch_pet.xls has stale data from 29-Sep-2026 (8 days old)
+
   [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
     (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
-    • Summary sheet dispatch difference for PET Dispatch (MTD): Imran=250,800 vs Dashboard=250,960 (diff=+160) — Dashboard reflects authoritative ERP export; Imran sheet may have timing lag or unrecorded dispatch
+    • Summary sheet dispatch difference for Tube Dispatch (MTD): Imran=310,488 vs Dashboard=491,479 (diff=+180,991) — Dashboard reflects authoritative ERP export; Imran sheet may have timing lag or unrecorded dispatch
+    • Summary sheet dispatch difference for PET Dispatch (MTD): Imran=250,800 vs Dashboard=285,400 (diff=+34,600) — Dashboard reflects authoritative ERP export; Imran sheet may have timing lag or unrecorded dispatch
     • Pending Order SKU difference for 'HELLO HAIR': Req diff=+0, Prod diff=+8, Bal diff=-8
     • Pending Order SKU difference for 'VINCE NURTURAL': Req diff=-17,612, Prod diff=-17,612, Bal diff=+0
     • Pending Orders floor difference: Imran=746,320 vs MRP Scheduled=749,832 (diff=-3,512)
+    • Latest Production_Log date (23-Sep-2026) is 14 days old (> 4 days lag).
 
