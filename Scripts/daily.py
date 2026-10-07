@@ -402,13 +402,17 @@ def step_check_erp():
         if real_date is not None:
             real_dates[filename] = real_date
             gap_days = (today - real_date).days
-            if gap_days >= 2:
+            age_h = (time.time() - os.path.getmtime(target)) / 3600
+            if gap_days >= 2 and age_h >= 24:
                 msg = f"{label}: {filename} has stale data from {real_date.strftime('%d-%b-%Y')} ({gap_days} days old)"
                 warn(msg)
                 warnings_list.append(msg)
                 stale_files.append((filename, label, msg))
             else:
-                ok(f"{label}: {filename} (data as of {real_date.strftime('%d-%b-%Y')})")
+                if gap_days >= 2:
+                    ok(f"{label}: {filename} (data as of {real_date.strftime('%d-%b-%Y')}, fresh export from {age_h:.1f}h ago)")
+                else:
+                    ok(f"{label}: {filename} (data as of {real_date.strftime('%d-%b-%Y')})")
         else:
             # Fall back to mtime check with a 12-hour threshold
             age_h = (time.time() - os.path.getmtime(target)) / 3600

@@ -225,6 +225,33 @@ def parse_dispatch_file(path, target_month_abbr=None, silent=False):
     ignored_today = 0
     latest_date_seen = None
 
+    # Extract report run date from header (Rule R1-07 / ERP header date)
+    report_run_date = None
+    for idx in range(min(10, len(df))):
+        row_vals = list(df.iloc[idx].values)
+        for i, v in enumerate(row_vals):
+            if pd.notna(v) and isinstance(v, str) and 'date' in v.lower() and ':' in v:
+                for next_v in row_vals[i+1:]:
+                    if pd.notna(next_v):
+                        if hasattr(next_v, 'date') and callable(getattr(next_v, 'date')):
+                            report_run_date = next_v.date()
+                            break
+                        elif isinstance(next_v, (datetime, date)):
+                            report_run_date = next_v.date() if isinstance(next_v, datetime) else next_v
+                            break
+                        else:
+                            try:
+                                ts = pd.to_datetime(next_v, dayfirst=True, errors='coerce')
+                                if pd.notna(ts):
+                                    report_run_date = ts.date()
+                                    break
+                            except Exception:
+                                pass
+                if report_run_date:
+                    break
+        if report_run_date:
+            break
+
     today = datetime.now()
     today_date = today.date()
     today_strs = [
@@ -332,7 +359,7 @@ def parse_dispatch_file(path, target_month_abbr=None, silent=False):
     if not silent and ignored_today > 0:
         print(f"  -> Ignored {ignored_today} dispatch row(s) from today ({today_date}) in {os.path.basename(path)}")
 
-    return result, latest_date_seen
+    return result, (report_run_date or latest_date_seen)
 
 
 def find_files(folder):

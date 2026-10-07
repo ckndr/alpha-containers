@@ -3,19 +3,13 @@
   ║  ⚠ DAILY WORKFLOW ERROR & ADVISORY SUMMARY               ║
   ╚══════════════════════════════════════════════════════════╝
 
-  [SYSTEM / FILE CHECK ISSUES]
-    • Dispatch (PET): dispatch_pet.xls has stale data from 01-Oct-2026 (6 days old)
-
   [INVENTORY: CRITICAL ITEMS (SLUG/RESIN) MISSING FROM ERP]
     (These rows are highlighted in RED in Excel and zeroed out)
     • [NEW] Item ID 406 (30X4.5 S/M) [Slug] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
 
   [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
     (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
-    • Production.xlsx data is from previous month (9). Machine total comparison deferred.
-    • Summary sheet 'Summary 30-09-2026' is from previous month (9). KPI comparison deferred.
-    • Pending Order SKU difference for 'HELLO HAIR': Req diff=+310,582, Prod diff=+198,016, Bal diff=+112,566
+    • Pending Order SKU difference for 'HELLO HAIR': Req diff=+310,582, Prod diff=+310,530, Bal diff=+52
     • Pending Order SKU difference for 'HOLA HAIR': Req diff=+27,664, Prod diff=+27,664, Bal diff=+0
-    • Pending Orders floor difference: Imran=746,320 vs MRP Scheduled=633,754 (diff=+112,566)
-    • Latest Production_Log date (01-Oct-2026) is 6 days old (> 4 days lag).
+    • Pending Orders floor difference: Imran=559,252 vs MRP Scheduled=559,200 (diff=+52)
 
