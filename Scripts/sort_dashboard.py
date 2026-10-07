@@ -214,6 +214,46 @@ def main():
         else:
             all_pets.append(row_data)
 
+    # Check for any products in Product_Catalog missing from Dashboard
+    if 'Product_Catalog' in wb.sheetnames:
+        ws_cat = wb['Product_Catalog']
+        existing_pids = {r['pid'] for r in all_tubes + all_pets}
+        for r_cat in range(3, ws_cat.max_row + 1):
+            pid_c = ws_cat.cell(r_cat, 1).value
+            if pid_c is None:
+                continue
+            try:
+                pid_int = int(pid_c)
+            except (ValueError, TypeError):
+                continue
+            if pid_int not in existing_pids:
+                pname = str(ws_cat.cell(r_cat, 4).value or '').strip()
+                cust = str(ws_cat.cell(r_cat, 3).value or '').strip()
+                dia = ws_cat.cell(r_cat, 5).value
+                p_type = 'PET' if (pid_int >= 8000 or 'PET' in pname.upper() or 'BOTTLE' in pname.upper() or (isinstance(dia, str) and 'ML' in dia.upper())) else 'TUBE'
+                orders = mrp_orders.get(pid_int, 0)
+                produced = mtd_by_pid.get(pid_int, 0)
+                dispatch = 0
+                is_active = (orders > 0) or (produced > 0) or (dispatch > 0)
+                new_row_data = {
+                    'type': p_type,
+                    'customer': cust,
+                    'product': pname,
+                    'dia': dia,
+                    'pid': pid_int,
+                    'orders': None,
+                    'dispatch_raw': None,
+                    'remarks': None,
+                    'produced': produced,
+                    'is_active': is_active,
+                    'orig_row': None,
+                }
+                if p_type == 'TUBE':
+                    all_tubes.append(new_row_data)
+                else:
+                    all_pets.append(new_row_data)
+                existing_pids.add(pid_int)
+
     active_tubes   = [t for t in all_tubes if t['is_active']]
     inactive_tubes = [t for t in all_tubes if not t['is_active']]
     active_pets    = [p for p in all_pets  if p['is_active']]

@@ -177,6 +177,12 @@ def resolve_pid(product_entry, catalog):
         return "TRANSPARENT BOTTLE 150ML", 8001
     if "ALPHA" in party_upper and ("75" in erp_upper or "75ML" in erp_upper):
         return "PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018
+    if "ALPHA" in party_upper and ("130" in erp_upper or "130ML" in erp_upper):
+        return "PET BOTTLE SMALL (130ML) TRANSPARENT", 8019
+    if ("MABLAY" in party_upper or "MABLEY" in party_upper) and ("130" in erp_upper or "130ML" in erp_upper):
+        if "WHITE" in erp_upper:
+            return "PET BOTTLE 130ML WHITE", 8015
+        return "PET BOTTLE SMALL (130ML) TRANSPARENT", 8010
 
     # 2. Check NAME_FIXES
     catalog_name = NAME_FIXES.get(erp_name, erp_name)

@@ -111,6 +111,7 @@ PET_SHORT_NAMES = {
     8016: "Samsol Coconut Oil 200ml White",
     8017: "Horizon 150ml TRP",
     8018: "Alpha 75ml TRP",
+    8019: "Alpha 130ml TRP",
 }
 
 
