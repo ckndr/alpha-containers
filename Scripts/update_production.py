@@ -178,8 +178,8 @@ ALIASES = {
     ("samsol 45",                "20.5"): ("SAMSOL HAIR COLOR 45 DIA 20.5 MM",     5731),
     ("samsol hc 45",             "20.5"): ("SAMSOL HAIR COLOR 45 DIA 20.5 MM",     5731),
     ("samsol red",               "20.5"): ("S-43 DIA 20.5",                        5699),
-    ("vince his",               "20.5"): ("VINCE HIS BEARD & MUSTACHE COLOR",      6077),
-    ("vince his (varnish)",     "20.5"): ("VINCE HIS BEARD & MUSTACHE COLOR (Varnish)", None),  # v19: no PID for varnish passes
+    ("vince his",               "20.5"): ("VINCE HIS ONLY BEARD & MUSTACHE COLOR CREAM", 6077),
+    ("vince his (varnish)",     "20.5"): ("VINCE HIS ONLY BEARD & MUSTACHE COLOR CREAM (Varnish)", None),  # v19: no PID for varnish passes
 
     # ── Dia 25 ──────────────────────────────────────────────────────────────
     ("s 43 25mm",                  "25"): ("S 43 25MM",                            3447),
@@ -193,7 +193,7 @@ ALIASES = {
     ("tube common purple",         "25"): ("TUBE COMMON PURPLE",                   6532),
     ("common red",                 "25"): ("TUBES COMMON RED",                     6470),
     ("common red tube",            "25"): ("TUBES COMMON RED",                     6470),
-    ("samsol red",                 "25"): ("SAMSOL RED 25MM",                      9006),
+    ("samsol red",                 "25"): ("TUBES COMMON RED",                     6470),
     ("vince his",                  "25"): ("HIS ONLY HAIR COLOR CREAM 40GM",      6228),  # BUGFIX v16: 25mm = PID 6228, not 6077 (6077 is 20.5mm)
     ("vincehis",                   "25"): ("HIS ONLY HAIR COLOR CREAM 40GM",      6228),  # BUGFIX v16
     ("vince his (varnish)",        "25"): ("HIS ONLY HAIR COLOR CREAM 40GM (Varnish)", None),  # v19: no PID for varnish passes
@@ -241,12 +241,12 @@ ALIASES = {
     ("bt-200ml yellow",           "200 ml"): ("PET BOTTLE LARGE (200 ML) YELLOW",   8006),
     ("bt 200 ml yellow",          "200 ml"): ("PET BOTTLE LARGE (200 ML) YELLOW",   8006),
     ("pet bottle large (200 ml) yellow", "200 ml"): ("PET BOTTLE LARGE (200 ML) YELLOW", 8006),
-    ("white bottle",              "200 ml"): ("WHITE BOTTLE 200ML",                8007),
+    ("white bottle",              "200 ml"): ("PET BOTTLE LARGE 200ML WHITE",       8007),
     ("black bottle",              "200 ml"): ("BLACK BOTTLE 200ML",                8008),
     ("trp bottle",                "130 ml"): ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
     ("white bottle",              "130 ml"): ("PET BOTTLE 130ML WHITE",            8015),
     ("trp bottle",                "150 ml"): ("TRANSPARENT BOTTLE 150ML",          8001),
-    ("trp bottle",                "200 ml"): ("BT-200ML MUSTARD OIL (TRANSPARENT)", 8014),
+    ("trp bottle",                "200 ml"): ("PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT", 8014),
     ("alpha lab\ttrp bottle",      "150 ml"): ("TRANSPARENT BOTTLE 150ML",          8001),
     ("transparent bottle",        "75 ml"):  ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
     ("trp bottle",                "75 ml"):  ("PET BOTTLE (75ML) TRANSPARENT BODY MIST", 8018),
@@ -277,7 +277,7 @@ FG_ALIASES = {
     # ── Dia 20.5 ────────────────────────────────────────────────────────────
     ("tube 43",          "20.5", "samsol"):          ("S-43 DIA 20.5",                      5699),
     ("tube 45",          "20.5", "samsol"):          ("SAMSOL HAIR COLOR 45 DIA 20.5 MM",   5731),
-    ("vince his",        "20.5", "mabley beauty"):   ("VINCE HIS BEARD & MUSTACHE COLOR",   6077),
+    ("vince his",        "20.5", "mabley beauty"):   ("VINCE HIS ONLY BEARD & MUSTACHE COLOR CREAM", 6077),
 
     # ── Dia 25 ──────────────────────────────────────────────────────────────
     ("tube 43",            "25", "samsol"):          ("S 43 25MM",                          3447),
@@ -349,9 +349,9 @@ FG_ALIASES = {
     ("bt-200ml yellow", "200ml", "abid masood khan"): ("PET BOTTLE LARGE (200 ML) YELLOW",   8006),
     ("pet bottle large (200 ml) yellow", "200ml", "samsol"): ("PET BOTTLE LARGE (200 ML) YELLOW", 8006),
     ("pet bottle large (200 ml) yellow", "200ml", "abid masood khan"): ("PET BOTTLE LARGE (200 ML) YELLOW", 8006),
-    ("white bottle",    "200ml", "samsol"):          ("WHITE BOTTLE 200ML",                 8007),
+    ("white bottle",    "200ml", "samsol"):          ("PET BOTTLE LARGE 200ML WHITE",       8007),
     ("black bottle",    "200ml", "samsol"):          ("BLACK BOTTLE 200ML",                 8008),
-    ("trp bottle",      "200ml", "samsol"):          ("BT-200ML MUSTARD OIL (TRANSPARENT)", 8014),
+    ("trp bottle",      "200ml", "samsol"):          ("PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT", 8014),
     ("trp bottle",      "130ml", "mabley beauty"):   ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
     ("trp bottle",      "130ml", "alpha lab"):       ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
     ("white bottle",    "130ml", "mabley beauty"):   ("PET BOTTLE 130ML WHITE",               8015),
