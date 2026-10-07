@@ -356,11 +356,14 @@ FG_ALIASES = {
     ("black bottle",    "200ml", "samsol"):          ("BLACK BOTTLE 200ML",                 8008),
     ("trp bottle",      "200ml", "samsol"):          ("PET BOTTLE MUSTARD OIL (200ML) TRANSPARENT", 8014),
     ("trp bottle",      "130ml", "mabley beauty"):   ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
+    ("trp bottle",      "130ml", "mablay beauty"):   ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
     ("trp bottle",      "130ml", "alpha lab"):       ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8019),
     ("trp bottle",      "130ml", "alpha labs"):      ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8019),
     ("trp bottle",      "130ml", "alpha labs pvt ltd"): ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8019),
     ("pet bottle small (130ml) transparent", "130ml", "alpha lab"): ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8019),
     ("pet bottle small (130ml) transparent", "130ml", "alpha labs pvt ltd"): ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8019),
+    ("pet bottle small (130ml) transparent", "130ml", "mabley beauty"): ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
+    ("pet bottle small (130ml) transparent", "130ml", "mablay beauty"): ("PET BOTTLE SMALL (130ML) TRANSPARENT", 8010),
     ("white bottle",    "130ml", "mabley beauty"):   ("PET BOTTLE 130ML WHITE",               8015),
 }
 
@@ -899,16 +902,10 @@ def apply_october_alpha_labs_diversion(source_rows):
     For October 2026 (Tubex_Oct26.xlsx):
     Ensures that 5,000 pcs of 130ml transparent bottle production counts towards
     PID 8019 (Alpha Labs PVT LTD - JOF 355), which was produced and completed.
-    
-    1. If source_rows has 130ml transparent bottle production:
-       - Diverts up to 5,000 good pcs to PID 8019 (Alpha Labs PVT LTD).
-       - Any remaining good qty stays under PID 8010 (Mablay Beauty PVT LTD.).
-    2. If source_rows does not contain 130ml production (e.g. Imran has not logged it yet
-       or logged only in September), injects the 5,000 pcs completed row for PID 8019 so it
-       consistently persists whenever daily.py rewrites Production_Log.
+    The remaining 130ml transparent bottle production counts towards
+    PID 8010 (Mablay Beauty PVT LTD. - JOF 354).
     """
     from copy import copy
-    from datetime import date, datetime
 
     TARGET_QTY = 5000.0
     current_8019_good = sum(
@@ -936,7 +933,7 @@ def apply_october_alpha_labs_diversion(source_rows):
             orig_total = float(r.get('total_production') or orig_good)
             orig_reject = float(r.get('reject_qty') or max(0.0, orig_total - orig_good))
 
-            # Alpha Labs row
+            # Alpha Labs row (5,000 pcs completed)
             r_alpha = copy(r)
             r_alpha['customer'] = 'Alpha Labs PVT LTD'
             r_alpha['product_name'] = 'PET BOTTLE SMALL (130ML) TRANSPARENT'
@@ -951,12 +948,16 @@ def apply_october_alpha_labs_diversion(source_rows):
                 r_alpha[dt_key] = None
             new_rows.append(r_alpha)
 
-            # Remaining Mablay row (if any positive qty remains)
+            # Remaining Mablay row (4,200 pcs on Oct 1)
             rem_good = orig_good - needed
             rem_reject = max(0.0, orig_reject - 60.0)
             rem_total = rem_good + rem_reject
             if rem_good > 0 or rem_total > 0:
                 r_rem = copy(r)
+                r_rem['customer'] = 'Mablay Beauty PVT LTD.'
+                r_rem['product_name'] = 'PET BOTTLE SMALL (130ML) TRANSPARENT'
+                r_rem['pid'] = 8010
+                r_rem['dia'] = '130 ml'
                 r_rem['good_qty'] = rem_good
                 r_rem['reject_qty'] = rem_reject
                 r_rem['total_production'] = rem_total
@@ -965,37 +966,6 @@ def apply_october_alpha_labs_diversion(source_rows):
             diverted = True
         else:
             new_rows.append(r)
-
-    if not diverted and needed > 0:
-        inject_date = date(2026, 10, 1)
-        for r in source_rows:
-            if r.get('date'):
-                inject_date = r['date']
-                break
-
-        r_inject = {
-            'date': inject_date,
-            'machine': 'PF Machine',
-            'customer': 'Alpha Labs PVT LTD',
-            'product_name': 'PET BOTTLE SMALL (130ML) TRANSPARENT',
-            'dia': '130 ml',
-            'pid': 8019,
-            'good_qty': needed,
-            'reject_qty': 60.0,
-            'total_production': needed + 60.0,
-            'mechanical_dt': None,
-            'electrical_dt': None,
-            'material_shortage_dt': None,
-            'changeover_dt': None,
-            'operations_dt': None,
-            'power_shutdown_dt': None,
-            'gas_shutdown_dt': None,
-            'workers_shortage_dt': None,
-            'compressor_dt': None,
-            'order_not_avail_dt': None,
-            'original_name': 'PET BOTTLE SMALL (130 ML) (TRANSPARENT) (WITHOUT CAP)',
-        }
-        new_rows.append(r_inject)
 
     return new_rows
 
