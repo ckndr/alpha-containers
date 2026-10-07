@@ -18,6 +18,12 @@
       "dia": "25",
       "catalog_name": "TUBES COMMON RED",
       "pid": 6470
+    },
+    {
+      "raw_name": "vivid brown",
+      "dia": "35",
+      "catalog_name": "V- HC BROWN",
+      "pid": 6530
     }
   ],
   "fg_aliases": [
@@ -55,6 +61,13 @@
       "customer": "samsol",
       "catalog_name": "TUBES COMMON RED",
       "pid": 6470
+    },
+    {
+      "raw_name": "vivid brown",
+      "dia": "35",
+      "customer": "muhammad hashim khan",
+      "catalog_name": "V- HC BROWN",
+      "pid": 6530
     }
   ]
 }
