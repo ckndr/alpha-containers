@@ -5,11 +5,12 @@
 
   [INVENTORY: CRITICAL ITEMS (SLUG/RESIN) MISSING FROM ERP]
     (These rows are highlighted in RED in Excel and zeroed out)
-    • [NEW] Item ID 406 (30X4.5 S/M) [Slug] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • [PERSISTENT] Item ID 406 (30X4.5 S/M) [Slug] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
 
   [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
     (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
+    • Summary sheet dispatch difference for Tube Dispatch (MTD): Imran=110,432 vs Dashboard=130,662 (diff=+20,230) — Dashboard reflects authoritative ERP export; Imran sheet may have timing lag or unrecorded dispatch
     • Pending Order SKU difference for 'HELLO HAIR': Req diff=+310,582, Prod diff=+310,530, Bal diff=+52
     • Pending Order SKU difference for 'HOLA HAIR': Req diff=+27,664, Prod diff=+27,664, Bal diff=+0
-    • Pending Orders floor difference: Imran=559,252 vs MRP Scheduled=559,200 (diff=+52)
+    • Pending Orders floor difference: Imran=519,268 vs MRP Scheduled=519,216 (diff=+52)
 
