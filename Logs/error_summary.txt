@@ -11,5 +11,5 @@
     (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
     • Pending Order SKU difference for 'HELLO HAIR': Req diff=+310,582, Prod diff=+310,530, Bal diff=+52
     • Pending Order SKU difference for 'HOLA HAIR': Req diff=+27,664, Prod diff=+27,664, Bal diff=+0
-    • Pending Orders floor difference: Imran=509,700 vs MRP Scheduled=509,648 (diff=+52)
+    • Pending Orders floor difference: Imran=504,084 vs MRP Scheduled=504,032 (diff=+52)
 
