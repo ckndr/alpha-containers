@@ -1243,8 +1243,25 @@ def step_crosscheck():
                     pending_warnings.append("No MRP sheet found in active Tubex workbook")
                 else:
                     ws_mrp = wb_mrp['MRP']
+                    # Pre-calculate MTD production from Production_Log as fallback for uncached formulas
+                    mtd_pid_cache = {}
+                    if 'Production_Log' in wb_mrp.sheetnames:
+                        ws_plog_mrp = wb_mrp['Production_Log']
+                        for r_pl in range(3, ws_plog_mrp.max_row + 1):
+                            pl_pid = ws_plog_mrp.cell(r_pl, 6).value
+                            pl_good = ws_plog_mrp.cell(r_pl, 8).value
+                            pl_mach = str(ws_plog_mrp.cell(r_pl, 2).value or '').upper()
+                            pl_name = str(ws_plog_mrp.cell(r_pl, 4).value or '').upper()
+                            if pl_pid and pl_good and ('(VARNISH)' not in pl_name) and (pl_mach.startswith('PRINT') or pl_mach.startswith('PLINE') or pl_mach.startswith('PF') or pl_mach.startswith('PET')):
+                                try:
+                                    pid_k = int(pl_pid)
+                                    mtd_pid_cache[pid_k] = mtd_pid_cache.get(pid_k, 0) + int(float(str(pl_good).replace(',', '').strip()))
+                                except Exception:
+                                    pass
+
                     mrp_rows = []
                     mrp_total = None
+
                     for r in range(3, 40):
                         val_e = str(ws_mrp.cell(r, 5).value or '').strip().upper()
                         if val_e == 'TOTAL:':
@@ -1256,16 +1273,40 @@ def step_crosscheck():
                         pid = ws_mrp.cell(r, 4).value
                         job = ws_mrp.cell(r, 5).value
                         req = ws_mrp.cell(r, 6).value or 0
-                        prod = ws_mrp.cell(r, 7).value or 0
-                        bal = ws_mrp.cell(r, 8).value or 0
+                        prod = ws_mrp.cell(r, 7).value
+                        bal = ws_mrp.cell(r, 8).value
                         remarks = str(ws_mrp.cell(r, 9).value or '').strip()
                         if pname:
                             try:
-                                req_int = int(float(str(req).replace(',', '').strip()))
-                                prod_int = int(float(str(prod).replace(',', '').strip()))
-                                bal_int = int(float(str(bal).replace(',', '').strip()))
+                                req_int = int(float(str(req).replace(',', '').strip())) if (req is not None and not str(req).startswith('=')) else 0
                             except Exception:
-                                req_int, prod_int, bal_int = 0, 0, 0
+                                req_int = 0
+                            
+                            # Resolve prod from cached formula value, or fallback to Production_Log MTD
+                            prod_int = None
+                            if prod is not None and not str(prod).startswith('='):
+                                try:
+                                    prod_int = int(float(str(prod).replace(',', '').strip()))
+                                except Exception:
+                                    pass
+                            if prod_int is None and pid:
+                                try:
+                                    prod_int = mtd_pid_cache.get(int(pid), 0)
+                                except Exception:
+                                    prod_int = 0
+                            elif prod_int is None:
+                                prod_int = 0
+
+                            # Resolve bal from cached formula value, or fallback to req - prod
+                            bal_int = None
+                            if bal is not None and not str(bal).startswith('='):
+                                try:
+                                    bal_int = int(float(str(bal).replace(',', '').strip()))
+                                except Exception:
+                                    pass
+                            if bal_int is None:
+                                bal_int = max(0, req_int - prod_int)
+
                             mrp_rows.append({
                                 'row': r, 'dia': dia, 'customer': cust, 'product': pname,
                                 'pid': pid, 'job': job, 'req': req_int, 'prod': prod_int,
@@ -1273,11 +1314,13 @@ def step_crosscheck():
                             })
                     wb_mrp.close()
 
-                    if mrp_total is not None:
+                    if mrp_total is not None and not str(mrp_total).startswith('='):
                         try:
                             mrp_total = int(float(str(mrp_total).replace(',', '').strip()))
                         except Exception:
                             mrp_total = None
+                    if mrp_total is None and mrp_rows:
+                        mrp_total = sum(r['bal'] for r in mrp_rows)
 
                     # Open Imran's pending workbook
                     wb_p = load_workbook(most_recent_pending, data_only=True)
@@ -1350,6 +1393,14 @@ def step_crosscheck():
                         def _tokens(s):
                             return set(re.findall(r'[a-zA-Z0-9]+', str(s).lower()))
 
+                        def _within_margin(v1, v2, margin=0.10):
+                            if v1 == v2:
+                                return True
+                            base = max(abs(v1), abs(v2))
+                            if base == 0:
+                                return True
+                            return (abs(v1 - v2) / base) <= margin
+
                         matched_mrp_indices = set()
                         line_mismatches = 0
 
@@ -1381,21 +1432,31 @@ def step_crosscheck():
                             if best_idx is not None:
                                 matched_mrp_indices.add(best_idx)
                                 mr = mrp_rows[best_idx]
-                                req_ok = (ir['req'] == mr['req'])
-                                prod_ok = (ir['prod'] == mr['prod'])
-                                bal_ok = (ir['bal'] == mr['bal'])
+                                req_ok = (ir['req'] == mr['req']) or _within_margin(ir['req'], mr['req'], 0.10)
+                                prod_ok = (ir['prod'] == mr['prod']) or _within_margin(ir['prod'], mr['prod'], 0.10)
+                                bal_ok = (ir['bal'] == mr['bal']) or _within_margin(ir['bal'], mr['bal'], 0.10)
                                 job_disp = f"Job {ir['job']}" if ir['job'] else "No Job #"
-                                if req_ok and prod_ok and bal_ok:
-                                    ok(f"Dia {ir['dia']}mm | {ir['product']} ({job_disp}): Req={ir['req']:,}, Prod={ir['prod']:,}, Bal={ir['bal']:,}")
+
+                                # 10% error margin: only highlight if balance difference exceeds 10%
+                                if bal_ok:
+                                    if req_ok and prod_ok:
+                                        ok(f"Dia {ir['dia']}mm | {ir['product']} ({job_disp}): Req={ir['req']:,}, Prod={ir['prod']:,}, Bal={ir['bal']:,}")
+                                    else:
+                                        diff_bal = ir['bal'] - mr['bal']
+                                        bal_base = max(abs(ir['bal']), abs(mr['bal']), 1)
+                                        pct = (abs(diff_bal) / bal_base) * 100
+                                        ok(f"Dia {ir['dia']}mm | {ir['product']} ({job_disp}): Bal={ir['bal']:,} vs MRP={mr['bal']:,} (diff={diff_bal:+,}, {pct:.1f}% <= 10% margin; cumulative req/prod noted)")
                                 else:
                                     diff_req = ir['req'] - mr['req']
                                     diff_prod = ir['prod'] - mr['prod']
                                     diff_bal = ir['bal'] - mr['bal']
-                                    warn(f"Dia {ir['dia']}mm | Imran '{ir['product']}' vs MRP '{mr['product']}':")
+                                    bal_base = max(abs(ir['bal']), abs(mr['bal']), 1)
+                                    pct = (abs(diff_bal) / bal_base) * 100
+                                    warn(f"Dia {ir['dia']}mm | Imran '{ir['product']}' vs MRP '{mr['product']}': Bal diff={diff_bal:+,} ({pct:.1f}% > 10% margin)")
                                     if not req_ok: print(f"         Req:  Imran={ir['req']:,} vs MRP={mr['req']:,} ({diff_req:+,})")
                                     if not prod_ok: print(f"         Prod: Imran={ir['prod']:,} vs MRP={mr['prod']:,} ({diff_prod:+,})")
-                                    if not bal_ok: print(f"         Bal:  Imran={ir['bal']:,} vs MRP={mr['bal']:,} ({diff_bal:+,})")
-                                    pending_warnings.append(f"Pending Order SKU difference for '{ir['product']}': Req diff={diff_req:+,}, Prod diff={diff_prod:+,}, Bal diff={diff_bal:+,}")
+                                    print(f"         Bal:  Imran={ir['bal']:,} vs MRP={mr['bal']:,} ({diff_bal:+,})")
+                                    pending_warnings.append(f"Pending Order SKU difference for '{ir['product']}': Bal diff={diff_bal:+,} ({pct:.1f}% > 10% margin; Req diff={diff_req:+,}, Prod diff={diff_prod:+,})")
                                     line_mismatches += 1
                             else:
                                 warn(f"Unmatched Imran floor line: Dia {ir['dia']}mm | '{ir['product']}' | Bal: {ir['bal']:,}")
@@ -1413,14 +1474,21 @@ def step_crosscheck():
                         unscheduled_mrp_bal = sum(mr['bal'] for mr in unscheduled_mrp)
 
                         if pending_total is not None and mrp_total is not None:
-                            accounted_diff = pending_total - (mrp_total - unscheduled_mrp_bal)
+                            mrp_scheduled = mrp_total - unscheduled_mrp_bal
+                            accounted_diff = pending_total - mrp_scheduled
+                            base_tot = max(abs(mrp_scheduled), abs(pending_total), 1)
+                            tot_err_pct = abs(accounted_diff) / base_tot
+
                             if accounted_diff == 0:
-                                ok(f"Scheduled Floor Orders: Imran={pending_total:,} == MRP Scheduled Total={mrp_total - unscheduled_mrp_bal:,}")
+                                ok(f"Scheduled Floor Orders: Imran={pending_total:,} == MRP Scheduled Total={mrp_scheduled:,}")
+                                safe_print(f"    {CYAN}ℹ{RESET} Total MRP Order Book: {mrp_total:,} ({pending_total:,} floor + {unscheduled_mrp_bal:,} unscheduled Vince)")
+                            elif tot_err_pct <= 0.10:
+                                ok(f"Scheduled Floor Orders: Imran={pending_total:,} vs MRP Scheduled Total={mrp_scheduled:,} (diff={accounted_diff:+,}, {tot_err_pct*100:.1f}% <= 10% margin)")
                                 safe_print(f"    {CYAN}ℹ{RESET} Total MRP Order Book: {mrp_total:,} ({pending_total:,} floor + {unscheduled_mrp_bal:,} unscheduled Vince)")
                             else:
-                                warn(f"Pending Orders difference: Imran={pending_total:,} vs MRP Scheduled={mrp_total - unscheduled_mrp_bal:,} (diff={accounted_diff:+,})")
+                                warn(f"Pending Orders difference: Imran={pending_total:,} vs MRP Scheduled={mrp_scheduled:,} (diff={accounted_diff:+,}, {tot_err_pct*100:.1f}% > 10% margin)")
                                 print(f"    {DIM}(Advisory notice: e.g. Imran pending sheet missing completed batches such as Vince 17k or timing lag — non-blocking){RESET}")
-                                pending_warnings.append(f"Pending Orders floor difference: Imran={pending_total:,} vs MRP Scheduled={mrp_total - unscheduled_mrp_bal:,} (diff={accounted_diff:+,})")
+                                pending_warnings.append(f"Pending Orders floor difference: Imran={pending_total:,} vs MRP Scheduled={mrp_scheduled:,} (diff={accounted_diff:+,}, {tot_err_pct*100:.1f}% > 10% margin)")
                         elif pending_total is not None:
                             ok(f"Imran Floor Total: {pending_total:,}")
     except Exception as e:

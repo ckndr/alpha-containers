@@ -3,13 +3,7 @@
   ║  ⚠ DAILY WORKFLOW ERROR & ADVISORY SUMMARY               ║
   ╚══════════════════════════════════════════════════════════╝
 
-  [INVENTORY: CRITICAL ITEMS (SLUG/RESIN) MISSING FROM ERP]
-    (These rows are highlighted in RED in Excel and zeroed out)
-    • [PERSISTENT] Item ID 406 (30X4.5 S/M) [Slug] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
-
   [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
     (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
-    • Pending Order SKU difference for 'HELLO HAIR': Req diff=+310,582, Prod diff=+310,530, Bal diff=+52
-    • Pending Order SKU difference for 'HOLA HAIR': Req diff=+27,664, Prod diff=+27,664, Bal diff=+0
-    • Pending Orders floor difference: Imran=504,084 vs MRP Scheduled=504,032 (diff=+52)
+    • Summary sheet dispatch difference for Tube Dispatch (MTD): Imran=161,636 vs Dashboard=150,404 (diff=-11,232) — Dashboard reflects authoritative ERP export; Imran sheet may have timing lag or unrecorded dispatch
 

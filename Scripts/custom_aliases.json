@@ -1,5 +1,8 @@
 {
   "_comment": "Custom product aliases for Tubex logs. Add or edit entries here.",
+  "inactive_inventory_items": [
+    406
+  ],
   "production_aliases": [
     {
       "raw_name": "yellow small",

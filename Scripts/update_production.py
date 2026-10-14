@@ -1296,6 +1296,186 @@ def write_fg_stock(ac_path, fg_rows, latest_date):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# PET SHIFTS AUTO-UPDATE (DASHBOARD CELL L8)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def resolve_shift_string(val):
+    """
+    Map column H value (minutes, hours, shift count, or label) from PF Machine
+    to shift display string:
+      - Single shift: A (8)
+      - Double shift: A+B (8+8)
+      - Triple shift: A+B+C (8+8+8)
+    """
+    if val is None:
+        return None
+
+    # Text representations
+    if isinstance(val, str):
+        s = val.strip().lower()
+        if any(k in s for k in ['a+b+c', 'triple', '8+8+8', '3 shift', 'three shift']):
+            return "A+B+C (8+8+8)"
+        elif any(k in s for k in ['a+b', 'double', '8+8', '2 shift', 'two shift']):
+            return "A+B (8+8)"
+        elif any(k in s for k in ['single', '1 shift', 'one shift']) or s in ('a', '8'):
+            return "A (8)"
+        try:
+            val = float(s)
+        except ValueError:
+            return None
+
+    try:
+        num = float(val)
+    except (ValueError, TypeError):
+        return None
+
+    # Shift count (1, 2, 3)
+    if 0.5 <= num <= 3.5:
+        if num <= 1.5:
+            return "A (8)"
+        elif num <= 2.5:
+            return "A+B (8+8)"
+        else:
+            return "A+B+C (8+8+8)"
+
+    # Operating hours (e.g. 8, 16, 24)
+    if 4.0 <= num <= 30.0:
+        if num <= 12.0:
+            return "A (8)"
+        elif num <= 20.0:
+            return "A+B (8+8)"
+        else:
+            return "A+B+C (8+8+8)"
+
+    # Operating minutes (e.g. 480, 540, 960, 1440)
+    if num > 30.0:
+        if num <= 720.0:  # <= 12 hours (e.g. 480 mins)
+            return "A (8)"
+        elif num <= 1200.0:  # <= 20 hours (e.g. 960 mins)
+            return "A+B (8+8)"
+        else:  # > 20 hours (e.g. 1440 mins)
+            return "A+B+C (8+8+8)"
+
+    return None
+
+
+def update_pet_shifts(ac_path, prod_path):
+    """
+    Reads daywise production sheet (column H) of PF machine only from Production.xlsx,
+    resolves the latest day's shift:
+      - single shift A (8)
+      - Double A+B (8+8)
+      - triple A+B+C (8+8+8)
+    and auto-updates cell L8 in Tubex_Dashboard sheet of the active workbook.
+    """
+    import pandas as pd
+    from openpyxl.styles import Font, PatternFill, Alignment
+    from alpha_checks import atomic_save
+
+    if not os.path.exists(prod_path) or not os.path.exists(ac_path):
+        return None
+
+    try:
+        header_row = detect_header_row(prod_path)
+        df = pd.read_excel(prod_path, sheet_name='Production Day wise', skiprows=header_row)
+    except Exception as e:
+        print(f"  [!] Warning: Could not read Production Day wise for PET Shifts: {e}")
+        return None
+
+    # Locate Date, Machines, and Actual Time columns
+    date_col = None
+    machine_col = None
+    actual_time_col = None
+
+    for c in df.columns:
+        c_str = str(c).strip().lower()
+        if c_str in ('date', '`'):
+            date_col = c
+        elif 'machine' in c_str:
+            machine_col = c
+        elif 'actual' in c_str or c_str == 'actual time':
+            actual_time_col = c
+
+    # Fallback to column H (8th column, index 7) if header not found
+    if actual_time_col is None and len(df.columns) >= 8:
+        actual_time_col = df.columns[7]
+
+    if not machine_col or not actual_time_col:
+        print("  [!] Warning: Could not identify Machine or Actual Time (Col H) column in Production.xlsx")
+        return None
+
+    # Filter for PF machine rows
+    pf_mask = df[machine_col].astype(str).str.lower().str.contains(r'\bpf\b', regex=True)
+    df_pf = df[pf_mask].copy()
+
+    if df_pf.empty:
+        pf_mask = df[machine_col].astype(str).str.lower().str.contains('pf')
+        df_pf = df[pf_mask].copy()
+
+    if df_pf.empty:
+        print("  [!] Notice: No PF machine rows found in Production Day wise.")
+        return None
+
+    # Determine latest date entry for PF machine
+    if date_col and date_col in df_pf.columns:
+        df_pf['_parsed_date'] = pd.to_datetime(df_pf[date_col], dayfirst=True, errors='coerce')
+        valid_dates = df_pf.dropna(subset=['_parsed_date'])
+        if not valid_dates.empty:
+            latest_dt = valid_dates['_parsed_date'].max()
+            latest_rows = valid_dates[valid_dates['_parsed_date'] == latest_dt]
+        else:
+            latest_rows = df_pf.tail(1)
+            latest_dt = None
+    else:
+        latest_rows = df_pf.tail(1)
+        latest_dt = None
+
+    # Sum actual time for PF machine on the latest date (in case of split shifts / products)
+    raw_vals = latest_rows[actual_time_col].dropna().tolist()
+    if not raw_vals:
+        print("  [!] Notice: No Actual Time recorded for PF machine on latest date.")
+        return None
+
+    try:
+        total_time = sum(float(v) for v in raw_vals)
+    except Exception:
+        total_time = raw_vals[-1]
+
+    shift_str = resolve_shift_string(total_time)
+    if not shift_str:
+        print(f"  [!] Warning: Could not resolve shift from PF machine Actual Time: {total_time}")
+        return None
+
+    dt_disp = latest_dt.strftime('%d-%b-%Y') if latest_dt else "latest entry"
+
+    # Write to Tubex_Dashboard cell L8
+    try:
+        wb = openpyxl.load_workbook(ac_path)
+        if 'Tubex_Dashboard' not in wb.sheetnames:
+            print("  [!] Warning: Tubex_Dashboard sheet not found in active workbook.")
+            wb.close()
+            return None
+
+        ws_dash = wb['Tubex_Dashboard']
+        ws_dash['L8'].value = shift_str
+        ws_dash['L8'].font = Font(name="Segoe UI", size=18, bold=True, color="FFFFFFFF")
+        ws_dash['L8'].fill = PatternFill(start_color="FF1F6B75", end_color="FF1F6B75", fill_type="solid")
+        ws_dash['L8'].alignment = Alignment(horizontal="center", vertical="center")
+
+        atomic_save(wb, ac_path)
+        wb.close()
+        msg = f"  ✓ PET Shifts (Dashboard L8) updated: '{shift_str}' (PF Machine on {dt_disp}: {total_time})"
+        try:
+            print(msg)
+        except UnicodeEncodeError:
+            print(msg.replace('✓', 'OK'))
+        return shift_str
+    except Exception as e:
+        print(f"  [!] Warning: Could not update cell L8 in Tubex_Dashboard: {e}")
+        return None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 
 def main():
     print("\n" + "="*60)
@@ -1365,6 +1545,9 @@ def main():
         print(f"  FG Stock written: {fg_written} rows  (date: {fg_date})")
     else:
         print("  No FG Stock rows — sheet not updated.")
+
+    print("\n[PET Shifts] Updating Dashboard cell L8 from PF Machine actual time...")
+    update_pet_shifts(ac_path, prod_path)
 
     print("  Saved:   " + os.path.basename(ac_path))
 

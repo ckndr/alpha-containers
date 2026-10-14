@@ -327,4 +327,22 @@ def atomic_save(wb, target_path):
         raise
 
 
+def get_inactive_inventory_items():
+    """
+    Returns a set of integer item IDs configured as inactive in custom_aliases.json.
+    """
+    import json
+    cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "custom_aliases.json")
+    if os.path.exists(cfg_path):
+        try:
+            with open(cfg_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            items = data.get("inactive_inventory_items", [])
+            return {int(x) for x in items if str(x).isdigit() or isinstance(x, (int, float))}
+        except Exception:
+            pass
+    return set()
+
+
+
 

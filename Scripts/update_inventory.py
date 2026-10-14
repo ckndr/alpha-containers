@@ -54,7 +54,7 @@ warnings.filterwarnings("ignore", message=".*extension.*")
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import Font
-from alpha_checks import check_freshness, check_not_locked, log_mismatches, replace_copy_export, get_active_tubex_file
+from alpha_checks import check_freshness, check_not_locked, log_mismatches, replace_copy_export, get_active_tubex_file, get_inactive_inventory_items
 
 # Scripts live in Tubex/Scripts/
 # Excel and ERP files live in Tubex/ (one level up)
@@ -296,7 +296,7 @@ def update_excel(excel_path, xls_items, date_range):
             
             # Clear the inactive note in Column K (11) if it exists
             k_cell = ws.cell(row=row, column=11)
-            if k_cell.value == "Not active in ERP":
+            if k_cell.value in ("Not active in ERP", "Inactive (Not in use)"):
                 k_cell.value = ""
 
             if any(_n(old[i]) != new[i] for i in range(3)):
@@ -316,6 +316,8 @@ def update_excel(excel_path, xls_items, date_range):
         if is_slug:
             new_critical_slugs.append((item_id, name, bal, uom, cat))
 
+    inactive_item_ids = get_inactive_inventory_items()
+
     # Find missing items (present in Inventory sheet but missing from new inventory.xls)
     missing_items = []
     missing_critical = []
@@ -325,10 +327,12 @@ def update_excel(excel_path, xls_items, date_range):
             cat_val = str(ws.cell(row=row, column=2).value or '').strip()
             missing_items.append((item_id, name_val, cat_val))
             
-            # Identify Slugs or Resin as critical items for warnings
+            is_inactive_cfg = (item_id in inactive_item_ids)
+
+            # Identify Slugs or Resin as critical items for warnings ONLY if not acknowledged inactive
             c_low = cat_val.lower()
             n_low = name_val.lower()
-            if 'slug' in c_low or 'resin' in c_low or 'slug' in n_low or 'resin' in n_low:
+            if not is_inactive_cfg and ('slug' in c_low or 'resin' in c_low or 'slug' in n_low or 'resin' in n_low):
                 missing_critical.append((item_id, name_val, cat_val))
 
             # ZERO OUT VALUES TO PREVENT PHANTOM STOCK (Rule R1-02 / AUDIT_NOTES.md:
@@ -337,20 +341,32 @@ def update_excel(excel_path, xls_items, date_range):
             ws.cell(row=row, column=6).value = 0.0
             ws.cell(row=row, column=7).value = 0.0
 
-            # Set font color to RED for visibility
-            for col in range(1, 12):
-                cell = ws.cell(row=row, column=col)
-                curr_font = cell.font
-                cell.font = Font(
-                    name=curr_font.name if curr_font else "Segoe UI",
-                    size=curr_font.size if curr_font else 9,
-                    bold=curr_font.bold if curr_font else False,
-                    italic=curr_font.italic if curr_font else False,
-                    color="FFFF0000"
-                )
-
-            # Note in Column K that this item is inactive
-            ws.cell(row=row, column=11).value = "Not active in ERP"
+            if is_inactive_cfg:
+                # Muted font for configured inactive items so they don't look like errors
+                for col in range(1, 12):
+                    cell = ws.cell(row=row, column=col)
+                    curr_font = cell.font
+                    cell.font = Font(
+                        name=curr_font.name if curr_font else "Segoe UI",
+                        size=curr_font.size if curr_font else 9,
+                        bold=curr_font.bold if curr_font else False,
+                        italic=True,
+                        color="FF888888"
+                    )
+                ws.cell(row=row, column=11).value = "Inactive (Not in use)"
+            else:
+                # Set font color to RED for visibility of unexpected missing items
+                for col in range(1, 12):
+                    cell = ws.cell(row=row, column=col)
+                    curr_font = cell.font
+                    cell.font = Font(
+                        name=curr_font.name if curr_font else "Segoe UI",
+                        size=curr_font.size if curr_font else 9,
+                        bold=curr_font.bold if curr_font else False,
+                        italic=curr_font.italic if curr_font else False,
+                        color="FFFF0000"
+                    )
+                ws.cell(row=row, column=11).value = "Not active in ERP"
 
     # Ensure header in K2 is set
     ws.cell(row=2, column=11).value = "Status / Remarks"

@@ -38,7 +38,7 @@ warnings.filterwarnings("ignore", message=".*Data Validation.*")
 warnings.filterwarnings("ignore", message=".*extension.*")
 
 from openpyxl import load_workbook
-from alpha_checks import get_active_tubex_file
+from alpha_checks import get_active_tubex_file, get_inactive_inventory_items
 
 # Scripts live in Tubex/Scripts/
 # Excel files live in Tubex/ (one level up)
@@ -122,13 +122,19 @@ def build_slug_map(ws):
                 except (ValueError, TypeError):
                     pass
 
+    inactive_item_ids = get_inactive_inventory_items()
     slug_map = {}
     for r in range(INV_DATA_START, ws.max_row + 1):
         if str(ws.cell(r, INV_CAT_COL).value or '').strip().upper() != 'SLUG':
             continue
+        item_id = ws.cell(r, INV_ID_COL).value
+        try:
+            if item_id is not None and int(float(str(item_id))) in inactive_item_ids:
+                continue
+        except (ValueError, TypeError):
+            pass
         name    = ws.cell(r, INV_NAME_COL).value
         issued  = ws.cell(r, INV_ISSUED_COL).value or 0
-        item_id = ws.cell(r, INV_ID_COL).value
         in_bom  = False
         if item_id is not None:
             try:

@@ -96,7 +96,14 @@ def build_dashboard_archive(available_months):
     kpi_data = {}
 
     try:
-        xl = win32com.client.DispatchEx("Excel.Application")
+        try:
+            xl = win32com.client.DispatchEx("Excel.Application")
+        except AttributeError:
+            gen_path = getattr(win32com, '__gen_path__', None)
+            if gen_path and os.path.exists(gen_path):
+                shutil.rmtree(gen_path)
+            xl = win32com.client.DispatchEx("Excel.Application")
+
         xl.Visible          = False
         xl.DisplayAlerts    = False
         xl.AskToUpdateLinks = False
