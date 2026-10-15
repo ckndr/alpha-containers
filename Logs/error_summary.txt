@@ -5,5 +5,5 @@
 
   [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
     (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
-    • Summary sheet dispatch difference for Tube Dispatch (MTD): Imran=161,636 vs Dashboard=150,404 (diff=-11,232) — Dashboard reflects authoritative ERP export; Imran sheet may have timing lag or unrecorded dispatch
+    • Unmatched Imran floor line in PENDING ORDER SEPTEMBER 2026.xlsx: 'SAMSOL COMMON RED' (Bal: 30,000)
 
