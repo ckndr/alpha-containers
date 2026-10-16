@@ -1,9 +1,2 @@
 
-  ╔══════════════════════════════════════════════════════════╗
-  ║  ⚠ DAILY WORKFLOW ERROR & ADVISORY SUMMARY               ║
-  ╚══════════════════════════════════════════════════════════╝
-
-  [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
-    (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
-    • Unmatched Imran floor line in PENDING ORDER SEPTEMBER 2026.xlsx: 'SAMSOL COMMON RED' (Bal: 30,000)
-
+  ✓ ALL CHECKS PASSED: No errors, missing items, or mismatches detected!
