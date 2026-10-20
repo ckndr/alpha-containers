@@ -1,9 +1,2 @@
 
-  ╔══════════════════════════════════════════════════════════╗
-  ║  ⚠ DAILY WORKFLOW ERROR & ADVISORY SUMMARY               ║
-  ╚══════════════════════════════════════════════════════════╝
-
-  [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
-    (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
-    • Summary sheet dispatch difference for PET Dispatch (MTD): Imran=25,490 vs Dashboard=42,970 (diff=+17,480) — Dashboard reflects authoritative ERP export; Imran sheet may have timing lag or unrecorded dispatch
-
+  ✓ ALL CHECKS PASSED: No errors, missing items, or mismatches detected!
