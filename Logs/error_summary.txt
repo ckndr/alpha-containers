@@ -1,2 +1,19 @@
 
-  ✓ ALL CHECKS PASSED: No errors, missing items, or mismatches detected!
+  ╔══════════════════════════════════════════════════════════╗
+  ║  ⚠ DAILY WORKFLOW ERROR & ADVISORY SUMMARY               ║
+  ╚══════════════════════════════════════════════════════════╝
+
+  [INVENTORY: CRITICAL NEW SLUG DETECTED IN ERP BUT NOT IN EXCEL]
+    Slug is a critical item! The following SLUG was found in ERP inventory.xls but is MISSING from the Excel file:
+    • New SLUG in ERP not in Excel: Item ID 2 (30X4.3) [Category: SLUG, Balance: 0.0 KGS]
+    • New SLUG in ERP not in Excel: Item ID 2813 (SLUG 25X4.5) [Category: SLUG, Balance: 0.0 KGS]
+    • New SLUG in ERP not in Excel: Item ID 6961 (32X5.2) [Category: SLUG, Balance: 0.0 KG]
+    Action Required: Add this Item ID to Tubex_*.xlsx (Inventory, MRP, and BOM) immediately.
+
+  [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
+    (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
+    • Summary sheet dispatch difference for Tube Dispatch (MTD): Imran=340,595 vs Dashboard=290,377 (diff=-50,218) — Dashboard reflects authoritative ERP export; Imran sheet may have timing lag or unrecorded dispatch
+    • Pending Order SKU difference for 'VINCE HIS BEARED': Bal diff=+22,440 (102.0% > 10% margin; Req diff=+0, Prod diff=-22,440)
+    • Pending Order SKU difference for 'HELLO HAIR': Bal diff=+30,894 (12.5% > 10% margin; Req diff=+310,582, Prod diff=+279,688)
+    • Pending Orders floor difference: Imran=405,470 vs MRP Scheduled=360,232 (diff=+45,238, 11.2% > 10% margin)
+

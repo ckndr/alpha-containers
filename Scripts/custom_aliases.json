@@ -27,6 +27,18 @@
       "dia": "35",
       "catalog_name": "V- HC BROWN",
       "pid": 6530
+    },
+    {
+      "raw_name": "vivid black",
+      "dia": "35",
+      "catalog_name": "V-HC BLACK",
+      "pid": 6531
+    },
+    {
+      "raw_name": "tubes men",
+      "dia": "25",
+      "catalog_name": "TUBES MEN BLUE",
+      "pid": 6506
     }
   ],
   "fg_aliases": [
@@ -71,6 +83,20 @@
       "customer": "muhammad hashim khan",
       "catalog_name": "V- HC BROWN",
       "pid": 6530
+    },
+    {
+      "raw_name": "vivid black",
+      "dia": "35",
+      "customer": "muhammad hashim khan",
+      "catalog_name": "V-HC BLACK",
+      "pid": 6531
+    },
+    {
+      "raw_name": "tubes men",
+      "dia": "25",
+      "customer": "samsol",
+      "catalog_name": "TUBES MEN BLUE",
+      "pid": 6506
     }
   ]
 }
