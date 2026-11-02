@@ -1,2 +1,15 @@
 
-  ✓ ALL CHECKS PASSED: No errors, missing items, or mismatches detected!
+  ╔══════════════════════════════════════════════════════════╗
+  ║  ⚠ DAILY WORKFLOW ERROR & ADVISORY SUMMARY               ║
+  ╚══════════════════════════════════════════════════════════╝
+
+  [INVENTORY: CRITICAL NEW SLUG DETECTED IN ERP BUT NOT IN EXCEL]
+    Slug is a critical item! The following SLUG was found in ERP inventory.xls but is MISSING from the Excel file:
+    • New SLUG in ERP not in Excel: Item ID 6961 (32X5.2) [Category: SLUG, Balance: 0.0 KG]
+    Action Required: Add this Item ID to Tubex_*.xlsx (Inventory, MRP, and BOM) immediately.
+
+  [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
+    (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
+    • Production.xlsx data is from previous month (10). Machine total comparison deferred.
+    • Summary sheet 'Summary 28-10-2026' is from previous month (10). KPI comparison deferred.
+

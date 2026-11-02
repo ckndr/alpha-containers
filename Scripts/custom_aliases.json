@@ -39,6 +39,12 @@
       "dia": "25",
       "catalog_name": "TUBES MEN BLUE",
       "pid": 6506
+    },
+    {
+      "raw_name": "vivid h,c",
+      "dia": "35",
+      "catalog_name": "V- HC BROWN",
+      "pid": 6530
     }
   ],
   "fg_aliases": [
@@ -97,6 +103,13 @@
       "customer": "samsol",
       "catalog_name": "TUBES MEN BLUE",
       "pid": 6506
+    },
+    {
+      "raw_name": "vivid h,c",
+      "dia": "35",
+      "customer": "muhammad hashim khan",
+      "catalog_name": "V- HC BROWN",
+      "pid": 6530
     }
   ]
 }

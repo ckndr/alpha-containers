@@ -299,6 +299,34 @@ def roll_new_month(month_str, year_val, dry_run=False, root_dir=None):
         if ws_fg.max_row >= 4:
             ws_fg.delete_rows(4, ws_fg.max_row - 3)
 
+    # Update MRP section titles to new month
+    if 'MRP' in wb.sheetnames:
+        ws_mrp = wb['MRP']
+        for r in range(1, ws_mrp.max_row + 1):
+            val = ws_mrp.cell(r, 1).value
+            if val and isinstance(val, str):
+                v_up = val.upper()
+                if "TUBE REQUIRED ORDERS" in v_up or "REQUIRED ORDERS" in v_up:
+                    ws_mrp.cell(r, 1).value = f"{full_month.upper()} {y} Tube Required Orders"
+                elif "TUBES MATERIAL REQUIREMENT PLAN" in v_up:
+                    ws_mrp.cell(r, 1).value = f"{full_month.upper()} TUBES MATERIAL REQUIREMENT PLAN"
+                elif "PET REQUIRED PET ORDERS" in v_up or ("PET" in v_up and "REQUIRED" in v_up and "ORDERS" in v_up):
+                    ws_mrp.cell(r, 1).value = f"{full_month.upper()} {y} PET Required Pet Orders"
+                elif "PET MATERIAL REQUIREMENT PLAN" in v_up:
+                    ws_mrp.cell(r, 1).value = f"{full_month.upper()} PET MATERIAL REQUIREMENT PLAN"
+
+    # Update Inventory section titles to new month
+    if 'Inventory' in wb.sheetnames:
+        ws_inv = wb['Inventory']
+        for r in range(1, min(25, ws_inv.max_row + 1)):
+            val = ws_inv.cell(r, 1).value
+            if val and isinstance(val, str):
+                v_up = val.upper()
+                if "SLUGS INVENTORY" in v_up:
+                    ws_inv.cell(r, 1).value = f"Slugs Inventory — {full_month} {y} MONTH TO DATE "
+                elif "INVENTORY —" in v_up or "INVENTORY -" in v_up:
+                    ws_inv.cell(r, 1).value = f"Inventory — {full_month} {y} Month to Date"
+
     # Step 5 & 6 prep: Reset Dashboard orders/dispatch references
     if 'Tubex_Dashboard' in wb.sheetnames:
         ws_dash = wb['Tubex_Dashboard']
