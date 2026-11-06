@@ -5,11 +5,11 @@
 
   [INVENTORY: CRITICAL NEW SLUG DETECTED IN ERP BUT NOT IN EXCEL]
     Slug is a critical item! The following SLUG was found in ERP inventory.xls but is MISSING from the Excel file:
-    • New SLUG in ERP not in Excel: Item ID 6961 (32X5.2) [Category: SLUG, Balance: 0.0 KG]
+    • New SLUG in ERP not in Excel: Item ID 4077 (25X5.0) [Category: SLUG, Balance: 96.74 KG]
     Action Required: Add this Item ID to Tubex_*.xlsx (Inventory, MRP, and BOM) immediately.
 
-  [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
-    (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
-    • Production.xlsx data is from previous month (10). Machine total comparison deferred.
-    • Summary sheet 'Summary 28-10-2026' is from previous month (10). KPI comparison deferred.
+  [INVENTORY: CRITICAL ITEMS (SLUG/RESIN) MISSING FROM ERP]
+    (These rows are highlighted in RED in Excel and zeroed out)
+    • [URGENT] [NEW] Item ID 3503 (35X5.0) [Slug] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • [URGENT] [NEW] Item ID 3597 (SLUG 30X4.8) [Slug] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
 
