@@ -45,6 +45,12 @@
       "dia": "35",
       "catalog_name": "V- HC BROWN",
       "pid": 6530
+    },
+    {
+      "raw_name": "helloa hair",
+      "dia": "30",
+      "catalog_name": "HELLO HAIR COLOR",
+      "pid": 6206
     }
   ],
   "fg_aliases": [
@@ -110,6 +116,13 @@
       "customer": "muhammad hashim khan",
       "catalog_name": "V- HC BROWN",
       "pid": 6530
+    },
+    {
+      "raw_name": "helloa hair",
+      "dia": "30",
+      "customer": "golden pearl",
+      "catalog_name": "HELLO HAIR COLOR",
+      "pid": 6206
     }
   ]
 }

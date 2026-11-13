@@ -3,13 +3,13 @@
   ║  ⚠ DAILY WORKFLOW ERROR & ADVISORY SUMMARY               ║
   ╚══════════════════════════════════════════════════════════╝
 
-  [INVENTORY: CRITICAL NEW SLUG DETECTED IN ERP BUT NOT IN EXCEL]
-    Slug is a critical item! The following SLUG was found in ERP inventory.xls but is MISSING from the Excel file:
-    • New SLUG in ERP not in Excel: Item ID 4077 (25X5.0) [Category: SLUG, Balance: 96.74 KG]
-    Action Required: Add this Item ID to Tubex_*.xlsx (Inventory, MRP, and BOM) immediately.
-
   [INVENTORY: CRITICAL ITEMS (SLUG/RESIN) MISSING FROM ERP]
     (These rows are highlighted in RED in Excel and zeroed out)
-    • [URGENT] [NEW] Item ID 3503 (35X5.0) [Slug] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
-    • [URGENT] [NEW] Item ID 3597 (SLUG 30X4.8) [Slug] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • [URGENT] [PERSISTENT] Item ID 3503 (35X5.0) [Slug] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+    • [URGENT] [PERSISTENT] Item ID 3597 (SLUG 30X4.8) [Slug] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
+
+  [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
+    (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
+    • Pending Order SKU difference for 'SAMSOL COMMON RED': Bal diff=+31,920 (106.4% > 10% margin; Req diff=+0, Prod diff=-31,920)
+    • Pending Orders floor difference: Imran=356,564 vs MRP Scheduled=320,332 (diff=+36,232, 10.2% > 10% margin)
 
