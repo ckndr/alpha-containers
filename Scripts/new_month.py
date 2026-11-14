@@ -48,7 +48,7 @@ fallback_scripts = os.path.join(r"D:\Alpha", "Scripts")
 if os.path.exists(fallback_scripts) and fallback_scripts not in sys.path:
     sys.path.insert(0, fallback_scripts)
 
-from alpha_checks import get_active_tubex_file, check_not_locked, atomic_save, _FULL_MONTHS, _MONTHS
+from alpha_checks import get_active_tubex_file, check_not_locked, atomic_save, _FULL_MONTHS, _MONTHS, safe_delete_rows
 from add_order import get_mrp_boundaries, rearrange_mrp_orders
 
 MONTH_MAP = {
@@ -278,7 +278,7 @@ def roll_new_month(month_str, year_val, dry_run=False, root_dir=None):
 
     # Delete finished order rows from bottom to top
     for r in sorted(rows_to_delete, reverse=True):
-        ws_mrp.delete_rows(r)
+        safe_delete_rows(ws_mrp, r, 1)
 
     # Reflow formulas using add_order.py logic
     rearrange_mrp_orders(ws_mrp)

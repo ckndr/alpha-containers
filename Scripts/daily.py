@@ -1646,21 +1646,22 @@ def step_screenshot():
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# STEP 8: GIT PUSH
+# STEP 8: GIT PUSH & GATING
 # ═══════════════════════════════════════════════════════════════════════════
-def step_git_push(skip=False):
-    header(8, "Pushing to GitHub...")
+def step_git_push(skip=False, show_header=True):
+    if show_header:
+        header(8, "Pushing to GitHub...")
 
     if skip:
         warn("Skipped (--skip-git)")
-        return
+        return False
 
     # Check git is available
     try:
         subprocess.run(["git", "--version"], capture_output=True, check=True)
     except (FileNotFoundError, subprocess.CalledProcessError):
         warn("Git not installed or not in PATH — skipping push")
-        return
+        return False
 
     # Check it's a git repo
     result = subprocess.run(
@@ -1669,7 +1670,7 @@ def step_git_push(skip=False):
     )
     if result.returncode != 0:
         warn("Not a git repo — skipping push")
-        return
+        return False
 
     # Stage all changes
     subprocess.run(["git", "-C", ALPHA_DIR, "add", "-A"], capture_output=True)
@@ -1681,7 +1682,7 @@ def step_git_push(skip=False):
     )
     if result.returncode == 0:
         ok("No changes to push")
-        return
+        return True
 
     # Commit and push
     msg = f"Daily update {datetime.now().strftime('%d-%b-%Y %H:%M')}"
@@ -1693,10 +1694,10 @@ def step_git_push(skip=False):
         commit_out = (commit_res.stdout.decode(errors='replace') + "\n" + commit_res.stderr.decode(errors='replace')).strip()
         if "nothing to commit" not in commit_out.lower():
             fail(f"Git commit failed: {commit_out}")
-            return
+            return False
         else:
             ok("Nothing to commit")
-            return
+            return True
 
     result = subprocess.run(
         ["git", "-C", ALPHA_DIR, "push", "origin", "main"],
@@ -1705,11 +1706,69 @@ def step_git_push(skip=False):
 
     if result.returncode == 0:
         ok("Pushed to GitHub ✓")
+        return True
     else:
         fail("Git push failed — check internet/credentials")
         stderr = result.stderr.decode(errors='replace').strip()
         if stderr:
             print(f"    {DIM}{stderr}{RESET}")
+        return False
+
+
+def decide_git_push_action(success, critical_errors, new_slug_warns, inv_warns, skip_git=False):
+    """
+    Determine the Git push action based on pipeline status, errors, and warnings.
+    Returns (action, reason_message) tuple:
+      - 'gated': hard blocker prevents push (pipeline fail, cross-check fail, new slug in ERP not in Excel)
+      - 'skip_flag': --skip-git was explicitly passed
+      - 'confirm_missing_active': active slug/resin missing from ERP; prompt operator or auto-confirm (--yes)
+      - 'push': clean or floor advisories only; proceed with push
+    """
+    if not success:
+        return ("gated", "CRITICAL: Core pipeline experienced failure. Skipping Git push to protect production integrity.")
+    if critical_errors:
+        return ("gated", f"CRITICAL: Core cross-check found {len(critical_errors)} discrepancy/discrepancies (Machine/KPI/PID). Gating deployment — skipping Git push to protect production integrity.")
+    if new_slug_warns:
+        return ("gated", f"CRITICAL: Found {len(new_slug_warns)} new SLUG inventory item(s) in ERP missing from Excel. Gating deployment — please update Excel before pushing.")
+    if skip_git:
+        return ("skip_flag", None)
+    if inv_warns:
+        return ("confirm_missing_active", None)
+    return ("push", None)
+
+
+def _confirm_missing_slug_push(inv_warns, auto_yes=False):
+    """
+    Confirm whether to push to GitHub when active slug/resin item(s) are missing from ERP.
+    Returns True to proceed with push, False to skip.
+    """
+    inv_text = " ".join(inv_warns).lower()
+    has_slug = 'slug' in inv_text
+    has_resin = 'resin' in inv_text
+    if has_slug and has_resin:
+        mat_label = 'slug/resin'
+    elif has_resin:
+        mat_label = 'resin'
+    else:
+        mat_label = 'slug'
+
+    warn(f"{len(inv_warns)} active {mat_label} item(s) missing from ERP (marked 'Not active in ERP' in Col K):")
+    for w in inv_warns:
+        print(f"        • {w}")
+
+    if auto_yes:
+        ok("Auto-confirming Git push (--yes)")
+        return True
+
+    if sys.stdin and hasattr(sys.stdin, 'isatty') and sys.stdin.isatty():
+        try:
+            ans = input(f"    [?] ERP no longer has active {mat_label} item(s) listed above. Still push to GitHub? [y/N]: ").strip().lower()
+            return ans in ('y', 'yes')
+        except (EOFError, KeyboardInterrupt):
+            return False
+    else:
+        warn(f"Non-interactive run: active {mat_label} missing from ERP — skipping Git push (use --yes to push without prompting).")
+        return False
 
 
 def read_mismatches_log(log_path):
@@ -1865,23 +1924,10 @@ def main():
     if success:
         critical_errors, pending_warnings = step_crosscheck()  # 6. Cross-check
         step_screenshot()                                      # 7. Screenshot
-        # Deployment gating: ONLY block Git push if critical core discrepancies exist (Machine/KPI/PID)
-        if critical_errors:
-            fail(f"CRITICAL: Core cross-check found {len(critical_errors)} discrepancy/discrepancies (Machine/KPI/PID). Gating deployment — skipping Git push to protect production integrity.")
-        elif new_slug_warns:
-            fail(f"CRITICAL: Found {len(new_slug_warns)} new SLUG inventory item(s) in ERP missing from Excel. Gating deployment — please update Excel before pushing.")
-        else:
-            if pending_warnings:
-                safe_print(f"    {CYAN}ℹ{RESET} {len(pending_warnings)} pending order floor notice(s) detected — non-blocking, proceeding with Git push.")
-            step_git_push(skip=skip_git)                       # 8. Git push
-    else:
-        fail("CRITICAL: Core pipeline experienced failure. Skipping Git push to protect production integrity.")
 
-    elapsed = time.time() - start
-
-    # ── Unified Error Summary ──
-    has_blocking = bool(all_errors or inv_warns or map_warns or critical_errors or new_slug_warns)
-    has_issues = bool(has_blocking or pending_warnings)
+    # ── Unified Error & Advisory Summary (written BEFORE Git push so error_summary.txt is committed) ──
+    has_blocking = bool((not success) or critical_errors or new_slug_warns)
+    has_issues = bool(has_blocking or all_errors or inv_warns or map_warns or pending_warnings)
     error_summary_path = os.path.join(LOGS_DIR, "error_summary.txt")
     
     with open(error_summary_path, 'w', encoding='utf-8') as f_sum:
@@ -1916,7 +1962,7 @@ def main():
 
             if inv_warns:
                 print_both(f"  {RED}{BOLD}[INVENTORY: CRITICAL ITEMS (SLUG/RESIN) MISSING FROM ERP]{RESET}")
-                print_both(f"  {DIM}  (These rows are highlighted in RED in Excel and zeroed out){RESET}")
+                print_both(f"  {DIM}  (These rows are zeroed out in Excel and marked 'Not active in ERP' in Column K){RESET}")
                 for err in inv_warns:
                     print_both(f"    • {err}")
                 print_both()
@@ -1944,18 +1990,61 @@ def main():
             print_both()
             print_both(f"  {GREEN}{BOLD}✓ ALL CHECKS PASSED: No errors, missing items, or mismatches detected!{RESET}")
 
+    # ── Step 8: Git Push / Deployment Gating ──
+    header(8, "Pushing to GitHub...")
+    auto_yes = ('--yes' in sys.argv or '-y' in sys.argv)
+    action, block_msg = decide_git_push_action(
+        success, critical_errors, new_slug_warns, inv_warns, skip_git=skip_git
+    )
+
+    push_outcome = None
+    if action == "gated":
+        push_outcome = "gated"
+        fail(block_msg)
+    elif action == "skip_flag":
+        push_outcome = "skipped_flag"
+        step_git_push(skip=True, show_header=False)
+    elif action == "confirm_missing_active":
+        should_push = _confirm_missing_slug_push(inv_warns, auto_yes=auto_yes)
+        if should_push:
+            ok("Proceeding with Git push (confirmed by user).")
+            if pending_warnings:
+                safe_print(f"    {CYAN}ℹ{RESET} {len(pending_warnings)} pending order floor notice(s) detected — non-blocking, proceeding with Git push.")
+            push_res = step_git_push(skip=False, show_header=False)
+            push_outcome = "pushed" if push_res else "git_failed"
+        else:
+            warn("Git push skipped by user (active slug/resin missing from ERP).")
+            push_outcome = "declined"
+    elif action == "push":
+        if pending_warnings:
+            safe_print(f"    {CYAN}ℹ{RESET} {len(pending_warnings)} pending order floor notice(s) detected — non-blocking, proceeding with Git push.")
+        push_res = step_git_push(skip=False, show_header=False)
+        push_outcome = "pushed" if push_res else "git_failed"
+
+    elapsed = time.time() - start
+
     # ── Final Summary ──
     print(f"\n  {'='*52}")
-    if not has_issues:
-        print(f"  {GREEN}{BOLD}  ALL DONE{RESET} in {elapsed:.0f} seconds")
-    elif not has_blocking:
-        print(f"  {GREEN}{BOLD}  ALL CORE STEPS DONE{RESET} in {elapsed:.0f} seconds (Git updated, floor advisories logged)")
-    else:
-        print(f"  {YELLOW}{BOLD}  COMPLETED WITH BLOCKING ISSUES{RESET} — see summary above (Git push gated)")
+    if push_outcome == "gated":
+        print(f"  {RED}{BOLD}  COMPLETED WITH BLOCKING ISSUES{RESET} — see summary above (Git push gated)")
+    elif push_outcome == "declined":
+        print(f"  {YELLOW}{BOLD}  COMPLETED (PUSH SKIPPED){RESET} in {elapsed:.0f} seconds (active materials missing from ERP, push declined)")
+    elif push_outcome == "git_failed":
+        print(f"  {YELLOW}{BOLD}  COMPLETED WITH WARNINGS{RESET} in {elapsed:.0f} seconds (Git push failed)")
+    elif push_outcome == "skipped_flag":
+        if has_issues:
+            print(f"  {GREEN}{BOLD}  ALL CORE STEPS DONE{RESET} in {elapsed:.0f} seconds (Git push skipped by flag, issues logged)")
+        else:
+            print(f"  {GREEN}{BOLD}  ALL CORE STEPS DONE{RESET} in {elapsed:.0f} seconds (Git push skipped by flag)")
+    else:  # pushed
+        if not has_issues:
+            print(f"  {GREEN}{BOLD}  ALL DONE{RESET} in {elapsed:.0f} seconds")
+        else:
+            print(f"  {GREEN}{BOLD}  ALL CORE STEPS DONE{RESET} in {elapsed:.0f} seconds (Git updated, floor advisories logged)")
     print(f"  {DIM}  Log: {os.path.basename(log_path)}{RESET}")
     print(f"  {DIM}  Error Summary: {os.path.basename(error_summary_path)}{RESET}")
     print(f"  {'='*52}\n")
-    if sys.stdin and sys.stdin.isatty():
+    if sys.stdin and hasattr(sys.stdin, 'isatty') and sys.stdin.isatty():
         try:
             input("  Press Enter to close...")
         except (EOFError, KeyboardInterrupt):

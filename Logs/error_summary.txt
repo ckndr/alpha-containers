@@ -4,12 +4,6 @@
   ╚══════════════════════════════════════════════════════════╝
 
   [INVENTORY: CRITICAL ITEMS (SLUG/RESIN) MISSING FROM ERP]
-    (These rows are highlighted in RED in Excel and zeroed out)
-    • [URGENT] [PERSISTENT] Item ID 3503 (35X5.0) [Slug] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
-    • [URGENT] [PERSISTENT] Item ID 3597 (SLUG 30X4.8) [Slug] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED
-
-  [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
-    (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
-    • Pending Order SKU difference for 'SAMSOL COMMON RED': Bal diff=+31,920 (106.4% > 10% margin; Req diff=+0, Prod diff=-31,920)
-    • Pending Orders floor difference: Imran=356,564 vs MRP Scheduled=320,332 (diff=+36,232, 10.2% > 10% margin)
+    (These rows are zeroed out in Excel and marked 'Not active in ERP' in Column K)
+    • [URGENT] [PERSISTENT] Item ID 3503 (35X5.0) [Slug] is missing from inventory.xls - ZEROED OUT (Not active in ERP)
 

@@ -65,7 +65,7 @@ LOGS_DIR = os.path.join(DIR, 'Logs')
 os.makedirs(LOGS_DIR, exist_ok=True)
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from alpha_checks import get_active_tubex_file, check_not_locked
+from alpha_checks import get_active_tubex_file, check_not_locked, safe_insert_rows, safe_delete_rows
 
 # Find active Tubex workbook
 EXCEL_PATH = get_active_tubex_file(DIR)
@@ -230,6 +230,21 @@ def check_bom(wb, pid):
     return bom_items
 
 
+def _normalize_jof_value(jof_val):
+    """
+    Normalizes a JOF value: returns integer if purely digits (to prevent Excel
+    'Number Stored as Text' warnings); otherwise stripped string, or '' if empty/None.
+    """
+    if jof_val is None:
+        return ''
+    s = str(jof_val).strip()
+    if not s:
+        return ''
+    if s.isdigit():
+        return int(s)
+    return s
+
+
 def get_mrp_boundaries(ws_mrp):
     """Scans and returns dynamic row boundaries for Tubes and PET sections in MRP."""
     tube_start = 3
@@ -248,6 +263,8 @@ def get_mrp_boundaries(ws_mrp):
         if ws_mrp.cell(r, 1).value is None:
             tube_items_end = r - 1
             break
+    if tube_items_end is None:
+        tube_items_end = ws_mrp.max_row
 
     pet_header_row = None
     for r in range(tube_items_end + 1, ws_mrp.max_row + 1):
@@ -255,20 +272,24 @@ def get_mrp_boundaries(ws_mrp):
             pet_header_row = r
             break
 
-    pet_start = pet_header_row + 2
+    pet_start = pet_header_row + 2 if pet_header_row else None
     pet_total_row = None
-    for r in range(pet_start, ws_mrp.max_row + 1):
-        if str(ws_mrp.cell(r, 5).value or '').strip().upper() == 'TOTAL:':
-            pet_total_row = r
-            break
+    if pet_start:
+        for r in range(pet_start, ws_mrp.max_row + 1):
+            if str(ws_mrp.cell(r, 5).value or '').strip().upper() == 'TOTAL:':
+                pet_total_row = r
+                break
 
-    pet_end = pet_total_row - 1
-    pet_items_start = pet_total_row + 3
+    pet_end = pet_total_row - 1 if pet_total_row else None
+    pet_items_start = pet_total_row + 3 if pet_total_row else None
     pet_items_end = None
-    for r in range(pet_items_start, ws_mrp.max_row + 2):
-        if ws_mrp.cell(r, 1).value is None:
-            pet_items_end = r - 1
-            break
+    if pet_items_start:
+        for r in range(pet_items_start, ws_mrp.max_row + 2):
+            if ws_mrp.cell(r, 1).value is None:
+                pet_items_end = r - 1
+                break
+        if pet_items_end is None:
+            pet_items_end = ws_mrp.max_row
 
     return {
         'tube_start': tube_start,
@@ -276,6 +297,8 @@ def get_mrp_boundaries(ws_mrp):
         'tube_total_row': tube_total_row,
         'tube_items_start': tube_items_start,
         'tube_items_end': tube_items_end,
+        'pet_banner_row': pet_header_row,
+        'pet_header_row': (pet_header_row + 1) if pet_header_row else None,
         'pet_start': pet_start,
         'pet_end': pet_end,
         'pet_total_row': pet_total_row,
@@ -287,8 +310,11 @@ def get_mrp_boundaries(ws_mrp):
 def update_tube_material_formulas(ws_mrp, tube_end, tube_items_start, tube_items_end):
     """Updates all formula columns in the Tube Material Plan."""
     for r in range(tube_items_start, tube_items_end + 1):
-        f_req = f'=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*((SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))>0)*(SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))/1000)'
-        ws_mrp.cell(r, 5, f_req)
+        if tube_end < 3:
+            ws_mrp.cell(r, 5, '=0')
+        else:
+            f_req = f'=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*((SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))>0)*(SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))/1000)'
+            ws_mrp.cell(r, 5, f_req)
 
         f_stk = f'=IFERROR(INDEX(TableInventory[Store Balance],MATCH(A{r},TableInventory[Item ID],0)),0)+IFERROR(INDEX(TableInventory[WIP],MATCH(A{r},TableInventory[Item ID],0)),0)'
         ws_mrp.cell(r, 6, f_stk)
@@ -296,34 +322,43 @@ def update_tube_material_formulas(ws_mrp, tube_end, tube_items_start, tube_items
         f_surp = f'=F{r}-E{r}'
         ws_mrp.cell(r, 7, f_surp)
 
-        f_pcp = (
-            f'=IFERROR(IF(SUMPRODUCT((TableBOM[Item ID]=A{r})*'
-            f'((SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))>0)*'
-            f'(SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))*'
-            f'TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))=0,"-",'
-            f'ROUND(F{r}*1000*SUMPRODUCT((TableBOM[Item ID]=A{r})*'
-            f'((SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))>0)*'
-            f'(SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end})))/'
-            f'SUMPRODUCT((TableBOM[Item ID]=A{r})*'
-            f'((SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))>0)*'
-            f'(SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))*'
-            f'TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])),0)),"-")'
-        )
+        if tube_end < 3:
+            f_pcp = '"-"'
+        else:
+            f_pcp = (
+                f'=IFERROR(IF(SUMPRODUCT((TableBOM[Item ID]=A{r})*'
+                f'((SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))>0)*'
+                f'(SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))*'
+                f'TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))=0,"-",'
+                f'ROUND(F{r}*1000*SUMPRODUCT((TableBOM[Item ID]=A{r})*'
+                f'((SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))>0)*'
+                f'(SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end})))/'
+                f'SUMPRODUCT((TableBOM[Item ID]=A{r})*'
+                f'((SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))>0)*'
+                f'(SUMIF($D$3:$D${tube_end},TableBOM[Product ID],$H$3:$H${tube_end}))*'
+                f'TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])),0)),"-")'
+            )
         ws_mrp.cell(r, 8, f_pcp)
 
         f_stat = f'=IF(E{r}=0,"Not needed",IF(G{r}<0,"SHORTAGE",IF(G{r}<E{r}*0.1,"LOW","OK")))'
         ws_mrp.cell(r, 9, f_stat)
 
-        pname_conds = ' & '.join([f'IF((COUNTIFS(TableBOM[Product ID],$D${pr},TableBOM[Item ID],$A{r})>0)*($H${pr}>0),$C${pr}&", ","")' for pr in range(3, tube_end + 1)])
-        f_pnames = f'=IF(LEN({pname_conds})>1,LEFT({pname_conds},LEN({pname_conds})-2),"")'
-        ws_mrp.cell(r, 10, f_pnames)
+        if tube_end < 3:
+            ws_mrp.cell(r, 10, '=""')
+        else:
+            pname_conds = ' & '.join([f'IF((COUNTIFS(TableBOM[Product ID],$D${pr},TableBOM[Item ID],$A{r})>0)*($H${pr}>0),$C${pr}&", ","")' for pr in range(3, tube_end + 1)])
+            f_pnames = f'=IF(LEN({pname_conds})>1,LEFT({pname_conds},LEN({pname_conds})-2),"")'
+            ws_mrp.cell(r, 10, f_pnames)
 
 
 def update_pet_material_formulas(ws_mrp, pet_start, pet_end, pet_items_start, pet_items_end):
     """Updates all formula columns in the PET Material Plan."""
     for r in range(pet_items_start, pet_items_end + 1):
-        f_req = f'=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*((SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))>0)*(SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))/1000)'
-        ws_mrp.cell(r, 5, f_req)
+        if pet_end < pet_start:
+            ws_mrp.cell(r, 5, '=0')
+        else:
+            f_req = f'=SUMPRODUCT((TableBOM[Item ID]=A{r})*TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])*((SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))>0)*(SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))/1000)'
+            ws_mrp.cell(r, 5, f_req)
 
         f_stk = f'=IFERROR(INDEX(TableInventory[Store Balance],MATCH(A{r},TableInventory[Item ID],0)),0)+IFERROR(INDEX(TableInventory[WIP],MATCH(A{r},TableInventory[Item ID],0)),0)'
         ws_mrp.cell(r, 6, f_stk)
@@ -331,37 +366,234 @@ def update_pet_material_formulas(ws_mrp, pet_start, pet_end, pet_items_start, pe
         f_surp = f'=F{r}-E{r}'
         ws_mrp.cell(r, 7, f_surp)
 
-        f_pcp = (
-            f'=IFERROR(IF(SUMPRODUCT((TableBOM[Item ID]=A{r})*'
-            f'((SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))>0)*'
-            f'(SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))*'
-            f'TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))=0,"-",'
-            f'ROUND(F{r}*1000*SUMPRODUCT((TableBOM[Item ID]=A{r})*'
-            f'((SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))>0)*'
-            f'(SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end})))/'
-            f'SUMPRODUCT((TableBOM[Item ID]=A{r})*'
-            f'((SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))>0)*'
-            f'(SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))*'
-            f'TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])),0)),"-")'
-        )
+        if pet_end < pet_start:
+            f_pcp = '"-"'
+        else:
+            f_pcp = (
+                f'=IFERROR(IF(SUMPRODUCT((TableBOM[Item ID]=A{r})*'
+                f'((SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))>0)*'
+                f'(SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))*'
+                f'TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %]))=0,"-",'
+                f'ROUND(F{r}*1000*SUMPRODUCT((TableBOM[Item ID]=A{r})*'
+                f'((SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))>0)*'
+                f'(SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end})))/'
+                f'SUMPRODUCT((TableBOM[Item ID]=A{r})*'
+                f'((SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))>0)*'
+                f'(SUMIF($D${pet_start}:$D${pet_end},TableBOM[Product ID],$H${pet_start}:$H${pet_end}))*'
+                f'TableBOM[Per 1000 Units]*(1+TableBOM[Scrap %])),0)),"-")'
+            )
         ws_mrp.cell(r, 8, f_pcp)
 
         f_stat = f'=IF(E{r}=0,"Not needed",IF(G{r}<0,"SHORTAGE",IF(G{r}<E{r}*0.1,"LOW","OK")))'
         ws_mrp.cell(r, 9, f_stat)
 
-        pet_order_names = []
-        for pr in range(pet_start, pet_end + 1):
-            pid_val = ws_mrp.cell(pr, 4).value
-            try:
-                pid_int = int(pid_val)
-                sname = PET_SHORT_NAMES.get(pid_int, str(ws_mrp.cell(pr, 3).value or ''))
-            except (ValueError, TypeError):
-                sname = str(ws_mrp.cell(pr, 3).value or '')
-            pet_order_names.append((pr, sname))
+        if pet_end < pet_start:
+            ws_mrp.cell(r, 10, '=""')
+        else:
+            pet_order_names = []
+            for pr in range(pet_start, pet_end + 1):
+                pid_val = ws_mrp.cell(pr, 4).value
+                try:
+                    pid_int = int(pid_val)
+                    sname = PET_SHORT_NAMES.get(pid_int, str(ws_mrp.cell(pr, 3).value or ''))
+                except (ValueError, TypeError):
+                    sname = str(ws_mrp.cell(pr, 3).value or '')
+                pet_order_names.append((pr, sname))
 
-        pname_conds = ' & '.join([f'IF((COUNTIFS(TableBOM[Product ID],$D${pr},TableBOM[Item ID],$A{r})>0)*($H${pr}>0),"{sname}, ","")' for pr, sname in pet_order_names])
-        f_pnames = f'=IF(LEN({pname_conds})>1,LEFT({pname_conds},LEN({pname_conds})-2),"")'
-        ws_mrp.cell(r, 10, f_pnames)
+            pname_conds = ' & '.join([f'IF((COUNTIFS(TableBOM[Product ID],$D${pr},TableBOM[Item ID],$A{r})>0)*($H${pr}>0),"{sname}, ","")' for pr, sname in pet_order_names])
+            f_pnames = f'=IF(LEN({pname_conds})>1,LEFT({pname_conds},LEN({pname_conds})-2),"")'
+            ws_mrp.cell(r, 10, f_pnames)
+
+
+def _unhide_bom_items_for_product(ws_mrp, wb, pid, p_type):
+    """
+    Finds the product's BOM item IDs and ensures matching rows in the Tube
+    or PET Material Plan are visible (hidden=False).
+    """
+    bom_items = check_bom(wb, pid)
+    if not bom_items:
+        return
+    bom_item_ids = set()
+    for item in bom_items:
+        try:
+            if item.get('item_id') is not None:
+                bom_item_ids.add(int(item['item_id']))
+        except (ValueError, TypeError):
+            pass
+
+    if not bom_item_ids:
+        return
+
+    b = get_mrp_boundaries(ws_mrp)
+    if p_type == 'TUBE':
+        start_r, end_r = b['tube_items_start'], b['tube_items_end']
+    else:
+        start_r, end_r = b['pet_items_start'], b['pet_items_end']
+
+    if start_r and end_r:
+        for r in range(start_r, end_r + 1):
+            val = ws_mrp.cell(r, 1).value
+            try:
+                if val is not None and int(val) in bom_item_ids:
+                    ws_mrp.row_dimensions[r].hidden = False
+            except (ValueError, TypeError):
+                pass
+
+
+def _apply_canonical_order_row_style(ws_mrp, row):
+    """
+    Applies the canonical Tubex Order Row style schema:
+    Segoe UI 9pt #1A1A2E, thin borders (D9D9D9), wrap_text=True, vertical='center',
+    horizontal='left' on Col C and 'center' on others, Bold on Cols B, C, E, F, G, H, I,
+    number formats: 'General' on A-D, '0' on E-G, '#,##0' on H-I.
+    """
+    thin_border = Border(
+        left=Side(style='thin', color='D9D9D9'),
+        right=Side(style='thin', color='D9D9D9'),
+        top=Side(style='thin', color='D9D9D9'),
+        bottom=Side(style='thin', color='D9D9D9')
+    )
+
+    for c in range(1, 10):
+        cell = ws_mrp.cell(row, c)
+        is_bold = (c in (2, 3, 5, 6, 7, 8, 9))
+        cell.font = Font(name='Segoe UI', size=9.0, bold=is_bold, color='FF1A1A2E')
+        cell.border = thin_border
+        cell.alignment = Alignment(wrap_text=True, vertical='center',
+                                   horizontal='left' if c == 3 else 'center')
+        if c in (5, 6, 7):
+            cell.number_format = '0'
+        elif c in (8, 9):
+            cell.number_format = '#,##0'
+        else:
+            cell.number_format = 'General'
+
+
+def sync_mrp_layout(ws_mrp):
+    """
+    Enforces clean layout and alignment across MRP sheet:
+    1. Ensures hidden=False and appropriate heights on all structural rows
+       (headers, banners, totals, order rows, blank separators).
+    2. Enforces Tube MRP Header height >= 36.0 (3-line text) and PET MRP Header >= 36.0.
+    3. Keeps ws_mrp.auto_filter.ref cleanly bound to the Tube Material Plan.
+    4. Restricts Data Validation ranges so they do not bleed into headers or Material Plan formula rows.
+    """
+    from openpyxl.worksheet.cell_range import MultiCellRange
+
+    b = get_mrp_boundaries(ws_mrp)
+
+    # 1. Structural rows visibility and heights
+    # Row 1 (Title)
+    ws_mrp.row_dimensions[1].hidden = False
+    if ws_mrp.row_dimensions[1].height is None:
+        ws_mrp.row_dimensions[1].height = 30.0
+
+    # Row 2 (Tube Order Table Header)
+    ws_mrp.row_dimensions[2].hidden = False
+    if ws_mrp.row_dimensions[2].height is None:
+        ws_mrp.row_dimensions[2].height = 21.0
+
+    # Active Tube order rows
+    for r in range(b['tube_start'], b['tube_end'] + 1):
+        ws_mrp.row_dimensions[r].hidden = False
+
+    # Tube Total row
+    ws_mrp.row_dimensions[b['tube_total_row']].hidden = False
+
+    # Tube MRP Banner
+    tube_banner_row = b['tube_total_row'] + 1
+    ws_mrp.row_dimensions[tube_banner_row].hidden = False
+    if ws_mrp.row_dimensions[tube_banner_row].height is None:
+        ws_mrp.row_dimensions[tube_banner_row].height = 16.5
+
+    # Tube MRP Header (needs >= 36.0 for 3-line headers)
+    tube_header_row = b['tube_total_row'] + 2
+    ws_mrp.row_dimensions[tube_header_row].hidden = False
+    h = ws_mrp.row_dimensions[tube_header_row].height
+    ws_mrp.row_dimensions[tube_header_row].height = max(float(h) if h is not None else 0.0, 36.0)
+
+    # Blank separator rows between Tube items and PET Banner
+    pet_banner = b.get('pet_banner_row')
+    if pet_banner and b['tube_items_end']:
+        for r in range(b['tube_items_end'] + 1, pet_banner):
+            ws_mrp.row_dimensions[r].hidden = False
+
+    # PET Banner and Header rows
+    if pet_banner:
+        ws_mrp.row_dimensions[pet_banner].hidden = False
+    pet_hdr = b.get('pet_header_row')
+    if pet_hdr:
+        ws_mrp.row_dimensions[pet_hdr].hidden = False
+
+    # Active PET order rows
+    if b.get('pet_start') and b.get('pet_end'):
+        for r in range(b['pet_start'], b['pet_end'] + 1):
+            ws_mrp.row_dimensions[r].hidden = False
+
+    # PET Total row
+    if b.get('pet_total_row'):
+        ws_mrp.row_dimensions[b['pet_total_row']].hidden = False
+
+        # PET MRP Banner
+        pet_mrp_banner = b['pet_total_row'] + 1
+        ws_mrp.row_dimensions[pet_mrp_banner].hidden = False
+        if ws_mrp.row_dimensions[pet_mrp_banner].height is None:
+            ws_mrp.row_dimensions[pet_mrp_banner].height = 16.5
+
+        # PET MRP Header
+        pet_mrp_header = b['pet_total_row'] + 2
+        ws_mrp.row_dimensions[pet_mrp_header].hidden = False
+        h_pet = ws_mrp.row_dimensions[pet_mrp_header].height
+        ws_mrp.row_dimensions[pet_mrp_header].height = max(float(h_pet) if h_pet is not None else 0.0, 36.0)
+
+    # 2. Keep ws_mrp.auto_filter.ref cleanly set to Tube Material Plan
+    if b['tube_items_end']:
+        ws_mrp.auto_filter.ref = f"A{b['tube_total_row'] + 2}:J{b['tube_items_end']}"
+
+    # 3. Clean up Data Validations so they never bleed outside active order rows
+    if hasattr(ws_mrp, 'data_validations') and ws_mrp.data_validations and hasattr(ws_mrp.data_validations, 'dataValidation'):
+        has_tube_orders = (b['tube_end'] >= b['tube_start'])
+        has_pet_orders = (b.get('pet_end') is not None and b.get('pet_start') is not None and b['pet_end'] >= b['pet_start'])
+
+        to_remove_dv = []
+        for dv in list(ws_mrp.data_validations.dataValidation):
+            formula = str(dv.formula1 or '')
+            if 'Confirmed' in formula:
+                # Order Remarks / Status list
+                remarks_ranges = []
+                if has_tube_orders:
+                    remarks_ranges.append(f"I{b['tube_start']}:I{b['tube_end']}")
+                if has_pet_orders:
+                    remarks_ranges.append(f"I{b['pet_start']}:I{b['pet_end']}")
+                if remarks_ranges:
+                    dv.sqref = MultiCellRange(" ".join(remarks_ranges))
+                else:
+                    to_remove_dv.append(dv)
+            elif any(c in formula for c in ['Samsol', 'Alpha Lab', 'PBS', 'Brookes']):
+                # Customer list
+                cust_ranges = []
+                if has_tube_orders:
+                    cust_ranges.append(f"B{b['tube_start']}:B{b['tube_end']}")
+                if has_pet_orders:
+                    cust_ranges.append(f"B{b['pet_start']}:B{b['pet_end']}")
+                if cust_ranges:
+                    dv.sqref = MultiCellRange(" ".join(cust_ranges))
+                else:
+                    to_remove_dv.append(dv)
+            elif any(p in formula for p in ['TUBES', 'CONTRATUBEX', 'EAZICOLOR', 'S-43']):
+                # Product list
+                prod_ranges = []
+                if has_tube_orders:
+                    prod_ranges.append(f"C{b['tube_start']}:C{b['tube_end']}")
+                if has_pet_orders:
+                    prod_ranges.append(f"C{b['pet_start']}:C{b['pet_end']}")
+                if prod_ranges:
+                    dv.sqref = MultiCellRange(" ".join(prod_ranges))
+                else:
+                    to_remove_dv.append(dv)
+
+        for dv in to_remove_dv:
+            ws_mrp.data_validations.dataValidation.remove(dv)
 
 
 def parse_dia_sort_key(dia_val):
@@ -428,7 +660,7 @@ def rearrange_mrp_orders(ws_mrp):
             ws_mrp.cell(r, 2, o['customer'])
             ws_mrp.cell(r, 3, o['product_name'])
             ws_mrp.cell(r, 4, o['pid'])
-            ws_mrp.cell(r, 5, o['jof'] or '')
+            ws_mrp.cell(r, 5, _normalize_jof_value(o['jof']))
             ws_mrp.cell(r, 6, o['qty'])
             ws_mrp.cell(r, 7, f'=INDEX(Tubex_Dashboard!$H$11:$H$100,MATCH(MRP!D{r},Tubex_Dashboard!$F$11:$F$100,0))')
             ws_mrp.cell(r, 8, f'=F{r}-G{r}')
@@ -442,8 +674,8 @@ def rearrange_mrp_orders(ws_mrp):
                 cell.border = border
                 cell.alignment = alignment
                 cell.number_format = num_fmt
-            if o['height'] is not None:
-                ws_mrp.row_dimensions[r].height = o['height']
+            ws_mrp.row_dimensions[r].height = o['height']
+            ws_mrp.row_dimensions[r].hidden = False
 
         # Update Tube Totals
         ws_mrp.cell(b['tube_total_row'], 6, f'=SUM(F3:F{b["tube_end"]})')
@@ -452,12 +684,19 @@ def rearrange_mrp_orders(ws_mrp):
 
         # Update Tube Material Plan Formulas
         update_tube_material_formulas(ws_mrp, b['tube_end'], b['tube_items_start'], b['tube_items_end'])
+    else:
+        # 0 active Tube orders edge case
+        ws_mrp.cell(b['tube_total_row'], 6, '=0')
+        ws_mrp.cell(b['tube_total_row'], 7, '=0')
+        ws_mrp.cell(b['tube_total_row'], 8, '=0')
+        update_tube_material_formulas(ws_mrp, b['tube_end'], b['tube_items_start'], b['tube_items_end'])
 
     # Refresh boundaries in case row dimensions or counts shifted
     b = get_mrp_boundaries(ws_mrp)
 
     # 2. Rearrange PET orders
-    if b['pet_end'] >= b['pet_start']:
+    has_pet_orders = (b.get('pet_end') is not None and b.get('pet_start') is not None and b['pet_end'] >= b['pet_start'])
+    if has_pet_orders:
         pet_orders = []
         for r in range(b['pet_start'], b['pet_end'] + 1):
             pid_val = ws_mrp.cell(r, 4).value
@@ -483,7 +722,7 @@ def rearrange_mrp_orders(ws_mrp):
             ws_mrp.cell(r, 2, o['customer'])
             ws_mrp.cell(r, 3, o['product_name'])
             ws_mrp.cell(r, 4, o['pid'])
-            ws_mrp.cell(r, 5, o['jof'] or '')
+            ws_mrp.cell(r, 5, _normalize_jof_value(o['jof']))
             ws_mrp.cell(r, 6, o['qty'])
             ws_mrp.cell(r, 7, f'=INDEX(Tubex_Dashboard!$H$11:$H$100,MATCH(MRP!D{r},Tubex_Dashboard!$F$11:$F$100,0))')
             ws_mrp.cell(r, 8, f'=F{r}-G{r}')
@@ -497,8 +736,8 @@ def rearrange_mrp_orders(ws_mrp):
                 cell.border = border
                 cell.alignment = alignment
                 cell.number_format = num_fmt
-            if o['height'] is not None:
-                ws_mrp.row_dimensions[r].height = o['height']
+            ws_mrp.row_dimensions[r].height = o['height']
+            ws_mrp.row_dimensions[r].hidden = False
 
         # Update PET Totals
         ws_mrp.cell(b['pet_total_row'], 6, f'=SUM(F{b["pet_start"]}:F{b["pet_end"]})')
@@ -507,7 +746,14 @@ def rearrange_mrp_orders(ws_mrp):
 
         # Update PET Material Plan Formulas
         update_pet_material_formulas(ws_mrp, b['pet_start'], b['pet_end'], b['pet_items_start'], b['pet_items_end'])
+    elif b.get('pet_total_row') is not None:
+        # 0 active PET orders edge case
+        ws_mrp.cell(b['pet_total_row'], 6, '=0')
+        ws_mrp.cell(b['pet_total_row'], 7, '=0')
+        ws_mrp.cell(b['pet_total_row'], 8, '=0')
+        update_pet_material_formulas(ws_mrp, b['pet_start'], b['pet_end'], b['pet_items_start'], b['pet_items_end'])
 
+    sync_mrp_layout(ws_mrp)
     print(f"[SORT] MRP active orders rearranged according to Dia/ml (lower to higher).")
 
 
@@ -570,14 +816,18 @@ def apply_order_to_mrp(ws_mrp, wb, product, order_qty, jof_num=None, customer_ov
                 new_jof_val = old_jof_val.replace(' & ', ', ') + f" & {jof_num}"
             else:
                 new_jof_val = f"{old_jof_val} & {jof_num}"
-            ws_mrp.cell(existing_row, 5, new_jof_val)
+            ws_mrp.cell(existing_row, 5, _normalize_jof_value(new_jof_val))
         else:
             new_jof_val = old_jof_val
+            ws_mrp.cell(existing_row, 5, _normalize_jof_value(new_jof_val))
 
         # Update Remarks (Column I)
         if remarks and remarks not in old_rem_val:
             new_rem_val = f"{old_rem_val}; {remarks}" if old_rem_val else remarks
             ws_mrp.cell(existing_row, 9, new_rem_val)
+
+        if order_qty > 0:
+            _unhide_bom_items_for_product(ws_mrp, wb, pid, p_type)
 
         print(f"\n[MERGED] Product ID {pid} already exists at MRP Row {existing_row}.")
         print(f"         Updated Required Qty: {old_qty_val} + {order_qty:,} -> {new_qty_formula}")
@@ -588,65 +838,105 @@ def apply_order_to_mrp(ws_mrp, wb, product, order_qty, jof_num=None, customer_ov
     else:
         if p_type == 'TUBE':
             insert_row = b['tube_total_row']
-            ws_mrp.insert_rows(insert_row)
+            has_existing = (b['tube_end'] >= b['tube_start'])
+            if has_existing:
+                style_src_row = b['tube_start']
+                template_styles = [
+                    (copy(ws_mrp.cell(style_src_row, c).font),
+                     copy(ws_mrp.cell(style_src_row, c).fill),
+                     copy(ws_mrp.cell(style_src_row, c).border),
+                     copy(ws_mrp.cell(style_src_row, c).alignment),
+                     ws_mrp.cell(style_src_row, c).number_format)
+                    for c in range(1, 10)
+                ]
+                template_height = ws_mrp.row_dimensions[style_src_row].height if style_src_row in ws_mrp.row_dimensions else None
+            else:
+                template_styles = None
+                template_height = None
+
+            safe_insert_rows(ws_mrp, insert_row, 1)
 
             ws_mrp.cell(insert_row, 1, dia)
             ws_mrp.cell(insert_row, 2, customer)
             ws_mrp.cell(insert_row, 3, pname)
             ws_mrp.cell(insert_row, 4, pid)
-            ws_mrp.cell(insert_row, 5, jof_num or '')
+            ws_mrp.cell(insert_row, 5, _normalize_jof_value(jof_num))
             ws_mrp.cell(insert_row, 6, order_qty)
             ws_mrp.cell(insert_row, 7, f'=INDEX(Tubex_Dashboard!$H$11:$H$100,MATCH(MRP!D{insert_row},Tubex_Dashboard!$F$11:$F$100,0))')
             ws_mrp.cell(insert_row, 8, f'=F{insert_row}-G{insert_row}')
             ws_mrp.cell(insert_row, 9, remarks or '')
 
-            style_src_row = b['tube_start'] if b['tube_end'] >= b['tube_start'] else 3
-            for c in range(1, 10):
-                src = ws_mrp.cell(style_src_row, c)
-                dst = ws_mrp.cell(insert_row, c)
-                dst.font = copy(src.font)
-                dst.fill = copy(src.fill)
-                dst.border = copy(src.border)
-                dst.alignment = copy(src.alignment)
-                dst.number_format = src.number_format
+            if template_styles:
+                for c in range(1, 10):
+                    font, fill, border, alignment, num_fmt = template_styles[c - 1]
+                    cell = ws_mrp.cell(insert_row, c)
+                    cell.font = font
+                    cell.fill = fill
+                    cell.border = border
+                    cell.alignment = alignment
+                    cell.number_format = num_fmt
+                if template_height is not None:
+                    ws_mrp.row_dimensions[insert_row].height = template_height
+            else:
+                _apply_canonical_order_row_style(ws_mrp, insert_row)
 
-            if style_src_row in ws_mrp.row_dimensions:
-                ws_mrp.row_dimensions[insert_row].height = ws_mrp.row_dimensions[style_src_row].height
+            ws_mrp.row_dimensions[insert_row].hidden = False
+            _unhide_bom_items_for_product(ws_mrp, wb, pid, p_type)
 
         else:
             insert_row = b['pet_total_row']
-            ws_mrp.insert_rows(insert_row)
+            has_existing = (b['pet_end'] >= b['pet_start'])
+            if has_existing:
+                style_src_row = b['pet_start']
+                template_styles = [
+                    (copy(ws_mrp.cell(style_src_row, c).font),
+                     copy(ws_mrp.cell(style_src_row, c).fill),
+                     copy(ws_mrp.cell(style_src_row, c).border),
+                     copy(ws_mrp.cell(style_src_row, c).alignment),
+                     ws_mrp.cell(style_src_row, c).number_format)
+                    for c in range(1, 10)
+                ]
+                template_height = ws_mrp.row_dimensions[style_src_row].height if style_src_row in ws_mrp.row_dimensions else None
+            else:
+                template_styles = None
+                template_height = None
+
+            safe_insert_rows(ws_mrp, insert_row, 1)
 
             ws_mrp.cell(insert_row, 1, dia)
             ws_mrp.cell(insert_row, 2, customer)
             ws_mrp.cell(insert_row, 3, pname)
             ws_mrp.cell(insert_row, 4, pid)
-            ws_mrp.cell(insert_row, 5, jof_num or '')
+            ws_mrp.cell(insert_row, 5, _normalize_jof_value(jof_num))
             ws_mrp.cell(insert_row, 6, order_qty)
             ws_mrp.cell(insert_row, 7, f'=INDEX(Tubex_Dashboard!$H$11:$H$100,MATCH(MRP!D{insert_row},Tubex_Dashboard!$F$11:$F$100,0))')
             ws_mrp.cell(insert_row, 8, f'=F{insert_row}-G{insert_row}')
             ws_mrp.cell(insert_row, 9, remarks or '')
 
-            style_src_row = b['pet_start']
-            for c in range(1, 10):
-                src = ws_mrp.cell(style_src_row, c)
-                dst = ws_mrp.cell(insert_row, c)
-                dst.font = copy(src.font)
-                dst.fill = copy(src.fill)
-                dst.border = copy(src.border)
-                dst.alignment = copy(src.alignment)
-                dst.number_format = src.number_format
+            if template_styles:
+                for c in range(1, 10):
+                    font, fill, border, alignment, num_fmt = template_styles[c - 1]
+                    cell = ws_mrp.cell(insert_row, c)
+                    cell.font = font
+                    cell.fill = fill
+                    cell.border = border
+                    cell.alignment = alignment
+                    cell.number_format = num_fmt
+                if template_height is not None:
+                    ws_mrp.row_dimensions[insert_row].height = template_height
+            else:
+                _apply_canonical_order_row_style(ws_mrp, insert_row)
 
-            if style_src_row in ws_mrp.row_dimensions:
-                ws_mrp.row_dimensions[insert_row].height = ws_mrp.row_dimensions[style_src_row].height
+            ws_mrp.row_dimensions[insert_row].hidden = False
+            _unhide_bom_items_for_product(ws_mrp, wb, pid, p_type)
 
         print(f"\n[INSERTED] New order row inserted at MRP Row {insert_row}.")
         return 'INSERTED', insert_row
 
 
-def run_add_order_session(filepath, catalog, initial_product=None, initial_qty=None, initial_jof=None, initial_cust=None, initial_remarks=None, auto_keep=False):
+def run_add_order_session(filepath, catalog, initial_product=None, initial_qty=None, initial_jof=None, initial_cust=None, initial_remarks=None, auto_keep=False, dry_run=False):
     """Runs a session to add one or more orders, rearranges MRP by Dia/ml in the end, and prompts keep/revert."""
-    backup_file = backup_workbook(filepath)
+    backup_file = None if dry_run else backup_workbook(filepath)
     wb = load_workbook(filepath, data_only=False)
     ws_mrp = wb['MRP']
 
@@ -769,7 +1059,7 @@ def run_add_order_session(filepath, catalog, initial_product=None, initial_qty=N
     # Re-sort Dashboard
     sort_ok = False
     sort_script = os.path.join(os.path.dirname(__file__), 'sort_dashboard.py')
-    if os.path.exists(sort_script):
+    if os.path.exists(sort_script) and not dry_run:
         sort_ok = run_sort_dashboard(sort_script)
 
     # Order Session Summary
@@ -786,10 +1076,14 @@ def run_add_order_session(filepath, catalog, initial_product=None, initial_qty=N
         print(f"   [OK] Dashboard synchronized and re-sorted.")
     print(f"=" * 75)
 
+    if dry_run:
+        print(f"\n[DRY-RUN] Changes simulated successfully on sandbox copy.")
+        return True
+
     return confirm_keep_or_revert(filepath, backup_file, auto_keep)
 
 
-def add_or_update_order(filepath, product, order_qty, jof_num=None, customer_override=None, remarks=None, auto_keep=False):
+def add_or_update_order(filepath, product, order_qty, jof_num=None, customer_override=None, remarks=None, auto_keep=False, dry_run=False):
     """Programmatic wrapper to add a single order, sort MRP by dia/ml, and confirm."""
     wb_temp = load_workbook(filepath, data_only=True, read_only=True)
     catalog = load_product_catalog(wb_temp)
@@ -803,13 +1097,14 @@ def add_or_update_order(filepath, product, order_qty, jof_num=None, customer_ove
         initial_jof=jof_num,
         initial_cust=customer_override,
         initial_remarks=remarks,
-        auto_keep=auto_keep
+        auto_keep=auto_keep,
+        dry_run=dry_run
     )
 
 
-def remove_order_from_workbook(filepath, search_term, auto_keep=False):
+def remove_order_from_workbook(filepath, search_term, auto_keep=False, dry_run=False):
     """Removes an order from MRP, rearranges MRP by dia/ml, and updates dashboard."""
-    backup_file = backup_workbook(filepath)
+    backup_file = None if dry_run else backup_workbook(filepath)
     wb = load_workbook(filepath, data_only=False)
     ws_mrp = wb['MRP']
 
@@ -845,7 +1140,7 @@ def remove_order_from_workbook(filepath, search_term, auto_keep=False):
         return False
 
     print(f"\n[REMOVING] Found active order at MRP Row {target_row}: PID {pid} - {pname}")
-    ws_mrp.delete_rows(target_row)
+    safe_delete_rows(ws_mrp, target_row, 1)
 
     # Rearrange MRP orders and update all formulas
     rearrange_mrp_orders(ws_mrp)
@@ -859,7 +1154,7 @@ def remove_order_from_workbook(filepath, search_term, auto_keep=False):
     print(f"[OK] Removed row from MRP and updated all formulas.")
 
     sort_script = os.path.join(os.path.dirname(__file__), 'sort_dashboard.py')
-    if os.path.exists(sort_script):
+    if os.path.exists(sort_script) and not dry_run:
         run_sort_dashboard(sort_script)
 
     print(f"\n" + "=" * 60)
@@ -867,6 +1162,10 @@ def remove_order_from_workbook(filepath, search_term, auto_keep=False):
     print(f"=" * 60)
     print(f"Removed Product: [{p_type}] {pid} - {pname}")
     print(f"=" * 60)
+
+    if dry_run:
+        print(f"\n[DRY-RUN] Order removal simulated successfully on sandbox copy.")
+        return True
 
     return confirm_keep_or_revert(filepath, backup_file, auto_keep)
 
@@ -1000,9 +1299,10 @@ def confirm_keep_or_revert(filepath, backup_file, auto_keep):
             print(f"Invalid option '{choice}'. Please select P, V, K, or R.")
 
 
-def list_active_orders():
+def list_active_orders(filepath=None):
     """Prints all active orders currently in MRP."""
-    wb = load_workbook(EXCEL_PATH, data_only=False)
+    path = filepath or os.environ.get("TUBEX_FILE", EXCEL_PATH)
+    wb = load_workbook(path, data_only=False)
     ws_mrp = wb['MRP']
     b = get_mrp_boundaries(ws_mrp)
 
@@ -1031,6 +1331,25 @@ def list_active_orders():
         print(f"  Row {r}: PID {pid} | {name} ({cust}) Dia: {dia} | Qty: {qty} | JOF: {jof}")
     print("=" * 70)
     wb.close()
+
+
+def _run_rearrange_session(filepath, auto_keep=False, dry_run=False):
+    """Rearranges MRP orders according to Dia/ml (lower to higher) and synchronizes dashboard."""
+    print("[SORT] Rearranging MRP orders according to Dia/ml (lower to higher)...")
+    backup_file = None if dry_run else backup_workbook(filepath)
+    wb = load_workbook(filepath, data_only=False)
+    rearrange_mrp_orders(wb['MRP'])
+    try:
+        from alpha_checks import atomic_save
+        atomic_save(wb, filepath)
+    except Exception:
+        wb.save(filepath)
+    wb.close()
+    sort_script = os.path.join(os.path.dirname(__file__), 'sort_dashboard.py')
+    if os.path.exists(sort_script) and not dry_run:
+        run_sort_dashboard(sort_script)
+    if not dry_run:
+        confirm_keep_or_revert(filepath, backup_file, auto_keep)
 
 
 def main():
@@ -1067,25 +1386,11 @@ def main():
             return
 
         if args.sort_mrp:
-            print("[SORT] Rearranging MRP orders according to Dia/ml (lower to higher)...")
-            backup_file = None if args.dry_run else backup_workbook(target_excel)
-            wb = load_workbook(target_excel, data_only=False)
-            rearrange_mrp_orders(wb['MRP'])
-            try:
-                from alpha_checks import atomic_save
-                atomic_save(wb, target_excel)
-            except Exception:
-                wb.save(target_excel)
-            wb.close()
-            sort_script = os.path.join(os.path.dirname(__file__), 'sort_dashboard.py')
-            if os.path.exists(sort_script) and not args.dry_run:
-                run_sort_dashboard(sort_script)
-            if not args.dry_run:
-                confirm_keep_or_revert(target_excel, backup_file, args.auto_keep)
+            _run_rearrange_session(target_excel, auto_keep=args.auto_keep, dry_run=args.dry_run)
             return
 
         if args.remove_target:
-            remove_order_from_workbook(target_excel, args.remove_target, auto_keep=(args.auto_keep or args.dry_run))
+            remove_order_from_workbook(target_excel, args.remove_target, auto_keep=(args.auto_keep or args.dry_run), dry_run=args.dry_run)
             return
 
         # Load catalog
@@ -1128,7 +1433,7 @@ def main():
                         target = input("\nEnter Product ID or Name to remove (or Enter to cancel): ").strip()
                         if not target:
                             break
-                        remove_order_from_workbook(target_excel, target, auto_keep=(args.auto_keep or args.dry_run))
+                        remove_order_from_workbook(target_excel, target, auto_keep=(args.auto_keep or args.dry_run), dry_run=args.dry_run)
                         more = input("\nRemove another order? [y/N] (default: N): ").strip().upper()
                         if more != 'Y':
                             break
@@ -1139,21 +1444,7 @@ def main():
                 list_active_orders()
                 return
             elif mode == '4':
-                print("[SORT] Rearranging MRP orders according to Dia/ml (lower to higher)...")
-                backup_file = None if args.dry_run else backup_workbook(target_excel)
-                wb = load_workbook(target_excel, data_only=False)
-                rearrange_mrp_orders(wb['MRP'])
-                try:
-                    from alpha_checks import atomic_save
-                    atomic_save(wb, target_excel)
-                except Exception:
-                    wb.save(target_excel)
-                wb.close()
-                sort_script = os.path.join(os.path.dirname(__file__), 'sort_dashboard.py')
-                if os.path.exists(sort_script) and not args.dry_run:
-                    run_sort_dashboard(sort_script)
-                if not args.dry_run:
-                    confirm_keep_or_revert(target_excel, backup_file, args.auto_keep)
+                _run_rearrange_session(target_excel, auto_keep=args.auto_keep, dry_run=args.dry_run)
                 return
             elif mode == 'Q':
                 print("Cancelled.")
@@ -1183,7 +1474,8 @@ def main():
             initial_jof=jof_input,
             initial_cust=cust_input,
             initial_remarks=remarks_input,
-            auto_keep=(args.auto_keep or args.dry_run)
+            auto_keep=(args.auto_keep or args.dry_run),
+            dry_run=args.dry_run
         )
     finally:
         if temp_sandbox and os.path.exists(temp_sandbox):

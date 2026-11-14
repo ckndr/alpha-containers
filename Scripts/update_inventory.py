@@ -236,6 +236,21 @@ def check_export_coverage(xls_items, excel_ids):
     return ok, matched, coverage, message
 
 
+def _clear_red_font(ws, row):
+    """Restore standard navy font on any cells in cols A..K previously colored red."""
+    for col in range(1, 12):
+        cell = ws.cell(row=row, column=col)
+        curr_font = cell.font
+        if curr_font and curr_font.color and getattr(curr_font.color, 'rgb', None) in ('FFFF0000', 'FF0000'):
+            cell.font = Font(
+                name=curr_font.name or "Segoe UI",
+                size=curr_font.size or 9,
+                bold=curr_font.bold,
+                italic=curr_font.italic,
+                color="FF1A1A2E",
+            )
+
+
 def update_excel(excel_path, xls_items, date_range):
     wb = load_workbook(excel_path)
     ws = wb['Inventory']
@@ -282,17 +297,7 @@ def update_excel(excel_path, xls_items, date_range):
             ws.cell(row=row, column=7).value = new[2]
 
             # Present in ERP - restore standard font color if it was red
-            for col in range(1, 11):
-                cell = ws.cell(row=row, column=col)
-                curr_font = cell.font
-                if curr_font and curr_font.color and hasattr(curr_font.color, 'rgb') and curr_font.color.rgb in ('FFFF0000', 'FF0000'):
-                    cell.font = Font(
-                        name=curr_font.name,
-                        size=curr_font.size,
-                        bold=curr_font.bold,
-                        italic=curr_font.italic,
-                        color="FF1A1A2E"
-                    )
+            _clear_red_font(ws, row)
             
             # Clear the inactive note in Column K (11) if it exists
             k_cell = ws.cell(row=row, column=11)
@@ -355,18 +360,16 @@ def update_excel(excel_path, xls_items, date_range):
                     )
                 ws.cell(row=row, column=11).value = "Inactive (Not in use)"
             else:
-                # Set font color to RED for visibility of unexpected missing items
-                for col in range(1, 12):
-                    cell = ws.cell(row=row, column=col)
-                    curr_font = cell.font
-                    cell.font = Font(
-                        name=curr_font.name if curr_font else "Segoe UI",
-                        size=curr_font.size if curr_font else 9,
-                        bold=curr_font.bold if curr_font else False,
-                        italic=curr_font.italic if curr_font else False,
-                        color="FFFF0000"
-                    )
-                ws.cell(row=row, column=11).value = "Not active in ERP"
+                # Clear any legacy red font across cols 1..11, and mark inactive in Col K
+                _clear_red_font(ws, row)
+                k_cell = ws.cell(row=row, column=11)
+                k_cell.value = "Not active in ERP"
+                curr_k_font = k_cell.font
+                k_name = curr_k_font.name if (curr_k_font and curr_k_font.name and curr_k_font.name != "Calibri") else "Segoe UI"
+                k_size = curr_k_font.size if (curr_k_font and curr_k_font.size) else 9
+                k_bold = curr_k_font.bold if curr_k_font else False
+                k_italic = curr_k_font.italic if curr_k_font else False
+                k_cell.font = Font(name=k_name, size=k_size, bold=k_bold, italic=k_italic, color="FF1A1A2E")
 
     # Ensure header in K2 is set
     ws.cell(row=2, column=11).value = "Status / Remarks"
@@ -452,7 +455,7 @@ def main():
     # Highlight only critical missing items (Slugs / Resin) to the operator
     if missing_critical:
         print("")
-        print("  !! WARNING: %d critical item(s) (Slug/Resin) missing from inventory.xls (ZEROED OUT and highlighted RED):" % len(missing_critical))
+        print("  !! WARNING: %d critical item(s) (Slug/Resin) missing from inventory.xls (ZEROED OUT, marked 'Not active in ERP' in Col K):" % len(missing_critical))
         for item_id, name, cat in sorted(missing_critical, key=lambda x: x[0]):
             print("     - ID %5d [%s]: %s" % (item_id, cat, name))
         print("  !! Please take a look.")
@@ -460,7 +463,7 @@ def main():
         # Log to mismatches.log so that daily.py prints it at the end
         mismatch_entries = []
         for item_id, name, cat in sorted(missing_critical, key=lambda x: x[0]):
-            mismatch_entries.append((f"WARNING: Item ID {item_id} ({name}) [{cat}] is missing from inventory.xls - ZEROED OUT AND HIGHLIGHTED RED",))
+            mismatch_entries.append((f"WARNING: Item ID {item_id} ({name}) [{cat}] is missing from inventory.xls - ZEROED OUT (Not active in ERP)",))
         log_mismatches("inventory", mismatch_entries)
 
     non_critical_count = len(missing_items) - len(missing_critical)

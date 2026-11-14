@@ -344,5 +344,215 @@ def get_inactive_inventory_items():
     return set()
 
 
+# ── Safe Row Insertion and Deletion Engine (Rule R4-07) ─────────────────────
+
+def _shift_row_bounds(min_row, max_row, idx, amount=1, is_delete=False):
+    """
+    Calculate shifted row bounds [min_row, max_row] when inserting or deleting
+    `amount` rows at 1-based index `idx`.
+
+    Returns:
+        (new_min, new_max) tuple or None if the range is completely deleted.
+    """
+    if not is_delete:
+        # INSERT amount rows at idx
+        if max_row < idx:
+            return (min_row, max_row)
+        elif min_row >= idx:
+            return (min_row + amount, max_row + amount)
+        else:  # min_row < idx <= max_row: insertion inside range expands it
+            return (min_row, max_row + amount)
+    else:
+        # DELETE amount rows starting at idx (inclusive: idx .. idx + amount - 1)
+        del_start = idx
+        del_end = idx + amount - 1
+
+        if max_row < del_start:
+            return (min_row, max_row)
+        elif min_row > del_end:
+            return (min_row - amount, max_row - amount)
+        elif min_row >= del_start and max_row <= del_end:
+            # Entirely within deleted region
+            return None
+        elif min_row < del_start and max_row > del_end:
+            # Deleted region is strictly inside the range
+            new_min = min_row
+            new_max = max_row - amount
+            return (new_min, new_max) if new_min <= new_max else None
+        elif min_row < del_start and del_start <= max_row <= del_end:
+            # End of range falls inside deleted region
+            new_min = min_row
+            new_max = del_start - 1
+            return (new_min, new_max) if new_min <= new_max else None
+        elif del_start <= min_row <= del_end and max_row > del_end:
+            # Start of range falls inside deleted region
+            new_min = del_start
+            new_max = max_row - amount
+            return (new_min, new_max) if new_min <= new_max else None
+
+        return None
+
+
+def _shift_range_list(ranges, idx, amount=1, is_delete=False):
+    """
+    Shift an iterable of CellRange objects (or coordinate strings) by `amount` rows at `idx`.
+    Returns a list of shifted CellRange objects, omitting any that were completely deleted.
+    """
+    from openpyxl.worksheet.cell_range import CellRange
+    shifted = []
+    for r in ranges:
+        if isinstance(r, str):
+            cr = CellRange(r)
+        else:
+            cr = r
+        bounds = _shift_row_bounds(cr.min_row, cr.max_row, idx, amount, is_delete)
+        if bounds is not None:
+            new_min_r, new_max_r = bounds
+            if new_min_r <= new_max_r:
+                shifted.append(CellRange(min_col=cr.min_col, min_row=new_min_r,
+                                         max_col=cr.max_col, max_row=new_max_r))
+    return shifted
+
+
+def _apply_safe_row_shift(ws, idx, amount=1, is_delete=False):
+    """
+    Internal engine for safe_insert_rows and safe_delete_rows.
+    Preserves and shifts merged cells, row_dimensions (height, hidden, styles),
+    auto_filter, data_validations, conditional_formatting, and freeze_panes.
+    """
+    from collections import OrderedDict
+    from openpyxl.worksheet.cell_range import CellRange, MultiCellRange
+    from openpyxl.formatting.formatting import ConditionalFormatting
+    from openpyxl.utils.cell import coordinate_to_tuple, get_column_letter
+
+    if amount <= 0:
+        return
+
+    # 1. Snapshot & unmerge any ws.merged_cells.ranges with max_row >= idx BEFORE row operation
+    merged_to_shift = []
+    for cr in list(ws.merged_cells.ranges):
+        if cr.max_row >= idx:
+            merged_to_shift.append((cr.min_col, cr.min_row, cr.max_col, cr.max_row))
+            ws.unmerge_cells(range_string=cr.coord)
+
+    # 2. Call openpyxl's native row operation
+    if not is_delete:
+        ws.insert_rows(idx, amount)
+    else:
+        ws.delete_rows(idx, amount)
+
+    # 1b. Re-merge shifted valid ranges (skipping collapsed or 1x1 ranges)
+    for min_col, min_row, max_col, max_row in merged_to_shift:
+        bounds = _shift_row_bounds(min_row, max_row, idx, amount, is_delete)
+        if bounds is not None:
+            new_min_row, new_max_row = bounds
+            if new_min_row <= new_max_row:
+                # Skip 1x1 cells
+                if not (min_col == max_col and new_min_row == new_max_row):
+                    ws.merge_cells(start_row=new_min_row, start_column=min_col,
+                                   end_row=new_max_row, end_column=max_col)
+
+    # 3. Shift ws.row_dimensions keys cleanly
+    # (insert: >= idx by +amount; delete: > idx + amount - 1 by -amount; drop deleted; clear newly inserted)
+    new_row_dims = {}
+    del_start = idx
+    del_end = idx + amount - 1
+    for r, dim in list(ws.row_dimensions.items()):
+        if not is_delete:
+            if r >= idx:
+                new_r = r + amount
+                dim.index = new_r
+                new_row_dims[new_r] = dim
+            else:
+                new_row_dims[r] = dim
+        else:
+            if r < del_start:
+                new_row_dims[r] = dim
+            elif r > del_end:
+                new_r = r - amount
+                dim.index = new_r
+                new_row_dims[new_r] = dim
+            # keys inside [del_start, del_end] are omitted (deleted)
+    ws.row_dimensions.clear()
+    ws.row_dimensions.update(new_row_dims)
+
+    # 4. Shift ws.auto_filter.ref using _shift_row_bounds, preserving <filterColumn> criteria
+    if ws.auto_filter and ws.auto_filter.ref:
+        cr = CellRange(ws.auto_filter.ref)
+        bounds = _shift_row_bounds(cr.min_row, cr.max_row, idx, amount, is_delete)
+        if bounds is not None:
+            new_min_r, new_max_r = bounds
+            new_cr = CellRange(min_col=cr.min_col, min_row=new_min_r,
+                               max_col=cr.max_col, max_row=new_max_r)
+            ws.auto_filter.ref = new_cr.coord
+        else:
+            ws.auto_filter.ref = None
+
+    # 5. Shift ws.data_validations.dataValidation sqref ranges (drop DV if all ranges deleted)
+    if hasattr(ws, 'data_validations') and ws.data_validations and hasattr(ws.data_validations, 'dataValidation'):
+        to_remove = []
+        for dv in list(ws.data_validations.dataValidation):
+            if dv.sqref:
+                new_ranges = _shift_range_list(dv.sqref.ranges, idx, amount, is_delete)
+                if new_ranges:
+                    dv.sqref = MultiCellRange(new_ranges)
+                else:
+                    to_remove.append(dv)
+        for dv in to_remove:
+            ws.data_validations.dataValidation.remove(dv)
+
+    # 6. Shift ws.conditional_formatting._cf_rules safely by rebuilding OrderedDict
+    # (NEVER mutate cf.sqref in-place while it's a dict key in _cf_rules!)
+    if hasattr(ws, 'conditional_formatting') and ws.conditional_formatting and hasattr(ws.conditional_formatting, '_cf_rules'):
+        new_cf_rules = OrderedDict()
+        for cf, rules in ws.conditional_formatting._cf_rules.items():
+            if cf.sqref:
+                new_ranges = _shift_range_list(cf.sqref.ranges, idx, amount, is_delete)
+                if new_ranges:
+                    new_cf = ConditionalFormatting(
+                        sqref=MultiCellRange(new_ranges),
+                        pivot=getattr(cf, 'pivot', None),
+                        extLst=getattr(cf, 'extLst', None)
+                    )
+                    new_cf_rules[new_cf] = rules
+            else:
+                new_cf_rules[cf] = rules
+        ws.conditional_formatting._cf_rules = new_cf_rules
+
+    # 7. Shift ws.freeze_panes if set and row is at/below idx
+    if ws.freeze_panes and isinstance(ws.freeze_panes, str):
+        row, col = coordinate_to_tuple(ws.freeze_panes)
+        if not is_delete:
+            if row >= idx:
+                new_row = row + amount
+                ws.freeze_panes = f"{get_column_letter(col)}{new_row}"
+        else:
+            if row > del_end:
+                new_row = row - amount
+                ws.freeze_panes = f"{get_column_letter(col)}{new_row}"
+            elif del_start <= row <= del_end:
+                new_row = max(1, idx)
+                ws.freeze_panes = f"{get_column_letter(col)}{new_row}"
+
+
+def safe_insert_rows(ws, idx, amount=1):
+    """
+    Safely insert `amount` rows at 1-based index `idx` in worksheet `ws`.
+    Maintains merged cells, row_dimensions (heights, hidden), auto_filter,
+    data_validations, conditional_formatting, and freeze_panes without corruption.
+    """
+    _apply_safe_row_shift(ws, idx, amount=amount, is_delete=False)
+
+
+def safe_delete_rows(ws, idx, amount=1):
+    """
+    Safely delete `amount` rows starting at 1-based index `idx` in worksheet `ws`.
+    Maintains merged cells, row_dimensions (heights, hidden), auto_filter,
+    data_validations, conditional_formatting, and freeze_panes without corruption.
+    """
+    _apply_safe_row_shift(ws, idx, amount=amount, is_delete=True)
+
+
+
 
 

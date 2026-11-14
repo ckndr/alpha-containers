@@ -37,7 +37,7 @@ from alpha_checks import get_active_tubex_file, check_not_locked
 
 
 def main():
-    EXCEL_PATH = get_active_tubex_file(DIR)
+    EXCEL_PATH = os.environ.get("TUBEX_FILE") or get_active_tubex_file(DIR)
     if not EXCEL_PATH:
         raise FileNotFoundError(f"No Tubex*.xlsx found in {DIR}")
 
