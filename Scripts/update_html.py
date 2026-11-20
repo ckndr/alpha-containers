@@ -309,8 +309,8 @@ def main():
             except (TypeError, ValueError):
                 ordered_int = 0
 
-            # Fallback to MRP sheet for TUBE orders if it evaluates to 0 or is None/formula
-            if not is_pet and ordered_int == 0:
+            # Fallback to MRP sheet if Dashboard formula hasn't evaluated or evaluates to 0
+            if ordered_int == 0:
                 ordered_int = mrp_orders_map.get(pid_int, 0)
 
             try:
@@ -940,7 +940,7 @@ def main():
     tube_mats_start = sec_rows['TUBE_MATERIALS'] if sec_rows['TUBE_MATERIALS'] is not None else 8
     pet_orders_start = sec_rows['PET_ORDERS'] if sec_rows['PET_ORDERS'] is not None else 94
     pet_mats_start = sec_rows['PET_MATERIALS'] if sec_rows['PET_MATERIALS'] is not None else 103
-    ink_start = sec_rows['INK'] if sec_rows['INK'] is not None else 113
+    ink_start = sec_rows['INK'] if sec_rows['INK'] is not None else (ws_mrp.max_row + 1)
 
     def read_orders_from_range(start_row, end_row):
         orders = []

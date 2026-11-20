@@ -830,6 +830,7 @@ def step_pipeline(wip_msg=None):
         ("update_inventory.py",   "Inventory"),
         ("update_dispatch.py",    "Dispatch"),
         ("sort_dashboard.py",     "Sort Dashboard"),
+        ("update_plans.py",       "PET & Tubes Plan Tracker"),
         ("build_archives.py",     "Build Archives"),
         ("update_html.py",        "HTML Dashboard"),
     ]
