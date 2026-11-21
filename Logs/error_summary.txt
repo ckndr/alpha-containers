@@ -9,6 +9,6 @@
 
   [PENDING ORDERS: FLOOR ADVISORY (NON-BLOCKING)]
     (Shop-floor pending differences e.g. unrecorded prior batches, scheduling delays - does not halt push)
-    • Summary sheet dispatch difference for PET Dispatch (MTD): Imran=19,183 vs Dashboard=38,366 (diff=+19,183) — Dashboard reflects authoritative ERP export; Imran sheet may have timing lag or unrecorded dispatch
+    • Summary sheet dispatch difference for PET Dispatch (MTD): Imran=104,153 vs Dashboard=123,336 (diff=+19,183) — Dashboard reflects authoritative ERP export; Imran sheet may have timing lag or unrecorded dispatch
     • Pending Order SKU difference for 'HELLO HAIR': Bal diff=+22,424 (11.8% > 10% margin; Req diff=+476,528, Prod diff=+454,104)
 
