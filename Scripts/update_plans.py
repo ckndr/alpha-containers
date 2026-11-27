@@ -75,25 +75,25 @@ PET_SKU_META = {
     8020: ('150 ml', 'Alpha Labs PVT LTD', 'Alpha 150ml Capsule'),
 }
 
-# Order Progress display sequence (matches Boss's revised production sequence)
+# Order Progress display sequence (matches revised minimum-changeover sequence)
 ORDER_PROGRESS_ROWS = [
-    (8001, '150 ml', 'Alpha Labs PVT LTD', 'Alpha 150ml TRP', date(2027, 2, 2)),
-    (8008, '200 ml', 'Samsol', 'Samsol Black 200ml', date(2026, 11, 25)),
-    (8007, '200 ml', 'Samsol', 'Samsol White 200ml', date(2026, 11, 27)),
-    (8011, '120 ml', 'Samsol', 'Samsol Black 120ml', date(2026, 12, 1)),
-    (8005, '120 ml', 'Samsol', 'Samsol Yellow 120ml', date(2026, 12, 5)),
-    (8015, '130 ml', 'Mablay Beauty PVT LTD.', 'Mablay 130ml White', date(2026, 12, 8)),
-    (8006, '200 ml', 'Samsol', 'Samsol Yellow 200ml', date(2026, 12, 14)),
-    (8020, '150 ml', 'Alpha Labs PVT LTD', 'Alpha 150ml Capsule', date(2026, 12, 18)),
+    (8001, '150 ml', 'Alpha Labs PVT LTD',     'Alpha 150ml TRP',     date(2027, 2, 1)),
+    (8008, '200 ml', 'Samsol',                 'Samsol Black 200ml',  date(2026, 11, 25)),
+    (8011, '120 ml', 'Samsol',                 'Samsol Black 120ml',  date(2026, 11, 28)),
+    (8005, '120 ml', 'Samsol',                 'Samsol Yellow 120ml', date(2026, 12, 2)),
+    (8020, '150 ml', 'Alpha Labs PVT LTD',     'Alpha 150ml Capsule', date(2026, 12, 7)),
+    (8015, '130 ml', 'Mablay Beauty PVT LTD.', 'Mablay 130ml White',  date(2026, 12, 9)),
+    (8007, '200 ml', 'Samsol',                 'Samsol White 200ml',  date(2026, 12, 12)),
+    (8006, '200 ml', 'Samsol',                 'Samsol Yellow 200ml', date(2026, 12, 17)),
 ]
 
 WEEKLY_ROWS_META = [
     (date(2026, 11, 1), 'Week 3', '18 Nov – 21 Nov', 'Alpha 150ml TRP', 'Alpha 150ml TRP'),
-    (date(2026, 11, 1), 'Week 4', '22 Nov – 28 Nov', 'Samsol Compact Black 200ml, Samsol White 200ml', 'Samsol Blk 200ml, Samsol Wht 200ml'),
-    (date(2026, 11, 1), 'Week 5', '29 Nov – 30 Nov', 'Samsol Compact Black 120ml', 'Samsol Blk 120ml'),
-    (date(2026, 12, 1), 'Week 1', '01 Dec – 07 Dec', 'Samsol Compact Black 120ml, Samsol Yellow 120ml', 'Samsol Blk 120ml, Samsol Ylw 120ml'),
-    (date(2026, 12, 1), 'Week 2', '08 Dec – 14 Dec', 'Mablay 130ml White, Samsol Yellow 200ml', 'Mablay Wht 130ml, Samsol Ylw 200ml'),
-    (date(2026, 12, 1), 'Week 3', '15 Dec – 21 Dec', 'Samsol Yellow 200ml, Alpha 150ml Capsule, Alpha 150ml TRP', 'Samsol Ylw 200ml, Alpha Cap, Alpha TRP'),
+    (date(2026, 11, 1), 'Week 4', '22 Nov – 28 Nov', 'Samsol Compact Black 200ml, Samsol Compact Black 120ml', 'Samsol Blk 200ml, Samsol Blk 120ml'),
+    (date(2026, 11, 1), 'Week 5', '29 Nov – 30 Nov', 'Samsol Yellow 120ml', 'Samsol Ylw 120ml'),
+    (date(2026, 12, 1), 'Week 1', '01 Dec – 07 Dec', 'Samsol Yellow 120ml, Alpha 150ml Capsule', 'Samsol Ylw 120ml, Alpha Cap'),
+    (date(2026, 12, 1), 'Week 2', '08 Dec – 14 Dec', 'Mablay 130ml White, Samsol White 200ml, Samsol Yellow 200ml', 'Mablay Wht, Samsol Wht 200ml, Samsol Ylw 200ml'),
+    (date(2026, 12, 1), 'Week 3', '15 Dec – 21 Dec', 'Samsol Yellow 200ml, Alpha 150ml TRP', 'Samsol Ylw 200ml, Alpha TRP'),
     (date(2026, 12, 1), 'Week 4', '22 Dec – 28 Dec', 'Alpha 150ml TRP', 'Alpha 150ml TRP'),
     (date(2026, 12, 1), 'Week 5', '29 Dec – 31 Dec', 'Alpha 150ml TRP', 'Alpha 150ml TRP'),
     (date(2027, 1, 1),  'Week 1', '01 Jan – 07 Jan', 'Alpha 150ml TRP', 'Alpha 150ml TRP'),
@@ -101,23 +101,24 @@ WEEKLY_ROWS_META = [
     (date(2027, 1, 1),  'Week 3', '15 Jan – 21 Jan', 'Alpha 150ml TRP', 'Alpha 150ml TRP'),
     (date(2027, 1, 1),  'Week 4', '22 Jan – 28 Jan', 'Alpha 150ml TRP', 'Alpha 150ml TRP'),
     (date(2027, 1, 1),  'Week 5', '29 Jan – 31 Jan', 'Alpha 150ml TRP', 'Alpha 150ml TRP'),
-    (date(2027, 2, 1),  'Week 1', '01 Feb – 02 Feb', 'Alpha 150ml TRP', 'Alpha 150ml TRP'),
+    (date(2027, 2, 1),  'Week 1', '01 Feb',          'Alpha 150ml TRP', 'Alpha 150ml TRP'),
 ]
 
 # Scheduled 9-batch sequence for Material Readiness & Cumulative Depletion
 SCHEDULED_BATCHES = [
-    (1, 'Nov 18–21',    'Alpha Labs PVT LTD',     8001, 'Alpha 150ml TRP (T1)',       'T1'),
-    (2, 'Nov 23–25',    'Samsol',                 8008, 'Samsol Compact Black 200ml', 'FULL'),
-    (3, 'Nov 26–27',    'Samsol',                 8007, 'Samsol White 200ml',         'FULL'),
-    (4, 'Nov 30–Dec 1', 'Samsol',                 8011, 'Samsol Compact Black 120ml', 'FULL'),
-    (5, 'Dec 2–5',      'Samsol',                 8005, 'Samsol Yellow 120ml',        'FULL'),
-    (6, 'Dec 8',        'Mablay Beauty PVT LTD.', 8015, 'Mablay 130ml White',         'FULL'),
-    (7, 'Dec 10–14',    'Samsol',                 8006, 'Samsol Yellow 200ml',        'FULL'),
-    (8, 'Dec 16–18',    'Alpha Labs PVT LTD',     8020, 'Alpha 150ml Capsule',        'FULL'),
-    (9, 'Dec 21–Feb 2', 'Alpha Labs PVT LTD',     8001, 'Alpha 150ml TRP (T2)',       'T2'),
+    (1, 'Nov 18–21',    'Alpha Labs PVT LTD',     8001, 'Alpha 150ml TRP (T1)',       'T1',   40000),
+    (2, 'Nov 23–25',    'Samsol',                 8008, 'Samsol Compact Black 200ml', 'FULL', None),
+    (3, 'Nov 27–28',    'Samsol',                 8011, 'Samsol Compact Black 120ml', 'FULL', None),
+    (4, 'Nov 30–Dec 2', 'Samsol',                 8005, 'Samsol Yellow 120ml',        'FULL', None),
+    (5, 'Dec 4–7',      'Alpha Labs PVT LTD',     8020, 'Alpha 150ml Capsule',        'FULL', None),
+    (6, 'Dec 9',        'Mablay Beauty PVT LTD.', 8015, 'Mablay 130ml White',         'FULL', None),
+    (7, 'Dec 11–12',    'Samsol',                 8007, 'Samsol White 200ml',         'FULL', None),
+    (8, 'Dec 14–17',    'Samsol',                 8006, 'Samsol Yellow 200ml',        'FULL', None),
+    (9, 'Dec 19–Feb 1', 'Alpha Labs PVT LTD',     8001, 'Alpha 150ml TRP (T2)',       'T2',   None),
 ]
 
-POST_TRANCHE1_ORDER = [8008, 8007, 8011, 8005, 8015, 8006, 8020]
+# Post-8001-T1 ordered batches (run full remaining order per SKU, then 8001 T2)
+POST_TRANCHE1_ORDER = [8008, 8011, 8005, 8020, 8015, 8007, 8006]
 
 
 def _to_date(val):
@@ -341,8 +342,12 @@ def compute_material_readiness(wb, ws_pp, total_row, pl_info, pet_req, rem_by_pi
         t1_planned = 40000
 
     t1_produced = pl_info['post_plan_by_pid'].get(8001, 0)
-    t1_rem = max(0, t1_planned - t1_produced)
-    t2_rem = max(0, rem_by_pid.get(8001, 0) - t1_rem)
+    t1_rem_by_pid = {}
+    for _seq, _dates, _cl, pid, _lbl, kind, t1_cap in SCHEDULED_BATCHES:
+        if kind == 'T1':
+            cap = t1_planned if (pid == 8001 and t1_planned > 0) else (t1_cap or 0)
+            produced = t1_produced if pid == 8001 else pl_info['post_plan_by_pid'].get(pid, 0)
+            t1_rem_by_pid[pid] = max(0, min(rem_by_pid.get(pid, 0), cap - produced))
 
     init_stock = {
         2680: inv.get(2680, 0.0),  # PET Resin A-84
@@ -363,11 +368,11 @@ def compute_material_readiness(wb, ws_pp, total_row, pl_info, pet_req, rem_by_pi
     }
 
     rows_out = []
-    for seq, run_dates, client_lbl, pid, label, kind in SCHEDULED_BATCHES:
+    for seq, run_dates, client_lbl, pid, label, kind, _t1_cap in SCHEDULED_BATCHES:
         if kind == 'T1':
-            rem_qty = t1_rem
+            rem_qty = t1_rem_by_pid.get(pid, 0)
         elif kind == 'T2':
-            rem_qty = t2_rem
+            rem_qty = max(0, rem_by_pid.get(pid, 0) - t1_rem_by_pid.get(pid, 0))
         else:
             rem_qty = rem_by_pid.get(pid, 0)
 
@@ -495,18 +500,16 @@ def compute_material_readiness(wb, ws_pp, total_row, pl_info, pet_req, rem_by_pi
     return rows_out, summary
 
 
-def simulate_pet_forecast(ws_pp, total_row, rem_by_pid, by_date, last_date_by_pid, max_prod_date):
+def simulate_pet_forecast(ws_pp, total_row, rem_by_pid, by_date, last_date_by_pid, max_prod_date, post_plan_by_pid=None):
     """
-    Simulates forward from sim_start following the revised sequence:
-      8001 (Tranche 1 through Nov 21) -> Sun Nov 22 CO -> 8008 -> 8007 ->
-      Nov 28 CO -> 8011 -> 8005 -> Dec 7 CO -> 8015 -> Dec 9 CO -> 8006 ->
-      Dec 15 CO -> 8020 -> Dec 19 CO -> remaining 8001.
+    Simulates forward from sim_start following the minimum-changeover sequence:
+      8001 (T1) -> 8008 -> 8011 -> 8005 -> 8020 -> 8015 -> 8007 -> 8006 -> 8001 (T2),
+      with 1-day changeover between distinct mould groups and skipping Sundays & Pakistan holidays.
     """
     sim_start = max((max_prod_date + timedelta(days=1)) if max_prod_date else PLAN_START_DATE, PLAN_START_DATE)
 
     plan_holidays = set(PAKISTAN_HOLIDAYS)
     plan_co_dates = set()
-    daily_cap_by_date = {}
     first_co_date = None
     planned_8001_before_co = 0
 
@@ -524,9 +527,15 @@ def simulate_pet_forecast(ws_pp, total_row, rem_by_pid, by_date, last_date_by_pi
             if first_co_date is None:
                 first_co_date = dt
         elif cust != 'WEEKLY OFF' and pqty > 0:
-            daily_cap_by_date[(dt, pid_val)] = pqty
             if pid_val == 8001 and (first_co_date is None or dt < first_co_date):
                 planned_8001_before_co += pqty
+
+    if post_plan_by_pid is None:
+        post_plan_by_pid = {}
+        for dt, info in by_date.items():
+            if dt >= PLAN_START_DATE:
+                for p in info['pids']:
+                    post_plan_by_pid[p] = post_plan_by_pid.get(p, 0) + info['good']
 
     prod_8001_in_plan = sum(
         info['good'] for dt, info in by_date.items()
@@ -539,18 +548,31 @@ def simulate_pet_forecast(ws_pp, total_row, rem_by_pid, by_date, last_date_by_pi
         if rqty <= 0:
             forecast_finish[pid] = last_date_by_pid.get(pid, max_prod_date or PLAN_START_DATE)
 
+    allocated_rem = {pid: 0 for pid in PET_SKU_META}
+    queue = []
+
     tranche1_target = max(0, planned_8001_before_co - prod_8001_in_plan)
     tranche1_qty = min(rem.get(8001, 0), tranche1_target) if (not first_co_date or sim_start <= first_co_date) else 0
-    tranche2_qty = max(0, rem.get(8001, 0) - tranche1_qty)
-
-    queue = []
     if tranche1_qty > 0:
         queue.append([8001, tranche1_qty])
+        allocated_rem[8001] += tranche1_qty
+
     for pid in POST_TRANCHE1_ORDER:
-        if rem.get(pid, 0) > 0:
-            queue.append([pid, rem[pid]])
-    if tranche2_qty > 0:
-        queue.append([8001, tranche2_qty])
+        avail = max(0, rem.get(pid, 0) - allocated_rem.get(pid, 0))
+        if avail > 0:
+            queue.append([pid, avail])
+            allocated_rem[pid] = allocated_rem.get(pid, 0) + avail
+
+    left_8001 = max(0, rem.get(8001, 0) - allocated_rem.get(8001, 0))
+    if left_8001 > 0:
+        queue.append([8001, left_8001])
+        allocated_rem[8001] += left_8001
+
+    for pid, rqty in rem.items():
+        left = max(0, rqty - allocated_rem.get(pid, 0))
+        if left > 0:
+            queue.append([pid, left])
+            allocated_rem[pid] = allocated_rem.get(pid, 0) + left
 
     prev_group = None
     if max_prod_date and max_prod_date in by_date and by_date[max_prod_date]['pids']:
@@ -562,6 +584,7 @@ def simulate_pet_forecast(ws_pp, total_row, rem_by_pid, by_date, last_date_by_pi
     cur_dt = sim_start
     q_idx = 0
     need_co = False
+    co_satisfied = False
     if queue and prev_group and PET_MOULD_GROUP.get(queue[0][0]) != prev_group:
         need_co = True
 
@@ -578,19 +601,21 @@ def simulate_pet_forecast(ws_pp, total_row, rem_by_pid, by_date, last_date_by_pi
 
         if need_co:
             need_co = False
+            co_satisfied = True
             cur_dt += timedelta(days=1)
             continue
 
         cur_pid, cur_rem = queue[q_idx]
         cur_group = PET_MOULD_GROUP.get(cur_pid)
-        if cur_dt in plan_co_dates and prev_group != cur_group:
+        if cur_dt in plan_co_dates and prev_group != cur_group and not co_satisfied:
+            co_satisfied = True
             cur_dt += timedelta(days=1)
             continue
 
-        cap = daily_cap_by_date.get((cur_dt, cur_pid), DAILY_PET_CAPACITY)
-        run_qty = min(cap, cur_rem)
+        run_qty = min(DAILY_PET_CAPACITY, cur_rem)
         queue[q_idx][1] -= run_qty
         prev_group = cur_group
+        co_satisfied = False
 
         if queue[q_idx][1] <= 0:
             forecast_finish[cur_pid] = cur_dt
@@ -776,7 +801,10 @@ def update_pet_plan_sheet(wb, replan=False):
             elif dt and cust == 'CHANGEOVER':
                 plan_co_dates.add(dt)
 
-        _, queue = simulate_pet_forecast(ws_pp, total_row, rem_by_pid, by_date, last_date_by_pid, max_prod_date)
+        _, queue = simulate_pet_forecast(
+            ws_pp, total_row, rem_by_pid, by_date, last_date_by_pid, max_prod_date,
+            post_plan_by_pid=pl_info['post_plan_by_pid'],
+        )
         q_idx = 0
         need_co = False
 
@@ -883,10 +911,13 @@ def update_pet_plan_sheet(wb, replan=False):
             ws_pp.cell(r, 11, 'Off/Changeover' if is_non_prod else 'Scheduled')
 
     # Forecast Finish simulation
-    forecast_finish, _ = simulate_pet_forecast(ws_pp, total_row, rem_by_pid, by_date, last_date_by_pid, max_prod_date)
+    forecast_finish, _ = simulate_pet_forecast(
+        ws_pp, total_row, rem_by_pid, by_date, last_date_by_pid, max_prod_date,
+        post_plan_by_pid=pl_info['post_plan_by_pid'],
+    )
 
     # Clear & rebuild Right Side cleanly (M..X) so 4-row Reconciliation + shifted tables + Readiness never collide
-    _clear_right_side_area(ws_pp, 13, 24, min(60, ws_pp.max_row))
+    _clear_right_side_area(ws_pp, 13, 24, max(65, ws_pp.max_row))
 
     thin = Side(style='thin', color='BFBFBF')
     med = Side(style='medium', color='808080')
@@ -1050,14 +1081,18 @@ def update_pet_plan_sheet(wb, replan=False):
                 cell.number_format = '#,##0'
                 cell.alignment = a_r
 
-    ws_pp.merge_cells('T36:U36')
-    ws_pp.cell(36, 15, 'TOTAL')
-    ws_pp.cell(36, 16, '=SUM(P22:P35)')
-    ws_pp.cell(36, 17, '=SUM(Q22:Q35)')
-    ws_pp.cell(36, 18, '=SUM(R22:R35)')
-    ws_pp.cell(36, 19, '=IF(COUNT(S22:S35)=0,"",SUM(S22:S35))')
+    wk_start_row = 22
+    wk_end_row = wk_start_row + len(WEEKLY_ROWS_META) - 1
+    wk_tot_row = wk_end_row + 1
+
+    ws_pp.merge_cells(f'T{wk_tot_row}:U{wk_tot_row}')
+    ws_pp.cell(wk_tot_row, 15, 'TOTAL')
+    ws_pp.cell(wk_tot_row, 16, f'=SUM(P{wk_start_row}:P{wk_end_row})')
+    ws_pp.cell(wk_tot_row, 17, f'=SUM(Q{wk_start_row}:Q{wk_end_row})')
+    ws_pp.cell(wk_tot_row, 18, f'=SUM(R{wk_start_row}:R{wk_end_row})')
+    ws_pp.cell(wk_tot_row, 19, f'=IF(COUNT(S{wk_start_row}:S{wk_end_row})=0,"",SUM(S{wk_start_row}:S{wk_end_row}))')
     for c in range(13, 22):
-        cell = ws_pp.cell(36, c)
+        cell = ws_pp.cell(wk_tot_row, c)
         cell.font = f_bold
         cell.fill = fill_co
         cell.border = b_tot
@@ -1067,9 +1102,9 @@ def update_pet_plan_sheet(wb, replan=False):
         else:
             cell.alignment = a_r if c == 15 else a_c
 
-    # 4. Live Material Status (Unified 9-col grid: M38:U49, Col T:U merged for Packing)
+    # 4. Live Material Status (Unified 9-col grid, Col T:U merged for Packing)
     readiness_rows, mat_summary = compute_material_readiness(wb, ws_pp, total_row, pl_info, pet_req, rem_by_pid)
-    _write_material_readiness_block(ws_pp, 38, 13, readiness_rows, mat_summary)
+    _write_material_readiness_block(ws_pp, wk_tot_row + 2, 13, readiness_rows, mat_summary)
 
     # Remove any leftover columns beyond Col U (21) and rows beyond TOTAL row (80)
     if ws_pp.max_column > 21:
@@ -1492,13 +1527,15 @@ def export_standalone_plan(wb, month_name, pet_stats):
                 cell.alignment = align_r
         ws_weekly.row_dimensions[dst_r].height = 17.5
 
-    ws_weekly.cell(17, 1, 'TOTAL')
-    ws_weekly.cell(17, 4, '=SUM(D3:D16)')
-    ws_weekly.cell(17, 6, '=SUM(F3:F16)')
-    ws_weekly.cell(17, 7, '=SUM(G3:G16)')
-    ws_weekly.cell(17, 8, '=IF(COUNT(H3:H16)=0,"",SUM(H3:H16))')
+    wk_tot_r = 3 + len(WEEKLY_ROWS_META)
+    wk_last_r = wk_tot_r - 1
+    ws_weekly.cell(wk_tot_r, 1, 'TOTAL')
+    ws_weekly.cell(wk_tot_r, 4, f'=SUM(D3:D{wk_last_r})')
+    ws_weekly.cell(wk_tot_r, 6, f'=SUM(F3:F{wk_last_r})')
+    ws_weekly.cell(wk_tot_r, 7, f'=SUM(G3:G{wk_last_r})')
+    ws_weekly.cell(wk_tot_r, 8, f'=IF(COUNT(H3:H{wk_last_r})=0,"",SUM(H3:H{wk_last_r}))')
     for c in range(1, 9):
-        cell = ws_weekly.cell(17, c)
+        cell = ws_weekly.cell(wk_tot_r, c)
         cell.font = font_bold
         cell.fill = fill_total
         cell.border = border_total
@@ -1507,7 +1544,7 @@ def export_standalone_plan(wb, month_name, pet_stats):
             cell.alignment = align_r
         else:
             cell.alignment = align_c
-    ws_weekly.row_dimensions[17].height = 17.5
+    ws_weekly.row_dimensions[wk_tot_r].height = 17.5
 
     for c, w in {1: 10.0, 2: 10.0, 3: 18.5, 4: 14.5, 5: 60.0, 6: 14.5, 7: 14.5, 8: 14.5}.items():
         ws_weekly.column_dimensions[get_column_letter(c)].width = w

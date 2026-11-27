@@ -51,6 +51,12 @@
       "dia": "30",
       "catalog_name": "HELLO HAIR COLOR",
       "pid": 6206
+    },
+    {
+      "raw_name": "black bottle",
+      "dia": "120 ml",
+      "catalog_name": "BLACK BOTTLE",
+      "pid": 8011
     }
   ],
   "fg_aliases": [
@@ -123,6 +129,13 @@
       "customer": "golden pearl",
       "catalog_name": "HELLO HAIR COLOR",
       "pid": 6206
+    },
+    {
+      "raw_name": "black bottle",
+      "dia": "120ml",
+      "customer": "samsol",
+      "catalog_name": "BLACK BOTTLE",
+      "pid": 8011
     }
   ]
 }
